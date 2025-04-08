@@ -1,0 +1,6 @@
+/* Кастомные стили */
+pre {
+    font-family: 'Inter', sans-serif;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }

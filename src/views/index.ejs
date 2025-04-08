@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор контента</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Стили для темной темы */
+    body.dark {
+      background-color: #1f2937;
+      color: #ffffff;
+    }
+    body.dark .bg-white {
+      background-color: #374151;
+    }
+    body.dark .text-purple-600 {
+      color: #c084fc;
+    }
+    body.dark .bg-gray-50 {
+      background-color: #1f2937;
+    }
+    body.dark .text-red-700 {
+      color: #fca5a5;
+    }
+    body.dark .bg-red-50 {
+      background-color: #451a1a;
+    }
+
+    /* Стили для текстового поля в темной теме */
+    body.dark textarea {
+      background-color: #374151; /* Цвет фона */
+      color: #ffffff; /* Цвет текста */
+      border-color: #4b5563; /* Цвет границы */
+    }
+    body.dark textarea:focus {
+      border-color: #c084fc; /* Цвет границы при фокусе */
+      outline-color: #c084fc; /* Цвет подсветки при фокусе */
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-['Inter']">
+  <!-- Кнопка переключения темы -->
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6">
+      <button 
+        onclick="toggleTheme()"
+        class="mb-4 text-purple-600 hover:text-purple-700"
+      >
+        Темная тема
+      </button>
+
+      <h1 class="text-3xl font-bold text-purple-600 mb-6">AI Content Generator</h1>
+      
+      <form action="/generate" method="POST">
+        <div class="mb-4">
+          <textarea 
+            name="prompt"
+            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            rows="5"
+            placeholder="Пример: Напиши продающий текст для интернет-магазина электроники..."
+          ></textarea>
+        </div>
+        
+        <button 
+          type="submit"
+          class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors w-full"
+        >
+          Сгенерировать
+        </button>
+      </form>
+
+      <% if (result) { %>
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-xl font-semibold">Результат:</h2>
+            <button 
+              onclick="navigator.clipboard.writeText('<%= result %>')"
+              class="text-purple-600 hover:text-purple-700"
+            >
+              Копировать
+            </button>
+          </div>
+          <pre class="whitespace-pre-wrap"><%= result %></pre>
+        </div>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="mt-6 p-4 bg-red-50 text-red-700 rounded-lg">
+          <%= error %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    // Функция для переключения темы
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    // Применение сохраненной темы при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+      }
+    });
+  </script>
+</body>
+</html>
