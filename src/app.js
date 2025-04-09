@@ -20,22 +20,17 @@ app.get('/', (req, res) => {
 });
 
 app.post('/generate', async (req, res) => {
-  try {
-    const response = await axios.post(`${API_URL}/generate`, {
-      prompt: req.body.prompt
-    });
-    
-    res.render('index', {
-      result: response.data.content,
-      error: null
-    });
-  } catch (error) {
-    res.render('index', {
-      result: null,
-      error: error.response?.data?.error || 'Ошибка генерации'
-    });
-  }
-});
+    try {
+      const response = await axios.post(`${API_URL}/generate`, {
+        prompt: req.body.prompt
+      });
+      res.json({ content: response.data.content });
+    } catch (error) {
+      console.error("Error calling Go backend:", error.response?.data || error.message);
+      const errorMessage = error.response?.data?.error || 'Ошибка на сервере при обработке запроса';
+      res.status(error.response?.status || 500).json({ error: errorMessage });
+    }
+  });
 
 // Запуск сервера
 const PORT = process.env.PORT || 3000;
