@@ -46,6 +46,15 @@
       <div class="template-card p-4 rounded-lg cursor-pointer bg-yellow-50 hover:bg-yellow-100 dark:bg-gray-700 dark:hover:bg-gray-600" data-template="product">
         🛍️ Товар
       </div>
+      <div class="template-card p-4 rounded-lg cursor-pointer bg-yellow-50 hover:bg-yellow-100 dark:bg-gray-700 dark:hover:bg-gray-600" data-template="email">
+        📧 Email-рассылка
+      </div>
+      <div class="template-card p-4 rounded-lg cursor-pointer bg-yellow-50 hover:bg-yellow-100 dark:bg-gray-700 dark:hover:bg-gray-600" data-template="meta">
+        🔍 Meta-описание
+      </div>
+      <div class="template-card p-4 rounded-lg cursor-pointer bg-yellow-50 hover:bg-yellow-100 dark:bg-gray-700 dark:hover:bg-gray-600" data-template="video">
+        🎥 Сценарий видео
+      </div>
     </div>
 
     <!-- Ввод запроса -->
@@ -71,6 +80,17 @@
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
         <h2 class="text-xl font-semibold mb-4">Результат:</h2>
         <div id="output" class="prose prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-200"></div>
+        <div class="flex gap-3 mt-4">
+          <button onclick="copyResult()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+            📋 Копировать
+          </button>
+          <button onclick="exportResult('pdf')" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+            📄 PDF
+          </button>
+          <button onclick="exportResult('txt')" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+            📝 TXT
+          </button>
+        </div>
         <div id="output-stats" class="text-sm text-gray-500 dark:text-gray-400 mt-4"></div>
       </div>
     </div>

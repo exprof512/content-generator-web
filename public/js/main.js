@@ -45,7 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const templatePrompts = {
     blog: "Напиши SEO-оптимизированный пост для блога на тему: ",
     social: "Создай короткий пост для социальных сетей о: ",
-    product: "Напиши продающее описание для товара: "
+    product: "Напиши продающее описание для товара: ",
+    email: "Напиши цепляющее письмо для email-рассылки на тему: ",
+    meta: "Создай SEO-оптимизированное meta-описание для страницы: ",
+    video: "Напиши сценарий для 3-минутного видео о: "
   };
 
   function setupTemplateListeners() {
@@ -56,6 +59,43 @@ document.addEventListener('DOMContentLoaded', () => {
         promptTextarea.focus();
       });
     });
+  }
+
+  window.copyResult = () => {
+    const text = outputDiv.innerText;
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('Текст скопирован!'))
+      .catch(() => showError('Не удалось скопировать'));
+  };
+  
+  // Экспорт
+  window.exportResult = async (type) => {
+    const text = outputDiv.innerText;
+    
+    if(type === 'txt') {
+      const blob = new Blob([text], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `content-${Date.now()}.txt`;
+      a.click();
+    }
+    else if(type === 'pdf') {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text(text, 10, 10, {maxWidth: 180});
+      doc.save(`content-${Date.now()}.pdf`);
+    }
+  };
+  
+  // Уведомления
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 p-4 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 rounded-lg animate__animated animate__fadeInUp';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
   }
 
   // --- Генерация
