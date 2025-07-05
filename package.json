@@ -1,21 +1,16 @@
 {
-  "name": "ai-content-generator",
-  "version": "1.0.0",
-  "main": "app.js",
+  "name": "content-generator-web",
+  "version": "2.0.0",
+  "description": "Frontend for the AI Content Generator Hub",
+  "main": "server.js",
   "scripts": {
-    "build:css": "tailwindcss -i ./input.css -o ./public/css/styles.css --watch",
-    "start": "node app.js"
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "axios": "^1.6.0",
-    "dotenv": "^16.4.7",
-    "ejs": "^3.1.9",
-    "express": "^4.18.2",
-    "jspdf": "^3.0.1"
+    "ejs": "^3.1.10",
+    "express": "^4.19.2"
   },
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^3.4.17"
-  }
+  "author": "Gemini Code Assist",
+  "license": "ISC"
 }

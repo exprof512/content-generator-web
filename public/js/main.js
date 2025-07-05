@@ -1,216 +1,200 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Глобальные переменные
-  let history = JSON.parse(localStorage.getItem('contentHistory')) || [];
-  let darkMode = localStorage.getItem('darkMode') === 'true';
+    const API_BASE_URL = 'http://localhost:8080';
+    let currentModel = '';
 
-  const el = id => document.getElementById(id);
+    // --- DOM Elements ---
+    const generatorSection = document.getElementById('generator-section');
+    const heroSection = document.getElementById('hero-section');
+    const loginButton = document.getElementById('login-button');
+    const logoutButton = document.getElementById('logout-button');
+    const authControls = document.getElementById('auth-controls');
+    const callToAction = document.getElementById('call-to-action');
 
-  const generateButton = el('generateButton');
-  const promptTextarea = el('prompt');
-  const resultDiv = el('result');
-  const outputDiv = el('output');
-  const statsDiv = el('output-stats');
-  const loaderDiv = el('loader');
-  const errorDiv = el('errorMessage');
-  const historyModal = el('historyModal');
-  const historyListDiv = el('historyList');
-  const themeIcon = el('theme-icon');
-  const themeText = el('theme-text');
+    // Modal Elements
+    const modal = document.getElementById('generator-modal');
+    const modalContent = document.getElementById('modal-content');
+    const modalTitle = document.getElementById('modal-title');
+    const closeModalButton = document.getElementById('close-modal-button');
+    const modalPrompt = document.getElementById('modal-prompt');
+    const modalGenerateButton = document.getElementById('modal-generate-button');
+    const modalResultArea = document.getElementById('modal-result-area');
+    const modalLoader = document.getElementById('modal-loader');
+    const modalError = document.getElementById('modal-error-message');
+    const modalResultWrapper = document.getElementById('modal-result-wrapper');
+    const modalResultContent = document.getElementById('modal-result-content');
 
-  // --- Инициализация
-  initTheme();
-  renderHistory();
-  setupTemplateListeners();
-
-  // --- Темная тема
-  window.toggleDarkMode = () => {
-    darkMode = !darkMode;
-    localStorage.setItem('darkMode', darkMode);
-    updateTheme();
-  };
-
-  function initTheme() {
-    updateTheme();
-  }
-
-  function updateTheme() {
-    document.documentElement.classList.toggle('dark', darkMode);
-    if (themeIcon && themeText) {
-      themeIcon.textContent = darkMode ? '☀️' : '🌙';
-      themeText.textContent = darkMode ? 'Светлая тема' : 'Тёмная тема';
+    // --- Auth ---
+    function updateAuthState(isAuthenticated) {
+        if (isAuthenticated) {
+            generatorSection.classList.remove('hidden');
+            heroSection.classList.add('hidden');
+            loginButton.classList.add('hidden');
+            logoutButton.classList.remove('hidden');
+        } else {
+            generatorSection.classList.add('hidden');
+            heroSection.classList.remove('hidden');
+            loginButton.classList.remove('hidden');
+            logoutButton.classList.add('hidden');
+        }
     }
-  }
 
-  // --- Шаблоны
-  const templatePrompts = {
-    blog: "Напиши SEO-оптимизированный пост для блога на тему: ",
-    social: "Создай короткий пост для социальных сетей о: ",
-    product: "Напиши продающее описание для товара: ",
-    email: "Напиши цепляющее письмо для email-рассылки на тему: ",
-    meta: "Создай SEO-оптимизированное meta-описание для страницы: ",
-    video: "Напиши сценарий для 3-минутного видео о: "
-  };
-
-  function setupTemplateListeners() {
-    document.querySelectorAll('.template-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const basePrompt = templatePrompts[card.dataset.template] || "";
-        promptTextarea.value = basePrompt;
-        promptTextarea.focus();
-      });
-    });
-  }
-
-  window.copyResult = () => {
-    const text = outputDiv.innerText;
-    navigator.clipboard.writeText(text)
-      .then(() => showToast('Текст скопирован!'))
-      .catch(() => showError('Не удалось скопировать'));
-  };
-  
-  // Экспорт
-  window.exportResult = async (type) => {
-    const text = outputDiv.innerText;
-    
-    if(type === 'txt') {
-      const blob = new Blob([text], {type: 'text/plain'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `content-${Date.now()}.txt`;
-      a.click();
-    }
-    else if(type === 'pdf') {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(12);
-      doc.text(text, 10, 10, {maxWidth: 180});
-      doc.save(`content-${Date.now()}.pdf`);
-    }
-  };
-  
-  // Уведомления
-  function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-4 right-4 p-4 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 rounded-lg animate__animated animate__fadeInUp';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
-
-  // --- Генерация
-  window.generateContent = async () => {
-    const prompt = promptTextarea.value.trim();
-    if (!prompt) return showError('Введите текст запроса или выберите шаблон.');
-
-    generateButton.disabled = true;
-    hideError();
-    resultDiv.classList.add('hidden');
-    loaderDiv.classList.remove('hidden');
-
-    try {
-      const response = await fetch('/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ prompt })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
-
-      displayResult(data.content);
-      saveToHistory(prompt, data.content);
-    } catch (err) {
-      console.error(err);
-      showError(err.message);
-    } finally {
-      generateButton.disabled = false;
-      loaderDiv.classList.add('hidden');
-    }
-  };
-
-  function displayResult(text) {
-    outputDiv.innerHTML = text.replace(/\n/g, '<br>');
-    statsDiv.textContent = `Символов: ${text.length} | Слов: ${text.trim().split(/\s+/).length}`;
-    resultDiv.classList.remove('hidden');
-  }
-
-  // --- Ошибки
-  function showError(message) {
-    if (!errorDiv) return;
-    errorDiv.textContent = message;
-    errorDiv.classList.remove('hidden');
-    setTimeout(() => hideError(), 6000);
-  }
-
-  function hideError() {
-    if (!errorDiv) return;
-    errorDiv.classList.add('hidden');
-  }
-
-  // --- История
-  function saveToHistory(prompt, result) {
-    const entry = {
-      prompt,
-      result,
-      date: new Date().toLocaleString('ru-RU')
+    window.logout = function() {
+        localStorage.removeItem('jwt_token');
+        updateAuthState(false);
     };
-    history.unshift(entry);
-    history = history.slice(0, 50);
-    localStorage.setItem('contentHistory', JSON.stringify(history));
-  }
 
-  function renderHistory() {
-    if (!historyListDiv) return;
-
-    if (history.length === 0) {
-      historyListDiv.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400">История пуста.</p>';
-      return;
+    // --- Modal Logic ---
+    function openModal(model, title) {
+        currentModel = model;
+        modalTitle.textContent = title;
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modalContent.classList.remove('opacity-0', '-translate-y-10');
+        }, 10); // Delay for transition
+        resetModalState();
     }
 
-    historyListDiv.innerHTML = history.map((item, index) => `
-      <div class="p-4 rounded-lg border dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-        <div onclick="loadHistoryItem(${index})" class="cursor-pointer">
-          <div class="text-xs text-gray-500 dark:text-gray-400">${item.date}</div>
-          <div class="font-semibold truncate dark:text-white">Промпт: ${item.prompt}</div>
-          <div class="text-sm text-gray-600 dark:text-gray-300 truncate">Результат: ${item.result.slice(0, 100)}...</div>
-        </div>
-        <button onclick="deleteHistoryItem(${index}, event)" class="absolute top-2 right-2 text-red-500">✕</button>
-      </div>
-    `).join('');
-  }
+    function closeModal() {
+        modalContent.classList.add('opacity-0', '-translate-y-10');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
 
-  window.showHistory = () => {
-    renderHistory();
-    historyModal.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-  };
+    function resetModalState() {
+        modalPrompt.value = '';
+        modalResultArea.classList.add('hidden');
+        modalError.classList.add('hidden');
+        modalLoader.classList.add('hidden');
+        modalResultWrapper.classList.add('hidden');
+    }
 
-  window.hideHistory = () => {
-    historyModal.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-  };
+    // --- API Call ---
+    async function generateContent() {
+        const prompt = modalPrompt.value;
+        if (!prompt) {
+            showError('Пожалуйста, введите запрос.');
+            return;
+        }
 
-  window.loadHistoryItem = index => {
-    const item = history[index];
-    if (!item) return showError("Элемент не найден");
-    promptTextarea.value = item.prompt;
-    displayResult(item.result);
-    hideHistory();
-  };
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            showError('Ошибка авторизации. Пожалуйста, войдите снова.');
+            logout();
+            return;
+        }
 
-  window.deleteHistoryItem = (index, event) => {
-    event.stopPropagation();
-    if (!confirm("Удалить запись?")) return;
-    history.splice(index, 1);
-    localStorage.setItem('contentHistory', JSON.stringify(history));
-    renderHistory();
-  };
+        // UI updates for loading
+        modalResultArea.classList.remove('hidden');
+        modalLoader.classList.remove('hidden');
+        modalError.classList.add('hidden');
+        modalResultWrapper.classList.add('hidden');
+        modalGenerateButton.disabled = true;
 
-  window.clearHistory = () => {
-    if (!confirm("Очистить всю историю?")) return;
-    history = [];
-    localStorage.removeItem('contentHistory');
-    renderHistory();
-  };
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ model: currentModel, prompt }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Произошла неизвестная ошибка.');
+            }
+
+            const data = await response.json();
+            displayResult(data.content);
+
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            modalLoader.classList.add('hidden');
+            modalGenerateButton.disabled = false;
+        }
+    }
+
+    function displayResult(content) {
+        modalResultWrapper.classList.remove('hidden');
+        if (currentModel === 'dalle') {
+            modalResultContent.innerHTML = `<img src="${content}" alt="Generated image by DALL-E" class="rounded-lg shadow-md mx-auto max-h-full" />`;
+        } else {
+            modalResultContent.innerHTML = `<p>${content.replace(/\n/g, '<br>')}</p>`;
+        }
+    }
+
+    function showError(message) {
+        modalResultArea.classList.remove('hidden');
+        modalResultWrapper.classList.add('hidden');
+        modalError.textContent = message;
+        modalError.classList.remove('hidden');
+    }
+
+    // --- Result Actions ---
+    window.copyResult = function() {
+        if (currentModel === 'dalle') return; // Don't copy image URLs
+        const content = modalResultContent.innerText;
+        navigator.clipboard.writeText(content).then(() => {
+            const copyText = document.getElementById('copy-text');
+            copyText.textContent = 'Скопировано!';
+            setTimeout(() => { copyText.textContent = 'Копировать'; }, 2000);
+        });
+    };
+
+    window.exportResult = function(format) {
+        if (currentModel === 'dalle') return;
+        const content = modalResultContent.innerText;
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `contentgen-hub-result.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    // --- Event Listeners ---
+    document.querySelectorAll('.model-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const model = card.dataset.model;
+            const title = card.querySelector('h3').textContent;
+            openModal(model, title);
+        });
+    });
+
+    closeModalButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    modalGenerateButton.addEventListener('click', generateContent);
+
+    // --- Initial Setup ---
+    const token = localStorage.getItem('jwt_token');
+    updateAuthState(!!token);
 });
+
+// --- Dark Mode ---
+function toggleDarkMode() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    body.classList.toggle('dark');
+
+    if (body.classList.contains('dark')) {
+        themeIcon.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`;
+        localStorage.setItem('theme', 'dark');
+    } else {
+        themeIcon.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Load theme from local storage
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    toggleDarkMode(); // To set the correct icon
+}
