@@ -1,159 +1,35 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ContentGen Hub - Ваш Единый AI-Центр</title>
+    <title>ContentGen Hub - Ваш AI-помощник</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <script>
+        window.API_BASE_URL = "<%= API_BASE_URL %>";
         tailwind.config = {
             darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                }
-            }
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
         }
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
-
-    <!-- Header -->
-    <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
-        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">ContentGen Hub</a>
-            <div class="flex items-center gap-2">
-                <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    <span id="theme-icon">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                    </span>
-                </button>
-                <div id="auth-controls">
-                    <a id="login-button" href="http://localhost:8080/auth/google/login" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg">Войти</a>
-                    <button id="logout-button" onclick="logout()" class="hidden px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors">Выйти</button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <!-- Hero Section -->
-        <section id="hero-section" class="text-center py-20 md:py-32 px-4">
-            <div class="max-w-3xl mx-auto">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 animate__animated animate__fadeInDown">
-                    Ваш <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">универсальный</span> AI-инструмент
-                </h1>
-                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 animate__animated animate__fadeInUp">
-                    Объединяем лучшие AI-модели в одном месте. Генерируйте тексты и изображения быстрее, чем когда-либо.
-                </p>
-                <div id="call-to-action" class="animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
-                    <a href="http://localhost:8080/auth/google/login" class="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300">
-                        Начать творить
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Generator Section (Hidden by default) -->
-        <section id="generator-section" class="hidden max-w-screen-lg mx-auto px-4 py-12 animate__animated animate__fadeIn">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Выберите модель</h2>
-                <p class="mt-3 text-lg text-gray-600 dark:text-gray-400">Нажмите на карточку, чтобы начать генерацию</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Model Cards -->
-                <div class="model-card" data-model="chatgpt">
-                    <h3 class="font-bold text-xl">ChatGPT</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Универсальный текст</p>
-                </div>
-                <div class="model-card" data-model="gemini">
-                    <h3 class="font-bold text-xl">Gemini</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Креативный текст</p>
-                </div>
-                <div class="model-card" data-model="deepseek">
-                    <h3 class="font-bold text-xl">DeepSeek</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Текст и код</p>
-                </div>
-                <div class="model-card" data-model="dalle">
-                    <h3 class="font-bold text-xl">DALL-E</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Генерация изображений</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Pricing Section -->
-        <section id="pricing" class="py-20 px-4 bg-gray-100 dark:bg-gray-800/50">
-            <div class="max-w-screen-xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Простые и понятные тарифы</h2>
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Начните бесплатно и выбирайте план по мере необходимости.</p>
-                </div>
-                <%- include('partials/pricing'); %>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-900">
-        <div class="max-w-screen-xl mx-auto py-8 px-4 text-center text-gray-500 dark:text-gray-400">
-            <p>&copy; <%= new Date().getFullYear() %> ContentGen Hub. Все права защищены.</p>
-        </div>
-    </footer>
-
-    <!-- Generator Modal -->
-    <div id="generator-modal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
-        <div id="modal-content" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 transform transition-all opacity-0 -translate-y-10">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-title" class="text-2xl font-bold text-gray-900 dark:text-white"></h3>
-                <button id="close-modal-button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-
-            <!-- Form -->
-            <div>
-                <label for="modal-prompt" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ваш запрос:</label>
-                <textarea id="modal-prompt" class="w-full p-3 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500" rows="5" placeholder="Опишите вашу идею..."></textarea>
-                <button id="modal-generate-button" class="mt-4 w-full flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors disabled:bg-purple-400 disabled:cursor-not-allowed">
-                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" /></svg>
-                    <span>Сгенерировать</span>
-                </button>
-            </div>
-
-            <!-- Result Area -->
-            <div id="modal-result-area" class="mt-6 hidden">
-                <div id="modal-loader" class="flex flex-col items-center justify-center p-6 text-center hidden">
-                    <div class="loader"></div>
-                    <p class="mt-4 font-medium text-gray-600 dark:text-gray-300">AI творит магию...</p>
-                </div>
-                <div id="modal-error-message" class="hidden p-4 mb-4 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200 rounded-lg"></div>
-                
-                <div id="modal-result-wrapper">
-                    <h4 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Результат:</h4>
-                    <div id="modal-result-content" class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg max-h-64 overflow-y-auto prose dark:prose-invert max-w-none">
-                        <!-- Content will be injected here -->
-                    </div>
-                    <div id="modal-result-actions" class="mt-4 flex flex-wrap gap-2">
-                        <button onclick="copyResult()" class="action-button">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                            <span id="copy-text">Копировать</span>
-                        </button>
-                        <button onclick="exportResult('txt')" class="action-button">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            <span>Экспорт в .txt</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300 overflow-hidden h-full">
+    <%- include('partials/landing'); %>
+    <%- include('partials/app'); %>
+    <%- include('partials/auth_modal'); %>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/history.js"></script>
+    <script src="/js/auth.js"></script>
     <script src="/js/main.js"></script>
 </body>
 </html>

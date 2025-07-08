@@ -1,0 +1,174 @@
+let isChatActive = false;
+
+function showAuthModal(view = 'login') {
+    const modal = document.getElementById('auth-modal');
+    const loginView = document.getElementById('login-view');
+    const registerView = document.getElementById('register-view');
+    const forgotView = document.getElementById('forgot-password-view');
+    const loginError = document.getElementById('login-error');
+    const registerError = document.getElementById('register-error');
+    const forgotError = document.getElementById('forgot-error');
+
+    loginError.textContent = '';
+    loginError.className = 'text-red-500 text-sm mt-2 h-4'; // Reset to error style
+    registerError.textContent = '';
+    forgotError.textContent = '';
+
+    if (view === 'login') {
+        loginView.classList.remove('hidden');
+        registerView.classList.add('hidden');
+        forgotView.classList.add('hidden');
+    } else if (view === 'register') {
+        loginView.classList.add('hidden');
+        registerView.classList.remove('hidden');
+        forgotView.classList.add('hidden');
+    } else {
+        loginView.classList.add('hidden');
+        registerView.classList.remove('hidden');
+        forgotView.classList.remove('hidden');
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function hideAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    modal.classList.add('hidden');
+    document.getElementById('login-form').reset();
+    document.getElementById('register-form').reset();
+    document.getElementById('forgot-password-form').reset();
+}
+
+// --- Marked.js & Highlight.js Setup ---
+marked.setOptions({
+    highlight: function(code, lang) {
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language }).value;
+    },
+    langPrefix: 'hljs language-',
+    gfm: true,
+    breaks: true,
+});
+
+function activateChatLayout() {
+    if (isChatActive) return;
+    isChatActive = true;
+    const initialView = document.getElementById('initial-view');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatContainer = document.getElementById('chat-container');
+
+    initialView.classList.add('hidden');
+    chatMessages.classList.remove('hidden');
+    chatContainer.classList.remove('justify-center');
+}
+
+function resetChatLayout() {
+    isChatActive = false;
+    const initialView = document.getElementById('initial-view');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatContainer = document.getElementById('chat-container');
+
+    chatMessages.innerHTML = '';
+    chatMessages.classList.add('hidden');
+    initialView.classList.remove('hidden');
+    chatContainer.classList.add('justify-center');
+}
+
+function clearAppState() {
+    const historyList = document.getElementById('history-list');
+    if (historyList) {
+        historyList.innerHTML = '';
+    }
+
+    // Clear user info in the dropdown
+    const profileButton = document.getElementById('user-profile-button');
+    const dropdownAvatar = document.getElementById('dropdown-user-avatar');
+    const dropdownName = document.getElementById('dropdown-user-name');
+    const dropdownEmail = document.getElementById('dropdown-user-email');
+    if (profileButton) profileButton.innerHTML = '';
+    if (dropdownAvatar) dropdownAvatar.innerHTML = '';
+    if (dropdownName) dropdownName.textContent = '';
+    if (dropdownEmail) dropdownEmail.textContent = '';
+
+    // Reset the main chat view to its initial state
+    resetChatLayout();
+}
+
+function addMessageToChat(content, type) {
+    activateChatLayout();
+    const chatMessages = document.getElementById('chat-messages');
+    const messageElement = document.createElement('div');
+    const isUser = type === 'user';
+    const isError = type === 'ai-error';
+
+    messageElement.className = `chat-message group animate__animated animate__fadeInUp ${isUser ? 'user' : 'ai'}`;
+
+    if (isUser) {
+        messageElement.innerHTML = `
+            <div class="message-bubble user-bubble">
+                <div class="message-content">${content}</div>
+                <div class="message-actions">
+                    <button class="message-action-btn copy-btn" title="Копировать">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
+                    <button class="message-action-btn edit-btn" title="Редактировать">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
+                    </button>
+                </div>
+            </div>`;
+
+        messageElement.querySelector('.copy-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(content);
+        });
+
+        messageElement.querySelector('.edit-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('prompt-input').value = content;
+            document.getElementById('prompt-input').focus();
+            messageElement.remove();
+        });
+    } else {
+        const aiBubble = document.createElement('div');
+        aiBubble.className = `message-bubble ai-bubble prose dark:prose-invert max-w-none ${isError ? 'border border-red-500' : ''}`;
+        const isImage = content.startsWith('https://') && /\.(jpg|jpeg|png|gif|webp)$/.test(content.split('?')[0]);
+
+        aiBubble.innerHTML = isImage && !isError ? `<img src="${content}" alt="Generated image" class="rounded-lg max-w-sm"/>` : marked.parse(content);
+        messageElement.appendChild(aiBubble);
+
+        aiBubble.querySelectorAll('pre').forEach(preElement => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-block-wrapper group';
+            const copyButton = document.createElement('button');
+            copyButton.textContent = 'Copy';
+            copyButton.className = 'copy-code-btn';
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(preElement.querySelector('code').innerText);
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => { copyButton.textContent = 'Copy'; }, 2000);
+            };
+            preElement.parentNode.insertBefore(wrapper, preElement);
+            wrapper.appendChild(preElement);
+            wrapper.appendChild(copyButton);
+        });
+    }
+
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showLoader() {
+    activateChatLayout();
+    const chatMessages = document.getElementById('chat-messages');
+    const loaderElement = document.createElement('div');
+    loaderElement.id = 'ai-loader';
+    loaderElement.className = 'chat-message ai';
+    loaderElement.innerHTML = `<div class="message-bubble ai-bubble"><div class="loader"></div></div>`;
+    chatMessages.appendChild(loaderElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeLoader() {
+    const loaderElement = document.getElementById('ai-loader');
+    if (loaderElement) loaderElement.remove();
+}

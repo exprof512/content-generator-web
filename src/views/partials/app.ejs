@@ -1,0 +1,104 @@
+<div id="app-page" class="hidden flex h-full">
+    <!-- Sidebar (History) -->
+    <aside id="history-panel" class="hidden md:flex flex-col w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-semibold">История</h2>
+            <button id="new-chat-button" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700" title="Новый чат">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            </button>
+        </div>
+        <div id="history-list" class="flex-grow overflow-y-auto p-2 space-y-1">
+            <!-- History items will be injected here -->
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col h-full relative">
+        <!-- App Header with Account Dropdown -->
+        <header class="absolute top-0 right-0 p-4 z-10">
+            <div class="relative">
+                <button id="user-profile-button" class="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold overflow-hidden shadow-lg hover:ring-2 hover:ring-purple-400 transition-all">
+                    <!-- Avatar or Initial will be injected here -->
+                </button>
+                <!-- Account Dropdown -->
+                <div id="account-dropdown" class="hidden absolute top-14 right-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-1 animate__animated animate__fadeIn animate__faster">
+                    <div class="p-3">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div id="dropdown-user-avatar" class="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center text-xl font-bold overflow-hidden"></div>
+                            <div>
+                                <div id="dropdown-user-name" class="font-semibold text-gray-900 dark:text-white truncate"></div>
+                                <div id="dropdown-user-email" class="text-sm text-gray-500 dark:text-gray-400 truncate"></div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Тариф: <b id="account-tariff" class="text-gray-800 dark:text-white"></b></span>
+                                <a href="/pricing" class="text-purple-600 dark:text-purple-400 hover:underline font-medium">Сменить</a>
+                            </div>
+                            <div class="mt-2">
+                                <p class="text-gray-600 dark:text-gray-300">Осталось генераций: <b id="account-generations" class="text-gray-800 dark:text-white"></b></p>
+                                <p class="text-gray-600 dark:text-gray-300">Активен до: <b id="account-expires" class="text-gray-800 dark:text-white"></b></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                    <div class="p-1 text-gray-700 dark:text-gray-300">
+                        <div class="px-3 py-2 flex justify-between items-center text-sm">
+                            <span>Темная тема</span>
+                            <label for="theme-toggle" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="theme-toggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                            </label>
+                        </div>
+                        <div class="px-3 py-2 flex justify-between items-center text-sm">
+                            <span>Язык</span>
+                            <div class="flex items-center gap-1">
+                                <button class="px-2 py-1 rounded-md bg-gray-200 dark:bg-gray-700 font-bold">RU</button>
+                                <button class="px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">EN</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                    <div class="p-1">
+                        <a href="/privacy" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Privacy Policy</a>
+                        <a href="/terms" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Terms of Use</a>
+                        <button id="logout-button" class="block w-full text-left mt-1 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Выйти</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="chat-container" class="flex-1 flex flex-col h-full items-center justify-center transition-all duration-500">
+            <div id="chat-messages" class="w-full max-w-4xl flex-1 overflow-y-auto p-4 md:p-6 space-y-8 hidden">
+                <!-- Chat messages will be injected here -->
+            </div>
+
+            <!-- Initial Centered View -->
+            <div id="initial-view" class="text-center">
+                <svg class="w-16 h-16 mb-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300">Как я могу помочь?</h2>
+                <p class="text-gray-500">Выберите модель и задайте вопрос ниже</p>
+            </div>
+
+            <!-- Prompt Input Area -->
+            <div id="prompt-wrapper" class="w-full p-4 md:p-6">
+                <div class="max-w-4xl mx-auto mt-auto">
+                    <div class="relative p-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 shadow-lg focus-within:ring-2 focus-within:ring-purple-500">
+                        <textarea id="prompt-input" class="w-full h-12 p-2 pr-28 bg-transparent resize-none focus:outline-none text-base" rows="1" placeholder="Введите ваш запрос..."></textarea>
+                        <div class="absolute right-2 bottom-2 flex items-center gap-2">
+                            <select id="model-select" class="p-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500">
+                                <option value="chatgpt">ChatGPT</option>
+                                <option value="gemini">Gemini</option>
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="dalle">DALL-E</option>
+                            </select>
+                            <button id="generate-button" class="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-400 disabled:cursor-not-allowed" disabled>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

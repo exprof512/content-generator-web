@@ -1,27 +1,52 @@
 const express = require('express');
 const path = require('path');
+require('dotenv').config(); // Load .env file
 
 const app = express();
-// Порт будет взят из переменной окружения, как настроено в docker-compose.yml
 const port = process.env.PORT || 3000;
 
-// Настраиваем EJS как шаблонизатор
+// Setup EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
-// Указываем, что статические файлы (css, js, картинки) лежат в папке 'public'
+// Serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Маршрут для главной страницы
+// Middleware to pass environment variables to all rendered templates
+app.use((req, res, next) => {
+    res.locals.API_BASE_URL = process.env.API_BASE_URL;
+    next();
+});
+
 app.get('/', (req, res) => {
     res.render('index');
 });
 
-// Маршрут для страницы оплаты
-// Он принимает параметр 'plan' из URL (например, /payment?plan=pro)
-app.get('/payment', (req, res) => {
-    const plan = req.query.plan || 'unknown';
-    res.render('payment', { plan: plan });
+app.get('/pricing', (req, res) => {
+    res.render('pricing');
+});
+
+// New route for the account page
+app.get('/account', (req, res) => {
+    res.render('account');
+});
+
+// New route for the account page
+app.get('/account', (req, res) => {
+    res.render('account');
+});
+
+// New pages for Privacy and Terms
+app.get('/privacy', (req, res) => {
+    res.render('privacy');
+});
+
+app.get('/terms', (req, res) => {
+    res.render('terms');
+});
+
+app.get('/reset-password', (req, res) => {
+    res.render('reset-password');
 });
 
 app.listen(port, () => {

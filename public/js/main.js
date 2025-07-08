@@ -1,200 +1,115 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE_URL = 'http://localhost:8080';
-    let currentModel = '';
-
     // --- DOM Elements ---
-    const generatorSection = document.getElementById('generator-section');
-    const heroSection = document.getElementById('hero-section');
-    const loginButton = document.getElementById('login-button');
-    const logoutButton = document.getElementById('logout-button');
-    const authControls = document.getElementById('auth-controls');
-    const callToAction = document.getElementById('call-to-action');
+    const promptInput = document.getElementById('prompt-input');
+    const generateButton = document.getElementById('generate-button');
+    const modelSelect = document.getElementById('model-select');
+    const profileButton = document.getElementById('user-profile-button');
+    const accountDropdown = document.getElementById('account-dropdown');
 
-    // Modal Elements
-    const modal = document.getElementById('generator-modal');
-    const modalContent = document.getElementById('modal-content');
-    const modalTitle = document.getElementById('modal-title');
-    const closeModalButton = document.getElementById('close-modal-button');
-    const modalPrompt = document.getElementById('modal-prompt');
-    const modalGenerateButton = document.getElementById('modal-generate-button');
-    const modalResultArea = document.getElementById('modal-result-area');
-    const modalLoader = document.getElementById('modal-loader');
-    const modalError = document.getElementById('modal-error-message');
-    const modalResultWrapper = document.getElementById('modal-result-wrapper');
-    const modalResultContent = document.getElementById('modal-result-content');
+    // --- Core Logic ---
+    async function handleGeneration() {
+        const prompt = promptInput.value.trim();
+        if (!prompt) return;
 
-    // --- Auth ---
-    function updateAuthState(isAuthenticated) {
-        if (isAuthenticated) {
-            generatorSection.classList.remove('hidden');
-            heroSection.classList.add('hidden');
-            loginButton.classList.add('hidden');
-            logoutButton.classList.remove('hidden');
-        } else {
-            generatorSection.classList.add('hidden');
-            heroSection.classList.remove('hidden');
-            loginButton.classList.remove('hidden');
-            logoutButton.classList.add('hidden');
-        }
-    }
-
-    window.logout = function() {
-        localStorage.removeItem('jwt_token');
-        updateAuthState(false);
-    };
-
-    // --- Modal Logic ---
-    function openModal(model, title) {
-        currentModel = model;
-        modalTitle.textContent = title;
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modalContent.classList.remove('opacity-0', '-translate-y-10');
-        }, 10); // Delay for transition
-        resetModalState();
-    }
-
-    function closeModal() {
-        modalContent.classList.add('opacity-0', '-translate-y-10');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
-    }
-
-    function resetModalState() {
-        modalPrompt.value = '';
-        modalResultArea.classList.add('hidden');
-        modalError.classList.add('hidden');
-        modalLoader.classList.add('hidden');
-        modalResultWrapper.classList.add('hidden');
-    }
-
-    // --- API Call ---
-    async function generateContent() {
-        const prompt = modalPrompt.value;
-        if (!prompt) {
-            showError('Пожалуйста, введите запрос.');
-            return;
-        }
-
-        const token = localStorage.getItem('jwt_token');
-        if (!token) {
-            showError('Ошибка авторизации. Пожалуйста, войдите снова.');
-            logout();
-            return;
-        }
-
-        // UI updates for loading
-        modalResultArea.classList.remove('hidden');
-        modalLoader.classList.remove('hidden');
-        modalError.classList.add('hidden');
-        modalResultWrapper.classList.add('hidden');
-        modalGenerateButton.disabled = true;
+        const model = modelSelect.value;
+        addMessageToChat(prompt, 'user');
+        promptInput.value = '';
+        promptInput.style.height = 'auto';
+        updateGenerateButtonState();
+        showLoader();
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/generate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ model: currentModel, prompt }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Произошла неизвестная ошибка.');
-            }
-
-            const data = await response.json();
-            displayResult(data.content);
-
+            const result = await apiCall('/api/generate', 'POST', { model, prompt });
+            removeLoader();
+            addMessageToChat(result.content, 'ai');
+            fetchAndRenderHistory();
         } catch (error) {
-            showError(error.message);
-        } finally {
-            modalLoader.classList.add('hidden');
-            modalGenerateButton.disabled = false;
+            removeLoader();
+            addMessageToChat(`Ошибка: ${error.message}`, 'ai-error');
         }
     }
 
-    function displayResult(content) {
-        modalResultWrapper.classList.remove('hidden');
-        if (currentModel === 'dalle') {
-            modalResultContent.innerHTML = `<img src="${content}" alt="Generated image by DALL-E" class="rounded-lg shadow-md mx-auto max-h-full" />`;
-        } else {
-            modalResultContent.innerHTML = `<p>${content.replace(/\n/g, '<br>')}</p>`;
-        }
+    function updateGenerateButtonState() {
+        if (promptInput) generateButton.disabled = promptInput.value.trim() === '';
     }
-
-    function showError(message) {
-        modalResultArea.classList.remove('hidden');
-        modalResultWrapper.classList.add('hidden');
-        modalError.textContent = message;
-        modalError.classList.remove('hidden');
-    }
-
-    // --- Result Actions ---
-    window.copyResult = function() {
-        if (currentModel === 'dalle') return; // Don't copy image URLs
-        const content = modalResultContent.innerText;
-        navigator.clipboard.writeText(content).then(() => {
-            const copyText = document.getElementById('copy-text');
-            copyText.textContent = 'Скопировано!';
-            setTimeout(() => { copyText.textContent = 'Копировать'; }, 2000);
-        });
-    };
-
-    window.exportResult = function(format) {
-        if (currentModel === 'dalle') return;
-        const content = modalResultContent.innerText;
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `contentgen-hub-result.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
 
     // --- Event Listeners ---
-    document.querySelectorAll('.model-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const model = card.dataset.model;
-            const title = card.querySelector('h3').textContent;
-            openModal(model, title);
+    if (generateButton) generateButton.addEventListener('click', handleGeneration);
+
+    if (promptInput) {
+        promptInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!generateButton.disabled) {
+                    handleGeneration();
+                }
+            }
         });
+        promptInput.addEventListener('input', () => {
+            updateGenerateButtonState();
+            promptInput.style.height = 'auto';
+            promptInput.style.height = (promptInput.scrollHeight) + 'px';
+        });
+    }
+
+    document.getElementById('new-chat-button')?.addEventListener('click', resetChatLayout);
+
+    // --- Auth Modal Listeners ---
+    document.getElementById('show-auth-modal-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showAuthModal('login');
+    });
+    document.getElementById('auth-modal-close')?.addEventListener('click', hideAuthModal);
+    document.getElementById('show-register-view')?.addEventListener('click', () => showAuthModal('register'));
+    document.getElementById('show-login-view')?.addEventListener('click', () => showAuthModal('login'));
+    document.getElementById('show-forgot-password-view')?.addEventListener('click', () => showAuthModal('forgot'));
+    document.getElementById('back-to-login-view')?.addEventListener('click', () => showAuthModal('login'));
+    document.getElementById('login-form')?.addEventListener('submit', handleEmailLogin);
+    document.getElementById('register-form')?.addEventListener('submit', handleEmailRegister);
+    document.getElementById('forgot-password-form')?.addEventListener('submit', handleForgotPasswordRequest);
+    // Close modal on overlay click
+    document.getElementById('auth-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'auth-modal') {
+            hideAuthModal();
+        }
     });
 
-    closeModalButton.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
+    // --- Account Dropdown Listeners ---
+    profileButton?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        accountDropdown.classList.toggle('hidden');
     });
-    modalGenerateButton.addEventListener('click', generateContent);
+
+    document.addEventListener('click', (e) => {
+        if (!profileButton?.contains(e.target) && !accountDropdown?.contains(e.target)) {
+            accountDropdown?.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('logout-button')?.addEventListener('click', window.logout);
+
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.checked = document.documentElement.classList.contains('dark');
+        themeToggle.addEventListener('change', () => {
+            window.toggleDarkMode();
+        });
+    }
 
     // --- Initial Setup ---
     const token = localStorage.getItem('jwt_token');
     updateAuthState(!!token);
-});
+    updateGenerateButtonState();
 
-// --- Dark Mode ---
-function toggleDarkMode() {
-    const body = document.body;
-    const themeIcon = document.getElementById('theme-icon');
-    body.classList.toggle('dark');
-
-    if (body.classList.contains('dark')) {
-        themeIcon.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`;
-        localStorage.setItem('theme', 'dark');
-    } else {
-        themeIcon.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
-        localStorage.setItem('theme', 'light');
+    // --- Dark Mode ---
+    window.toggleDarkMode = function() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        if (themeToggle) {
+            themeToggle.checked = document.documentElement.classList.contains('dark');
+        }
     }
-}
-
-// Load theme from local storage
-if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark');
-    toggleDarkMode(); // To set the correct icon
-}
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
+});

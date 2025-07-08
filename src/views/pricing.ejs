@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тарифы - ContentGen Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <section id="pricing" class="py-20 px-4">
+        <div class="max-w-screen-xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Управление подпиской</h2>
+                <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Выберите план, который подходит именно вам.</p>
+                <a href="/" class="mt-6 inline-block text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300">← Вернуться в чат</a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Plan -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center flex flex-col">
+                    <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Бесплатный</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-6">Для старта и личных проектов</p>
+                    <p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">0₽<span class="text-lg font-medium">/мес</span></p>
+                    <ul class="text-left space-y-2 mb-8 flex-grow">
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 10 генераций в день</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Доступ к базовым моделям</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Сохранение истории</li>
+                    </ul>
+                    <a href="/payment?plan=free" class="mt-auto w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-colors">
+                        Начать бесплатно
+                    </a>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="border-2 border-purple-500 rounded-lg p-8 text-center flex flex-col shadow-2xl relative">
+                    <span class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">ПОПУЛЯРНЫЙ</span>
+                    <h3 class="text-2xl font-bold mb-2 text-purple-500">Pro</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-6">Для профессионалов и команд</p>
+                    <p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">499₽<span class="text-lg font-medium">/мес</span></p>
+                    <ul class="text-left space-y-2 mb-8 flex-grow">
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 100 генераций в день</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Доступ ко всем моделям</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Приоритетная поддержка</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Ранний доступ к новым функциям</li>
+                    </ul>
+                    <a href="/payment?plan=pro" class="mt-auto w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors">
+                        Выбрать Pro
+                    </a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center flex flex-col">
+                    <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Enterprise</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-6">Для крупного бизнеса</p>
+                    <p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">Индивидуально</p>
+                    <ul class="text-left space-y-2 mb-8 flex-grow">
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Безлимитные генерации</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Персональный менеджер</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Кастомные интеграции</li>
+                    </ul>
+                    <a href="mailto:sales@example.com" class="mt-auto w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-colors">
+                        Связаться с нами
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
