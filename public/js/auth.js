@@ -3,12 +3,16 @@ function updateAuthState(isAuthenticated) {
     const appPage = document.getElementById('app-page');
 
     if (isAuthenticated) {
+        document.body.classList.remove('is-landing');
+        document.body.classList.add('is-app');
         landingPage.classList.add('hidden');
         appPage.classList.remove('hidden');
         appPage.classList.add('flex');
         fetchUserData();
         fetchAndRenderHistory();
     } else {
+        document.body.classList.add('is-landing');
+        document.body.classList.remove('is-app');
         landingPage.classList.remove('hidden');
         appPage.classList.add('hidden');
         appPage.classList.remove('flex');

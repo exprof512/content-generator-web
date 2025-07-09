@@ -1,3 +1,19 @@
+html {
+    scroll-behavior: smooth;
+}
+
+/* Class for the app view, prevents scrolling */
+.is-app {
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Class for the landing page view, allows scrolling */
+.is-landing {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
 /* For Webkit browsers like Chrome, Safari */
 main#chat-container {
     background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0);

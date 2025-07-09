@@ -74,6 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('leave-review-btn')?.addEventListener('click', () => {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            // User is authenticated
+            alert('Спасибо! Функционал добавления отзывов скоро появится.');
+        } else {
+            // User is not authenticated, show login modal
+            showAuthModal('login');
+        }
+    });
+
     // --- Account Dropdown Listeners ---
     profileButton?.addEventListener('click', (e) => {
         e.stopPropagation();
