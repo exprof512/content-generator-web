@@ -13,34 +13,41 @@
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                     </span>
                 </button>
-            <button id="show-auth-modal-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
-                    Войти
-            </button>
+                <div class="relative">
+                    <button id="lang-switch" class="px-3 py-2 rounded-lg font-semibold bg-gradient-to-r from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-900 text-purple-700 dark:text-white shadow hover:from-purple-200 hover:to-pink-200 dark:hover:from-gray-600 dark:hover:to-gray-800 transition-all">
+                        <span id="lang-label">RU</span>
+                    </button>
+                </div>
+                <button id="show-auth-modal-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
+                    <span data-lang="login">Войти</span>
+                </button>
             </div>
         </div>
     </header>
 
     <main>
         <!-- Hero Section -->
-        <section class="text-center py-20 md:py-32 px-4">
+        <section class="text-center py-20 md:py-32 px-4 animate__animated animate__fadeInDown animate__faster">
             <div class="max-w-3xl mx-auto">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 animate__animated animate__fadeInDown">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4">
                     Ваш <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">универсальный</span> AI-инструмент
                 </h1>
-                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 animate__animated animate__fadeInUp">
+                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">
                     Объединяем лучшие AI-модели в одном месте. Генерируйте тексты и изображения быстрее, чем когда-либо.
                 </p>
             </div>
         </section>
 
-        <!-- AI Models Showcase Section -->
-        <section id="models" class="py-20 px-4">
+        <!-- AI Models Showcase Section + Преимущества платформы -->
+        <section id="models" class="py-20 px-4 animate__animated animate__fadeInUp animate__faster">
             <div class="max-w-screen-xl mx-auto">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Один интерфейс для всех задач</h2>
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Мы объединили лучшие нейросети, чтобы вы могли решать любые задачи в одном окне.</p>
+                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+                        Мы объединили лучшие нейросети, чтобы вы могли решать любые задачи в одном окне.
+                    </p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
                     <!-- ChatGPT Card -->
                     <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
                         <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-500 rounded-xl flex items-center justify-center mb-4"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-14l2-2 2 2m-4 4l2 2 2-2m-4 4l2 2 2-2m-4 4l2 2 2-2"></path></svg></div>
@@ -66,11 +73,40 @@
                         <p class="text-gray-600 dark:text-gray-400">Ваш незаменимый помощник в написании, отладке и рефакторинге кода на любом языке программирования.</p>
                     </div>
                 </div>
+                <!-- Преимущества платформы (бывший блок "О платформе") -->
+                <div class="max-w-4xl mx-auto text-center mt-16">
+                    <p class="text-lg text-gray-600 dark:text-gray-300 mb-8" data-lang="about-desc">
+                        ContentGen Hub — это ваш универсальный AI-хаб: тексты, изображения, код, аналитика. Всё в одном окне, с удобным интерфейсом и прозрачными тарифами.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
+                            <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-400 text-white">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m4 0h-1v-4h-1"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-lg mb-2" data-lang="about-1-title">Все топовые AI-модели</h3>
+                            <p class="text-gray-500 dark:text-gray-400" data-lang="about-1-desc">ChatGPT, Gemini, DALL-E, DeepSeek и другие — в одном аккаунте.</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
+                            <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 text-white">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-lg mb-2" data-lang="about-2-title">Простота и скорость</h3>
+                            <p class="text-gray-500 dark:text-gray-400" data-lang="about-2-desc">Минималистичный интерфейс, быстрый отклик, ничего лишнего.</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
+                            <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-purple-400 text-white">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-lg mb-2" data-lang="about-3-title">Выгодно и честно</h3>
+                            <p class="text-gray-500 dark:text-gray-400" data-lang="about-3-desc">Прозрачные тарифы, бесплатный старт, поддержка 24/7.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- Pricing Section -->
-        <section id="pricing" class="py-20 px-4 bg-gray-50 dark:bg-gray-800/50">
+        <section id="pricing" class="py-20 px-4 bg-gray-50 dark:bg-gray-800/50 animate__animated animate__fadeInUp animate__delay-1s animate__faster">
             <div class="max-w-screen-xl mx-auto">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Простые и понятные тарифы</h2>
@@ -88,7 +124,7 @@
         </section>
 
         <!-- Testimonials Section -->
-        <section id="testimonials" class="py-20 px-4">
+        <section id="testimonials" class="py-20 px-4 animate__animated animate__fadeInUp animate__delay-2s animate__faster">
             <div class="max-w-screen-xl mx-auto">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Что говорят наши пользователи</h2>
@@ -113,12 +149,12 @@
                 </div>
             </div>
         </section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-100 dark:bg-gray-800/50">
-        <div class="max-w-screen-xl mx-auto py-8 px-4 text-center text-gray-500 dark:text-gray-400">
-            <p>&copy; <%= new Date().getFullYear() %> ContentGen Hub. Все права защищены.</p>
-        </div>
-    </footer>
+        <!-- Footer -->
+        <footer class="bg-gray-100 dark:bg-gray-800/50">
+            <div class="max-w-screen-xl mx-auto py-8 px-4 text-center text-gray-500 dark:text-gray-400">
+                <p>&copy; <%= new Date().getFullYear() %> ContentGen Hub. Все права защищены.</p>
+            </div>
+        </footer>
+    </main>
 </div>

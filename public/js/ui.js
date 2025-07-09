@@ -97,51 +97,62 @@ function clearAppState() {
 function addMessageToChat(content, type) {
     activateChatLayout();
     const chatMessages = document.getElementById('chat-messages');
+    const messageWrapper = document.createElement('div');
+    messageWrapper.className = 'flex w-full gap-4 mb-4';
+    if (type === 'user') {
+        messageWrapper.classList.add('justify-end');
+    } else {
+        messageWrapper.classList.add('justify-start');
+    }
     const messageElement = document.createElement('div');
     const isUser = type === 'user';
     const isError = type === 'ai-error';
 
-    messageElement.className = `chat-message group animate__animated animate__fadeInUp ${isUser ? 'user' : 'ai'}`;
+    // Добавляем разный фон и тень для разделения
+    messageElement.className = `chat-message group animate__animated animate__fadeInUp ${isUser ? 'user' : 'ai'} ${isUser ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-2xl shadow-lg px-5 py-4 max-w-xl lg:max-w-3xl`;
+    messageElement.style.border = isUser ? '2px solid #a78bfa' : '2px solid #e5e7eb';
+    messageElement.style.marginBottom = '12px';
 
     if (isUser) {
         messageElement.innerHTML = `
-            <div class="message-bubble user-bubble">
-                <div class="message-content">${content}</div>
-                <div class="message-actions">
-                    <button class="message-action-btn copy-btn" title="Копировать">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    </button>
-                    <button class="message-action-btn edit-btn" title="Редактировать">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
-                    </button>
-                </div>
-            </div>`;
-
+            <div class="message-content">${content}</div>
+            <div class="message-actions mt-2 flex gap-2">
+                <button class="message-action-btn copy-btn" title="Копировать">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                </button>
+                <button class="message-action-btn edit-btn" title="Редактировать">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
+                </button>
+            </div>
+        `;
         messageElement.querySelector('.copy-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             navigator.clipboard.writeText(content);
         });
-
         messageElement.querySelector('.edit-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             document.getElementById('prompt-input').value = content;
             document.getElementById('prompt-input').focus();
             messageElement.remove();
         });
+        messageWrapper.appendChild(messageElement);
     } else {
+        // AI ответ: увеличиваем ширину, делаем фон светлее, кодовые блоки выделяем
         const aiBubble = document.createElement('div');
-        aiBubble.className = `message-bubble ai-bubble prose dark:prose-invert max-w-none ${isError ? 'border border-red-500' : ''}`;
+        aiBubble.className = `prose dark:prose-invert max-w-3xl w-full bg-gray-50 dark:bg-gray-900 border border-purple-100 dark:border-gray-700 px-6 py-5 rounded-2xl shadow-lg ${isError ? 'border-red-500' : ''}`;
         const isImage = content.startsWith('https://') && /\.(jpg|jpeg|png|gif|webp)$/.test(content.split('?')[0]);
-
         aiBubble.innerHTML = isImage && !isError ? `<img src="${content}" alt="Generated image" class="rounded-lg max-w-sm"/>` : marked.parse(content);
-        messageElement.appendChild(aiBubble);
-
+        // Стилизация code/pre
         aiBubble.querySelectorAll('pre').forEach(preElement => {
+            preElement.classList.add('bg-gray-900', 'text-white', 'rounded-xl', 'p-4', 'overflow-x-auto', 'my-4', 'shadow-inner');
+            preElement.style.fontSize = '1rem';
+            preElement.style.lineHeight = '1.6';
+            preElement.style.border = '1px solid #a78bfa';
             const wrapper = document.createElement('div');
-            wrapper.className = 'code-block-wrapper group';
+            wrapper.className = 'code-block-wrapper group flex items-center gap-2';
             const copyButton = document.createElement('button');
             copyButton.textContent = 'Copy';
-            copyButton.className = 'copy-code-btn';
+            copyButton.className = 'copy-code-btn px-3 py-1 rounded-lg bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-all ml-2';
             copyButton.onclick = () => {
                 navigator.clipboard.writeText(preElement.querySelector('code').innerText);
                 copyButton.textContent = 'Copied!';
@@ -151,9 +162,10 @@ function addMessageToChat(content, type) {
             wrapper.appendChild(preElement);
             wrapper.appendChild(copyButton);
         });
+        messageElement.appendChild(aiBubble);
+        messageWrapper.appendChild(messageElement);
     }
-
-    chatMessages.appendChild(messageElement);
+    chatMessages.appendChild(messageWrapper);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
@@ -172,3 +184,45 @@ function removeLoader() {
     const loaderElement = document.getElementById('ai-loader');
     if (loaderElement) loaderElement.remove();
 }
+
+const LANGS = {
+    RU: {
+        login: 'Войти',
+        'about-title': 'О платформе',
+        'about-desc': 'ContentGen Hub — это ваш универсальный AI-хаб: тексты, изображения, код, аналитика. Всё в одном окне, с удобным интерфейсом и прозрачными тарифами.',
+        'about-1-title': 'Все топовые AI-модели',
+        'about-1-desc': 'ChatGPT, Gemini, DALL-E, DeepSeek и другие — в одном аккаунте.',
+        'about-2-title': 'Простота и скорость',
+        'about-2-desc': 'Минималистичный интерфейс, быстрый отклик, ничего лишнего.',
+        'about-3-title': 'Выгодно и честно',
+        'about-3-desc': 'Прозрачные тарифы, бесплатный старт, поддержка 24/7.'
+    },
+    EN: {
+        login: 'Sign In',
+        'about-title': 'About the Platform',
+        'about-desc': 'ContentGen Hub is your universal AI hub: text, images, code, analytics. All in one window, with a simple interface and transparent pricing.',
+        'about-1-title': 'All Top AI Models',
+        'about-1-desc': 'ChatGPT, Gemini, DALL-E, DeepSeek and more — in one account.',
+        'about-2-title': 'Simplicity & Speed',
+        'about-2-desc': 'Minimalist interface, instant response, nothing extra.',
+        'about-3-title': 'Fair & Profitable',
+        'about-3-desc': 'Transparent pricing, free start, 24/7 support.'
+    }
+};
+let currentLang = localStorage.getItem('lang') || 'RU';
+
+function switchLang() {
+    currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+    localStorage.setItem('lang', currentLang);
+    document.getElementById('lang-label').textContent = currentLang;
+    document.querySelectorAll('[data-lang]').forEach(el => {
+        const key = el.getAttribute('data-lang');
+        if (LANGS[currentLang][key]) el.textContent = LANGS[currentLang][key];
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('lang_label').textContent = currentLang;
+    document.getElementById('lang-switch').addEventListener('click', switchLang);
+    switchLang();
+});

@@ -1,14 +1,16 @@
 <div id="app-page" class="hidden flex h-full">
     <!-- Sidebar (History) -->
-    <aside id="history-panel" class="hidden md:flex flex-col w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300">
-        <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-            <h2 class="text-lg font-semibold">История</h2>
-            <button id="new-chat-button" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700" title="Новый чат">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+    <aside id="history-panel" class="hidden md:flex flex-col w-72 bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-xl transition-all duration-300">
+        <!-- Верхний блок: Новый чат -->
+        <div class="flex flex-col items-center gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
+            <button id="new-chat-button" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold text-lg shadow-lg hover:from-purple-700 hover:to-pink-600 transition-all duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Новый чат
             </button>
         </div>
-        <div id="history-list" class="flex-grow overflow-y-auto p-2 space-y-1">
-            <!-- History items will be injected here -->
+        <!-- История чатов -->
+        <div class="flex-1 overflow-y-auto p-2 space-y-2" id="history-list">
+            <!-- История чатов будет подгружаться сюда -->
         </div>
     </aside>
 
@@ -92,8 +94,9 @@
                                 <option value="deepseek">DeepSeek</option>
                                 <option value="dalle">DALL-E</option>
                             </select>
-                            <button id="generate-button" class="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-400 disabled:cursor-not-allowed" disabled>
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                            <button id="generate-button" class="p-3 px-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-semibold text-lg shadow-lg hover:from-purple-700 hover:to-pink-600 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed relative" disabled>
+                                <span id="generate-btn-text" data-lang="generate">Генерировать</span>
+                                <span id="generate-btn-spinner" class="hidden ml-2"><span class="loader"></span></span>
                             </button>
                         </div>
                     </div>
