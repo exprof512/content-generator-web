@@ -1,0 +1,75 @@
+{
+    "nav": {
+        "pricing": "Pricing",
+        "reviews": "Reviews",
+        "models": "Models",
+        "login": "Log In",
+        "goToApp": "Go to App"
+    },
+    "hero": {
+        "title": "Create Next-Generation Content with AI",
+        "subtitle": "A unified platform to access ChatGPT, DALL-E, Gemini, and other leading neural networks. Accelerate your work and creativity.",
+        "getStarted": "Get Started for Free"
+    },
+    "models": {
+        "title": "One Interface for All Tasks",
+        "subtitle": "We've combined the best neural networks so you can solve any task in one window.",
+        "chatgpt_title": "ChatGPT",
+        "chatgpt_desc": "Perfect for writing texts, articles, letters, and creative content. Your universal text assistant.",
+        "dalle_title": "DALL-E",
+        "dalle_desc": "Create unique images, illustrations, and art objects from a text description.",
+        "gemini_title": "Gemini",
+        "gemini_desc": "A powerful multimodal model from Google for complex analytical tasks and idea generation.",
+        "deepseek_title": "DeepSeek Coder",
+        "deepseek_desc": "Your indispensable assistant for writing, debugging, and refactoring code in any programming language."
+    },
+    "pricing": {
+        "title": "Choose Your Plan"
+    },
+    "testimonials": {
+        "title": "What Our Users Say",
+        "subtitle": "Specialists from various fields trust us.",
+        "student_text": "I'm preparing for exams, and this tool is a lifesaver. Gemini helps structure information for essays, and ChatGPT quickly writes papers on given topics. Saved a ton of time and got the highest grade!",
+        "student_author": "Alexey, Student",
+        "entrepreneur_text": "I run a small online store. With DALL-E, I generate unique images for product cards, and ChatGPT writes selling descriptions for them. Conversion has increased, and content manager costs have been reduced.",
+        "entrepreneur_author": "Irina, Entrepreneur",
+        "developer_text": "I use DeepSeek Coder for refactoring old code and writing unit tests. It offers elegant solutions and finds bugs I might have missed. The best coding assistant I've tried.",
+        "developer_author": "Victor, Full-stack Developer"
+    },
+    "app": {
+        "newChat": "New Chat",
+        "history": "History",
+        "promptPlaceholder": "Type your prompt here...",
+        "generateTitle": "Generate",
+        "model_chatgpt-4o": "ChatGPT 4o",
+        "model_dall-e-3": "DALL-E 3",
+        "model_gemini-1.5-pro": "Gemini 1.5 Pro",
+        "model_deepseek-coder": "DeepSeek Coder"
+    },
+    "account": {
+        "title": "Account",
+        "tariff": "Tariff:",
+        "generations": "Generations left:",
+        "language": "Language:",
+        "logout": "Logout"
+    },
+    "auth": {
+        "loginTitle": "Sign in to your account",
+        "emailLabel": "Email",
+        "passwordLabel": "Password",
+        "forgotPasswordLink": "Forgot password?",
+        "loginButton": "Log In",
+        "orContinueWith": "Or continue with",
+        "noAccount": "Don't have an account?",
+        "registerLink": "Register",
+        "registerTitle": "Create an account",
+        "nameLabel": "Name",
+        "registerButton": "Create account",
+        "haveAccount": "Already have an account?",
+        "loginLink": "Log In",
+        "forgotTitle": "Reset Password",
+        "forgotSubtitle": "Enter your email, and we will send you a link to recover (check the backend console).",
+        "sendButton": "Send",
+        "backToLogin": "← Back to login"
+    }
+}

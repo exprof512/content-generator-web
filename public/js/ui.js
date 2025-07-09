@@ -211,18 +211,42 @@ const LANGS = {
 };
 let currentLang = localStorage.getItem('lang') || 'RU';
 
-function switchLang() {
-    currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+function switchLang(lang) {
+    if (lang) {
+        currentLang = lang;
+    } else {
+        currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+    }
     localStorage.setItem('lang', currentLang);
-    document.getElementById('lang-label').textContent = currentLang;
+    const langLabel = document.getElementById('lang-label');
+    if (langLabel) langLabel.textContent = currentLang;
     document.querySelectorAll('[data-lang]').forEach(el => {
         const key = el.getAttribute('data-lang');
         if (LANGS[currentLang][key]) el.textContent = LANGS[currentLang][key];
     });
+    // Кнопки RU/EN в аккаунте
+    const ruBtn = document.getElementById('lang-ru-btn');
+    const enBtn = document.getElementById('lang-en-btn');
+    if (ruBtn && enBtn) {
+        if (currentLang === 'RU') {
+            ruBtn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
+            enBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
+        } else {
+            enBtn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
+            ruBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('lang_label').textContent = currentLang;
-    document.getElementById('lang-switch').addEventListener('click', switchLang);
-    switchLang();
+    const langLabel = document.getElementById('lang-label');
+    if (langLabel) langLabel.textContent = currentLang;
+    const langSwitch = document.getElementById('lang-switch');
+    if (langSwitch) langSwitch.addEventListener('click', () => switchLang());
+    // Кнопки RU/EN в аккаунте
+    const ruBtn = document.getElementById('lang-ru-btn');
+    const enBtn = document.getElementById('lang-en-btn');
+    if (ruBtn) ruBtn.addEventListener('click', () => switchLang('RU'));
+    if (enBtn) enBtn.addEventListener('click', () => switchLang('EN'));
+    switchLang(currentLang);
 });

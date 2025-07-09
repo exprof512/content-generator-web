@@ -1,5 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+let postLoginAction = null; // Global variable to store intended action
+
+document.addEventListener('DOMContentLoaded', async () => {
     // --- DOM Elements ---
+    await i18n.init();
     const promptInput = document.getElementById('prompt-input');
     const generateButton = document.getElementById('generate-button');
     const modelSelect = document.getElementById('model-select');
