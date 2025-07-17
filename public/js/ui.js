@@ -24,7 +24,7 @@ function showAuthModal(view = 'login') {
         forgotView.classList.add('hidden');
     } else {
         loginView.classList.add('hidden');
-        registerView.classList.remove('hidden');
+        registerView.classList.add('hidden');
         forgotView.classList.remove('hidden');
     }
 
@@ -209,7 +209,13 @@ const LANGS = {
         'about-3-desc': 'Transparent pricing, free start, 24/7 support.'
     }
 };
-let currentLang = localStorage.getItem('lang') || 'RU';
+
+function getInitialLang() {
+    const savedLang = (localStorage.getItem('lang') || 'RU').toUpperCase();
+    // Убедимся, что сохраненный язык валиден, иначе вернем 'RU'
+    return LANGS[savedLang] ? savedLang : 'RU';
+}
+let currentLang = getInitialLang();
 
 function switchLang(lang) {
     if (lang) {
@@ -250,3 +256,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (enBtn) enBtn.addEventListener('click', () => switchLang('EN'));
     switchLang(currentLang);
 });
+
+function updateGenerateButtonState() {
+    const promptInput = document.getElementById('prompt-input');
+    const generateButton = document.getElementById('generate-button');
+    if (promptInput && generateButton) {
+        generateButton.disabled = promptInput.value.trim() === '';
+    }
+}

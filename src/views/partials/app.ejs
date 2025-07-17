@@ -87,14 +87,60 @@
                 <div class="max-w-4xl mx-auto mt-auto">
                     <div class="relative p-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 shadow-lg focus-within:ring-2 focus-within:ring-purple-500">
                         <textarea id="prompt-input" class="w-full h-12 p-2 pr-28 bg-transparent resize-none focus:outline-none text-base" rows="1" placeholder="Введите ваш запрос..."></textarea>
-                        <div class="flex items-center gap-2 mt-3 justify-end">
-                            <select id="model-select" class="p-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500">
-                                <option value="chatgpt">ChatGPT</option>
-                                <option value="gemini">Gemini</option>
-                                <option value="deepseek">DeepSeek</option>
-                                <option value="dalle">DALL-E</option>
-                            </select>
-                            <button id="generate-button" class="p-3 px-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-semibold text-lg shadow-lg hover:from-purple-700 hover:to-pink-600 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed relative" disabled>
+                        <div class="flex items-center gap-3 mt-3 justify-end">
+                            <!-- Кастомный dropdown для ИИ агента -->
+                            <div class="relative group w-40">
+                                <button id="agent-dropdown-btn" type="button"
+                                    class="flex items-center w-full px-4 py-2 rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 shadow-sm text-sm font-semibold text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
+                                >
+                                    <span id="agent-dropdown-icon" class="mr-2">
+                                        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                        </svg>
+                                    </span>
+                                    <span id="agent-dropdown-label">ChatGPT</span>
+                                    <svg class="ml-auto w-3 h-3 text-purple-400 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div id="agent-dropdown-menu"
+                                    class="absolute left-0 top-full mt-2 w-full z-20 bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-xl shadow-lg opacity-0 pointer-events-none group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200"
+                                    style="display:none"
+                                >
+                                    <ul>
+                                        <li><button type="button" class="dropdown-item flex items-center w-full px-4 py-2 text-sm hover:bg-purple-50 dark:hover:bg-gray-700" data-value="chatgpt"><span class="mr-2"><svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg></span>ChatGPT</button></li>
+                                        <li><button type="button" class="dropdown-item flex items-center w-full px-4 py-2 text-sm hover:bg-purple-50 dark:hover:bg-gray-700" data-value="gemini"><span class="mr-2"><svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg></span>Gemini</button></li>
+                                        <li><button type="button" class="dropdown-item flex items-center w-full px-4 py-2 text-sm hover:bg-purple-50 dark:hover:bg-gray-700" data-value="deepseek"><span class="mr-2"><svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></span>DeepSeek</button></li>
+                                        <li><button type="button" class="dropdown-item flex items-center w-full px-4 py-2 text-sm hover:bg-purple-50 dark:hover:bg-gray-700" data-value="dalle"><span class="mr-2"><svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8h8v8H8z"/></svg></span>DALL-E</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Кастомный dropdown для модели -->
+                            <div class="relative group w-44">
+                                <button id="model-dropdown-btn" type="button"
+                                    class="flex items-center w-full px-4 py-2 rounded-lg border border-pink-300 dark:border-pink-700 bg-white dark:bg-gray-800 shadow-sm text-sm font-semibold text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-200"
+                                >
+                                    <span id="model-dropdown-icon" class="mr-2">
+                                        <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/>
+                                        </svg>
+                                    </span>
+                                    <span id="model-dropdown-label">GPT-4o-mini</span>
+                                    <svg class="ml-auto w-3 h-3 text-pink-400 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div id="model-dropdown-menu"
+                                    class="absolute left-0 top-full mt-2 w-full z-20 bg-white dark:bg-gray-800 border border-pink-200 dark:border-pink-700 rounded-xl shadow-lg opacity-0 pointer-events-none group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200"
+                                    style="display:none"
+                                >
+                                    <ul id="model-dropdown-list">
+                                        <!-- Модели будут подгружаться динамически -->
+                                    </ul>
+                                </div>
+                            </div>
+                            <button id="generate-button" class="p-3 px-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-semibold text-lg shadow-lg hover:from-purple-700 hover:to-pink-600 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed relative">
                                 <span id="generate-btn-text" data-lang="generate">Генерировать</span>
                                 <span id="generate-btn-spinner" class="hidden ml-2"><span class="loader"></span></span>
                             </button>

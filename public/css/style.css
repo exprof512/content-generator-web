@@ -109,3 +109,72 @@ main#chat-container {
 .copy-code-btn {
     @apply absolute top-2 right-2 p-1.5 text-xs bg-gray-600/50 text-white/70 rounded-md hover:bg-gray-500/70 transition-all opacity-0 group-hover:opacity-100;
 }
+
+select {
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+    box-shadow: 0 1px 4px 0 rgba(139, 92, 246, 0.07);
+    background-color: #fff;
+    outline: none;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    min-width: 0;
+}
+
+.dark select {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+
+select:focus {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 2px #c4b5fd;
+    transform: scale(1.03);
+}
+
+.group:hover select, .group:focus-within select {
+    border-color: #a78bfa;
+    box-shadow: 0 2px 8px 0 rgba(139, 92, 246, 0.12);
+    transform: scale(1.04);
+}
+
+select option {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.95rem;
+    background: #fff;
+    color: #4b5563;
+    border-radius: 0.5rem;
+}
+
+.dark select option {
+    background: #374151;
+    color: #f3f4f6;
+}
+
+/* Custom dropdown menu styles */
+.dropdown-item {
+    cursor: pointer;
+    border: none;
+    background: none;
+    outline: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+#agent-dropdown-menu, #model-dropdown-menu {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    display: none;
+}
+
+#agent-dropdown-menu[style*="display: block"], #model-dropdown-menu[style*="display: block"] {
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    animation: fadeInDropdown 0.18s ease;
+}
+
+@keyframes fadeInDropdown {
+    from { opacity: 0; transform: translateY(-8px);}
+    to { opacity: 1; transform: translateY(0);}
+}

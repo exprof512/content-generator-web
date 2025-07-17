@@ -6,15 +6,98 @@ document.addEventListener('DOMContentLoaded', async () => {
     const promptInput = document.getElementById('prompt-input');
     const generateButton = document.getElementById('generate-button');
     const modelSelect = document.getElementById('model-select');
+    const submodelSelect = document.getElementById('submodel-select');
     const profileButton = document.getElementById('user-profile-button');
     const accountDropdown = document.getElementById('account-dropdown');
+    const agentDropdownBtn = document.getElementById('agent-dropdown-btn');
+    const agentDropdownMenu = document.getElementById('agent-dropdown-menu');
+    const agentDropdownLabel = document.getElementById('agent-dropdown-label');
+    const modelDropdownBtn = document.getElementById('model-dropdown-btn');
+    const modelDropdownMenu = document.getElementById('model-dropdown-menu');
+    const modelDropdownLabel = document.getElementById('model-dropdown-label');
+    const modelDropdownList = document.getElementById('model-dropdown-list');
+
+    let selectedAgent = 'chatgpt';
+    let selectedModel = 'gpt-4o-mini';
+
+    // --- Модели для каждого ИИ ---
+    const MODEL_OPTIONS = {
+        chatgpt: [
+            { value: 'gpt-4o-mini', label: 'GPT-4o-mini' },
+            { value: 'gpt-4', label: 'GPT-4' },
+            { value: 'gpt-4.1', label: 'GPT-4.1' }
+        ],
+        gemini: [
+            { value: 'gemini-pro', label: 'Gemini Pro' },
+            { value: 'gemini-1.5', label: 'Gemini 1.5' }
+        ],
+        deepseek: [
+            { value: 'deepseek-chat', label: 'DeepSeek Chat' },
+            { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' },
+            { value: 'deepseek-coder', label: 'DeepSeek Coder' }
+        ],
+        dalle: [
+            { value: 'gpt-image-1', label: 'GPT Image 1' },
+            { value: 'dall-e-2', label: 'DALL-E 2' },
+            { value: 'dall-e-3', label: 'DALL-E 3' }
+        ]
+    };
+
+    function renderModelDropdown(agentKey) {
+        modelDropdownList.innerHTML = '';
+        const options = MODEL_OPTIONS[agentKey] || [];
+        options.forEach(opt => {
+            const li = document.createElement('li');
+            li.innerHTML = `<button type="button" class="dropdown-item flex items-center w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}">${opt.label}</button>`;
+            li.querySelector('button').addEventListener('click', () => {
+                selectedModel = opt.value;
+                modelDropdownLabel.textContent = opt.label;
+                modelDropdownMenu.style.display = 'none';
+            });
+            modelDropdownList.appendChild(li);
+        });
+        // Выбрать первую модель по умолчанию
+        if (options.length > 0) {
+            selectedModel = options[0].value;
+            modelDropdownLabel.textContent = options[0].label;
+        }
+    }
+
+    // --- Dropdown logic ---
+    agentDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        agentDropdownMenu.style.display = agentDropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', () => {
+        agentDropdownMenu.style.display = 'none';
+        modelDropdownMenu.style.display = 'none';
+    });
+    agentDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedAgent = btn.getAttribute('data-value');
+            agentDropdownLabel.textContent = btn.textContent.trim();
+            agentDropdownMenu.style.display = 'none';
+            renderModelDropdown(selectedAgent);
+        });
+    });
+
+    modelDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        modelDropdownMenu.style.display = modelDropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Инициализация при загрузке
+    renderModelDropdown(selectedAgent);
 
     // --- Core Logic ---
     async function handleGeneration() {
         const prompt = promptInput.value.trim();
         if (!prompt) return;
 
-        const model = modelSelect.value;
+        const model = selectedAgent;
+        const submodel = selectedModel;
+        // chat_id из глобальной переменной (инициализируется при старте или новом чате)
+        const chat_id = window.currentChatId || (window.currentChatId = generateChatId());
         addMessageToChat(prompt, 'user');
         promptInput.value = '';
         promptInput.style.height = 'auto';
@@ -22,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showLoader();
 
         try {
-            const result = await apiCall('/api/generate', 'POST', { model, prompt });
+            const result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id });
             removeLoader();
             addMessageToChat(result.content, 'ai');
             fetchAndRenderHistory();
