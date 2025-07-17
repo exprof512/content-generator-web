@@ -60,6 +60,8 @@ function activateChatLayout() {
     initialView.classList.add('hidden');
     chatMessages.classList.remove('hidden');
     chatContainer.classList.remove('justify-center');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.parentNode.scrollTop = chatMessages.parentNode.scrollHeight;
 }
 
 function resetChatLayout() {
@@ -94,7 +96,7 @@ function clearAppState() {
     resetChatLayout();
 }
 
-function addMessageToChat(content, type) {
+function addMessageToChat(content, type, historyId = null) {
     activateChatLayout();
     const chatMessages = document.getElementById('chat-messages');
     const messageWrapper = document.createElement('div');
@@ -108,7 +110,6 @@ function addMessageToChat(content, type) {
     const isUser = type === 'user';
     const isError = type === 'ai-error';
 
-    // Добавляем разный фон и тень для разделения
     messageElement.className = `chat-message group animate__animated animate__fadeInUp ${isUser ? 'user' : 'ai'} ${isUser ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-2xl shadow-lg px-5 py-4 max-w-xl lg:max-w-3xl`;
     messageElement.style.border = isUser ? '2px solid #a78bfa' : '2px solid #e5e7eb';
     messageElement.style.marginBottom = '12px';
@@ -137,11 +138,18 @@ function addMessageToChat(content, type) {
         });
         messageWrapper.appendChild(messageElement);
     } else {
-        // AI ответ: увеличиваем ширину, делаем фон светлее, кодовые блоки выделяем
         const aiBubble = document.createElement('div');
         aiBubble.className = `prose dark:prose-invert max-w-3xl w-full bg-gray-50 dark:bg-gray-900 border border-purple-100 dark:border-gray-700 px-6 py-5 rounded-2xl shadow-lg ${isError ? 'border-red-500' : ''}`;
-        const isImage = content.startsWith('https://') && /\.(jpg|jpeg|png|gif|webp)$/.test(content.split('?')[0]);
-        aiBubble.innerHTML = isImage && !isError ? `<img src="${content}" alt="Generated image" class="rounded-lg max-w-sm"/>` : marked.parse(content);
+        // Если это картинка DALL-E, используем прокси-эндпоинт
+        let isImage = false;
+        if (historyId && typeof content === 'string' && content.startsWith('https://')) {
+            isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(content.split('?')[0]);
+        }
+        if (isImage && !isError) {
+            aiBubble.innerHTML = `<img src="/api/image/${historyId}" alt="Generated image" class="rounded-lg max-w-sm"/>`;
+        } else {
+            aiBubble.innerHTML = marked.parse(content);
+        }
         // Стилизация code/pre
         aiBubble.querySelectorAll('pre').forEach(preElement => {
             preElement.classList.add('bg-gray-900', 'text-white', 'rounded-xl', 'p-4', 'overflow-x-auto', 'my-4', 'shadow-inner');
@@ -167,6 +175,8 @@ function addMessageToChat(content, type) {
     }
     chatMessages.appendChild(messageWrapper);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.classList.remove('hidden');
+    chatMessages.parentNode.scrollTop = chatMessages.parentNode.scrollHeight;
 }
 
 function showLoader() {

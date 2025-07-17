@@ -1,4 +1,4 @@
-<div id="app-page" class="hidden flex h-full">
+<div id="app-page" class="hidden flex h-full min-h-screen">
     <!-- Sidebar (History) -->
     <aside id="history-panel" class="hidden md:flex flex-col w-72 bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-xl transition-all duration-300">
         <!-- Верхний блок: Новый чат -->
@@ -17,7 +17,7 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col h-full relative">
         <!-- App Header with Account Dropdown -->
-        <header class="absolute top-0 right-0 p-4 z-10">
+        <header class="fixed top-0 right-0 p-4 z-30">
             <div class="relative">
                 <button id="user-profile-button" class="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold overflow-hidden shadow-lg hover:ring-2 hover:ring-purple-400 transition-all">
                     <!-- Avatar or Initial will be injected here -->
@@ -70,23 +70,27 @@
             </div>
         </header>
 
-        <main id="chat-container" class="flex-1 flex flex-col h-full items-center justify-center transition-all duration-500">
-            <div id="chat-messages" class="w-full max-w-4xl flex-1 overflow-y-auto p-4 md:p-6 space-y-8 hidden">
-                <!-- Chat messages will be injected here -->
-            </div>
-
+        <main id="chat-container" class="flex-1 flex flex-col h-full min-h-0 items-center justify-center transition-all duration-500 overflow-auto">
             <!-- Initial Centered View -->
-            <div id="initial-view" class="text-center">
+            <div id="initial-view" class="text-center sticky top-16 z-20 bg-white dark:bg-gray-800 py-8">
                 <svg class="w-16 h-16 mb-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300">Как я могу помочь?</h2>
                 <p class="text-gray-500">Выберите модель и задайте вопрос ниже</p>
             </div>
+            <div id="chat-messages" class="w-full max-w-4xl flex-1 overflow-y-auto p-4 md:p-6 space-y-8 hidden" style="min-height:0; flex: 1 1 auto;">
+                <!-- Chat messages will be injected here -->
+            </div>
 
             <!-- Prompt Input Area -->
-            <div id="prompt-wrapper" class="w-full p-4 md:p-6">
+            <div id="prompt-wrapper" class="w-full p-4 md:p-6 sticky bottom-0 bg-white dark:bg-gray-800 z-10">
                 <div class="max-w-4xl mx-auto mt-auto">
                     <div class="relative p-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 shadow-lg focus-within:ring-2 focus-within:ring-purple-500">
-                        <textarea id="prompt-input" class="w-full h-12 p-2 pr-28 bg-transparent resize-none focus:outline-none text-base" rows="1" placeholder="Введите ваш запрос..."></textarea>
+                        <textarea
+                            id="prompt-input"
+                            class="w-full min-h-[56px] max-h-40 p-2 pr-28 bg-transparent resize-none focus:outline-none text-base overflow-y-auto transition-all duration-200"
+                            rows="1"
+                            placeholder="Введите ваш запрос..."
+                        ></textarea>
                         <div class="flex items-center gap-3 mt-3 justify-end">
                             <!-- Кастомный dropdown для ИИ агента -->
                             <div class="relative group w-40">

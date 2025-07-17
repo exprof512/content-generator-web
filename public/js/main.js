@@ -42,10 +42,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             { value: 'dall-e-3', label: 'DALL-E 3' }
         ]
     };
+    const FREE_MODELS = {
+        chatgpt: ['gpt-4o-mini'],
+        gemini: ['gemini-1.5'],
+        deepseek: ['deepseek-chat'],
+        dalle: ['dall-e-2']
+    };
+    const PRO_IMAGE_LIMIT = 3;
+    const PRO_TEXT_LIMIT = 10;
+
+    let userTariff = 'free'; // default, обновляется после запроса /api/me
+    let imageGenCount = 0;
+    let textGenCount = 0;
+
+    async function fetchUserTariff() {
+        try {
+            const user = await apiCall('/api/me');
+            userTariff = user.tariff || 'free';
+            imageGenCount = user.image_gen_count || 0;
+            textGenCount = user.text_gen_count || 0;
+        } catch (e) {
+            userTariff = 'free';
+        }
+    }
 
     function renderModelDropdown(agentKey) {
         modelDropdownList.innerHTML = '';
-        const options = MODEL_OPTIONS[agentKey] || [];
+        let options = MODEL_OPTIONS[agentKey] || [];
+        if (userTariff === 'free') {
+            // Показываем только базовые модели
+            options = options.filter(opt => FREE_MODELS[agentKey]?.includes(opt.value));
+        }
         options.forEach(opt => {
             const li = document.createElement('li');
             li.innerHTML = `<button type="button" class="dropdown-item flex items-center w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}">${opt.label}</button>`;
@@ -87,6 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Инициализация при загрузке
+    await fetchUserTariff();
     renderModelDropdown(selectedAgent);
 
     // --- Core Logic ---
@@ -96,8 +124,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const model = selectedAgent;
         const submodel = selectedModel;
-        // chat_id из глобальной переменной (инициализируется при старте или новом чате)
         const chat_id = window.currentChatId || (window.currentChatId = generateChatId());
+
+        // Лимиты для free и pro
+        const isImageModel = model === 'dalle' || submodel.startsWith('dall-e');
+        if (userTariff === 'free' || userTariff === 'pro') {
+            if (isImageModel && imageGenCount >= PRO_IMAGE_LIMIT) {
+                addMessageToChat('Лимит генераций картинок исчерпан для вашего тарифа.', 'ai-error');
+                return;
+            }
+            if (!isImageModel && textGenCount >= PRO_TEXT_LIMIT) {
+                addMessageToChat('Лимит текстовых запросов исчерпан для вашего тарифа.', 'ai-error');
+                return;
+            }
+        }
+
         addMessageToChat(prompt, 'user');
         promptInput.value = '';
         promptInput.style.height = 'auto';
@@ -109,6 +150,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             removeLoader();
             addMessageToChat(result.content, 'ai');
             fetchAndRenderHistory();
+            // Увеличиваем счетчики
+            if (userTariff === 'free' || userTariff === 'pro') {
+                if (isImageModel) imageGenCount++;
+                else textGenCount++;
+            }
         } catch (error) {
             removeLoader();
             addMessageToChat(`Ошибка: ${error.message}`, 'ai-error');
@@ -133,8 +179,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         promptInput.addEventListener('input', () => {
             updateGenerateButtonState();
+            // Авто-увеличение высоты, как в ChatGPT
             promptInput.style.height = 'auto';
-            promptInput.style.height = (promptInput.scrollHeight) + 'px';
+            promptInput.style.height = Math.min(promptInput.scrollHeight, 160) + 'px'; // 160px = max-h-40
         });
     }
 

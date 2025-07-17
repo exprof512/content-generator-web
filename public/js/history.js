@@ -86,8 +86,8 @@ function loadChatMessages(chatItems) {
     chatMessages.innerHTML = '';
     activateChatLayout();
     chatItems.forEach(item => {
-        addMessageToChat(item.prompt, 'user');
-        addMessageToChat(item.response, 'ai');
+        addMessageToChat(item.prompt, 'user', item.id);
+        addMessageToChat(item.response, 'ai', item.id);
     });
 }
 
