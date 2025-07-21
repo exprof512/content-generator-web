@@ -71,14 +71,33 @@ async function fetchAndRenderHistory() {
     }
 }
 
+// Кастомное модальное окно для подтверждения удаления чата
+function showDeleteChatModal(chatId, element) {
+    let modal = document.getElementById('delete-chat-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    // Кнопки
+    const confirmBtn = document.getElementById('delete-chat-confirm');
+    const cancelBtn = document.getElementById('delete-chat-cancel');
+    // Очистка старых обработчиков
+    confirmBtn.onclick = null;
+    cancelBtn.onclick = null;
+    // Подтверждение
+    confirmBtn.onclick = async () => {
+        try {
+            await apiCall(`/api/history?chat_id=${encodeURIComponent(chatId)}`, 'DELETE');
+            element.remove();
+        } catch (error) {
+            // Можно добавить showToast или showErrorModal
+        }
+        modal.classList.add('hidden');
+    };
+    cancelBtn.onclick = () => modal.classList.add('hidden');
+    modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
+}
+
 async function handleDeleteChat(chatId, element) {
-    if (!confirm('Удалить весь чат?')) return;
-    try {
-        await apiCall(`/api/history?chat_id=${encodeURIComponent(chatId)}`, 'DELETE');
-        element.remove();
-    } catch (error) {
-        alert('Не удалось удалить чат.');
-    }
+    showDeleteChatModal(chatId, element);
 }
 
 function loadChatMessages(chatItems) {

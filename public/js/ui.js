@@ -274,3 +274,12 @@ function updateGenerateButtonState() {
         generateButton.disabled = promptInput.value.trim() === '';
     }
 }
+
+// Переключатель языка
+const langSwitcher = document.getElementById('lang-switcher');
+if (langSwitcher) {
+    langSwitcher.addEventListener('click', () => {
+        const nextLang = i18n.currentLang === 'ru' ? 'en' : 'ru';
+        i18n.setLanguage(nextLang);
+    });
+}

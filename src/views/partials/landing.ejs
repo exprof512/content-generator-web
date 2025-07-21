@@ -29,12 +29,9 @@
         <!-- Hero Section -->
         <section class="text-center py-20 md:py-32 px-4 animate__animated animate__fadeInDown animate__faster">
             <div class="max-w-3xl mx-auto">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4">
-                    Ваш <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">универсальный</span> AI-инструмент
-                </h1>
-                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">
-                    Объединяем лучшие AI-модели в одном месте. Генерируйте тексты и изображения быстрее, чем когда-либо.
-                </p>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4">Ваш <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">универсальный</span> AI-инструмент</h1>
+                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">Объединяем лучшие AI-модели в одном месте. Генерируйте тексты и изображения быстрее, чем когда-либо.</p>
+                <a id="hero-cta-btn" href="#" class="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold rounded-xl shadow-lg transition-all animate__animated animate__pulse animate__infinite">Начать бесплатно</a>
             </div>
         </section>
 
@@ -43,62 +40,124 @@
             <div class="max-w-screen-xl mx-auto">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Один интерфейс для всех задач</h2>
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
-                        Мы объединили лучшие нейросети, чтобы вы могли решать любые задачи в одном окне.
-                    </p>
+                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Мы объединили лучшие нейросети, чтобы вы могли решать любые задачи в одном окне.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
                     <!-- ChatGPT Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                        <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-500 rounded-xl flex items-center justify-center mb-4"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-14l2-2 2 2m-4 4l2 2 2-2m-4 4l2 2 2-2m-4 4l2 2 2-2"></path></svg></div>
+                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="ChatGPT иконка"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-14l2-2 2 2m-4 4l2 2 2-2m-4 4l2 2 2-2m-4 4l2 2 2-2"></path></svg>
+                        </div>
                         <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">ChatGPT</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Идеально для написания текстов, статей, писем и креативного контента. Ваш универсальный текстовый помощник.</p>
+                        <p class="text-gray-600 dark:text-gray-400">Генерация текстов, статей, писем, резюме. <b>До 10 текстовых запросов в день бесплатно.</b></p>
                     </div>
                     <!-- DALL-E Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center mb-4"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l2-2a2 2 0 012.828 0l2 2m-4 5h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
+                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="DALL-E иконка"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l2-2a2 2 0 012.828 0l2 2m-4 5h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        </div>
                         <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">DALL-E</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Создавайте уникальные изображения, иллюстрации и арт-объекты по текстовому описанию.</p>
+                        <p class="text-gray-600 dark:text-gray-400">Генерация уникальных изображений по описанию. <b>3 бесплатные картинки в день.</b></p>
                     </div>
                     <!-- Gemini Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mb-4"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-14l2-2 2 2m-4 4l2 2 2-2m-4 4l2 2 2-2m-4 4l2 2 2-2"></path></svg></div>
+                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Gemini иконка"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
+                        </div>
                         <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Gemini</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Мощная мультимодальная модель от Google для сложных аналитических задач и генерации идей.</p>
+                        <p class="text-gray-600 dark:text-gray-400">Аналитика, идеи, сложные задачи. <b>Бесплатный доступ к Gemini 1.5.</b></p>
                     </div>
                     <!-- DeepSeek Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                        <div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-xl flex items-center justify-center mb-4"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg></div>
+                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
+                        <div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="DeepSeek иконка"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        </div>
                         <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">DeepSeek Coder</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Ваш незаменимый помощник в написании, отладке и рефакторинге кода на любом языке программирования.</p>
+                        <p class="text-gray-600 dark:text-gray-400">Генерация и рефакторинг кода, помощь с программированием. <b>Бесплатный доступ к DeepSeek Chat.</b></p>
                     </div>
                 </div>
                 <!-- Преимущества платформы (бывший блок "О платформе") -->
-                <div class="max-w-4xl mx-auto text-center mt-16">
-                    <p class="text-lg text-gray-600 dark:text-gray-300 mb-8" data-lang="about-desc">
-                        ContentGen Hub — это ваш универсальный AI-хаб: тексты, изображения, код, аналитика. Всё в одном окне, с удобным интерфейсом и прозрачными тарифами.
-                    </p>
+                <div class="max-w-4xl mx-auto text-center mt-16 animate__animated animate__fadeInUp animate__delay-2s">
+                    <h2 class="text-2xl font-bold mb-6">Почему выбирают ContentGen Hub?</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
                             <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-400 text-white">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m4 0h-1v-4h-1"></path></svg>
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Все топовые AI-модели"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m4 0h-1v-4h-1"></path></svg>
                             </div>
-                            <h3 class="font-bold text-lg mb-2" data-lang="about-1-title">Все топовые AI-модели</h3>
-                            <p class="text-gray-500 dark:text-gray-400" data-lang="about-1-desc">ChatGPT, Gemini, DALL-E, DeepSeek и другие — в одном аккаунте.</p>
+                            <h3 class="font-bold text-lg mb-2">Все топовые AI-модели</h3>
+                            <p class="text-gray-500 dark:text-gray-400">ChatGPT, Gemini, DALL-E, DeepSeek и другие — в одном аккаунте. <b>Без переключения между сервисами.</b></p>
                         </div>
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
                             <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 text-white">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"></path></svg>
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Скорость и простота"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"></path></svg>
                             </div>
-                            <h3 class="font-bold text-lg mb-2" data-lang="about-2-title">Простота и скорость</h3>
-                            <p class="text-gray-500 dark:text-gray-400" data-lang="about-2-desc">Минималистичный интерфейс, быстрый отклик, ничего лишнего.</p>
+                            <h3 class="font-bold text-lg mb-2">Скорость и простота</h3>
+                            <p class="text-gray-500 dark:text-gray-400">Генерация за 5 секунд, минималистичный интерфейс, ничего лишнего. <b>Всё для продуктивности.</b></p>
                         </div>
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
                             <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-purple-400 text-white">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Выгодно и честно"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <h3 class="font-bold text-lg mb-2" data-lang="about-3-title">Выгодно и честно</h3>
-                            <p class="text-gray-500 dark:text-gray-400" data-lang="about-3-desc">Прозрачные тарифы, бесплатный старт, поддержка 24/7.</p>
+                            <h3 class="font-bold text-lg mb-2">Выгодно и честно</h3>
+                            <p class="text-gray-500 dark:text-gray-400">Прозрачные тарифы, бесплатный старт, <b>поддержка 24/7</b>, безопасность данных.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Как это работает -->
+        <section class="py-20 px-4 bg-white dark:bg-gray-900 animate__animated animate__fadeInUp animate__delay-3s">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-extrabold mb-8">Как это работает?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">1</div>
+                        <p>Зарегистрируйтесь или войдите</p>
+                    </div>
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">2</div>
+                        <p>Выберите AI-модель</p>
+                    </div>
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">3</div>
+                        <p>Опишите задачу или вопрос</p>
+                    </div>
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">4</div>
+                        <p>Получите результат за секунды!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Партнёры -->
+        <!-- (секция удалена по требованию) -->
+        <!-- FAQ с микроразметкой -->
+        <section class="py-20 px-4 bg-white dark:bg-gray-900 animate__animated animate__fadeInUp animate__delay-5s" itemscope itemtype="https://schema.org/FAQPage">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl font-extrabold mb-8">Частые вопросы</h2>
+                <div class="space-y-6">
+                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                        <h3 class="text-lg font-bold mb-2" itemprop="name">Как начать пользоваться сервисом?</h3>
+                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                            <p itemprop="text">Зарегистрируйтесь или войдите, выберите модель и начните генерировать тексты или изображения.</p>
+                        </div>
+                    </div>
+                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                        <h3 class="text-lg font-bold mb-2" itemprop="name">Какие есть бесплатные возможности?</h3>
+                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                            <p itemprop="text">10 текстовых генераций и 3 картинки DALL-E 2 в день бесплатно. Доступ к базовым моделям без ограничений.</p>
+                        </div>
+                    </div>
+                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                        <h3 class="text-lg font-bold mb-2" itemprop="name">Как оплатить подписку?</h3>
+                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                            <p itemprop="text">Перейдите на страницу <a href="/pricing" class="text-purple-600 underline">Тарифы</a> и выберите подходящий план.</p>
+                        </div>
+                    </div>
+                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                        <h3 class="text-lg font-bold mb-2" itemprop="name">Как связаться с поддержкой?</h3>
+                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                            <p itemprop="text">Пишите на <a href="mailto:support@contentgenhub.ru" class="text-purple-600 underline">support@contentgenhub.ru</a> или используйте чат поддержки на сайте.</p>
                         </div>
                     </div>
                 </div>

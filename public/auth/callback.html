@@ -15,15 +15,52 @@
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="text-center">
+    <div class="text-center" id="loader-block">
         <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mx-auto"></div>
         <h2 class="text-2xl font-semibold mt-4 text-gray-700">Выполняется вход...</h2>
+    </div>
+    <div class="hidden text-center max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg" id="consent-block">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Требуется согласие</h2>
+        <p class="mb-4 text-gray-700">Для регистрации через Google необходимо принять <a href="/privacy" target="_blank" class="underline text-purple-600">политику конфиденциальности</a> и <a href="/terms" target="_blank" class="underline text-purple-600">условия пользования</a>.</p>
+        <form id="consent-form">
+            <div class="flex items-center justify-center mb-4">
+                <input type="checkbox" id="consent-checkbox" required class="mr-2">
+                <label for="consent-checkbox" class="text-sm text-gray-600">Я принимаю условия</label>
+            </div>
+            <input type="hidden" id="consent-email">
+            <button type="submit" class="w-full px-4 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">Зарегистрироваться через Google</button>
+        </form>
+        <p class="text-red-500 text-sm mt-2 hidden" id="consent-error"></p>
     </div>
     <script>
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
-        if (token) localStorage.setItem('jwt_token', token);
-        window.location.href = '/';
+        const error = params.get('error');
+        const email = params.get('email');
+        if (token) {
+            localStorage.setItem('jwt_token', token);
+            window.location.href = '/';
+        } else if (error === 'new_user_no_consent') {
+            document.getElementById('loader-block').classList.add('hidden');
+            const consentBlock = document.getElementById('consent-block');
+            consentBlock.classList.remove('hidden');
+            if (email) document.getElementById('consent-email').value = email;
+            document.getElementById('consent-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const checkbox = document.getElementById('consent-checkbox');
+                if (!checkbox.checked) {
+                    document.getElementById('consent-error').textContent = 'Необходимо принять условия!';
+                    document.getElementById('consent-error').classList.remove('hidden');
+                    return;
+                }
+                // Перенаправляем на Google OAuth с register=1 и email (если есть)
+                let baseUrl = window.API_BASE_URL || '';
+                if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+                let url = baseUrl + '/auth/google/login?register=1';
+                if (email) url += `&email=${encodeURIComponent(email)}`;
+                window.location.href = url;
+            });
+        }
     </script>
 </body>
 </html>

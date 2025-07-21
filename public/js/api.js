@@ -20,7 +20,12 @@ async function apiCall(endpoint, method = 'GET', body = null) {
         options.body = JSON.stringify(body);
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, options);
+    let response;
+    try {
+        response = await fetch(`${API_URL}${endpoint}`, options);
+    } catch (e) {
+        throw new Error('Network error');
+    }
 
     if (response.status === 401) {
         window.logout(); // Токен невалиден или истек
@@ -28,7 +33,8 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     }
 
     if (!response.ok) {
-        const errorData = await response.json();
+        let errorData = {};
+        try { errorData = await response.json(); } catch {}
         throw new Error(errorData.error || 'API request failed');
     }
 
@@ -58,4 +64,9 @@ async function publicApiCall(endpoint, method = 'POST', body = null) {
     }
 
     return response.json();
+}
+
+// Проверка подписки пользователя
+async function checkSubscription() {
+    return apiCall('/api/subscription/check', 'GET');
 }

@@ -34,27 +34,69 @@ async function fetchUserData() {
     const accountGenerations = document.getElementById('account-generations');
     const accountExpires = document.getElementById('account-expires');
 
+    function showLoader() {
+        let loader = document.getElementById('global-loader');
+        if (!loader) {
+            loader = document.createElement('div');
+            loader.id = 'global-loader';
+            loader.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30';
+            loader.innerHTML = '<div class="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-500"></div>';
+            document.body.appendChild(loader);
+        }
+        loader.style.display = 'flex';
+    }
+    function hideLoader() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.style.display = 'none';
+    }
+
+    showLoader();
     try {
         const user = await apiCall('/api/me');
         const userInitial = user.name.charAt(0).toUpperCase();
 
-        if (user.avatar_url) {
-            const avatarImg = `<img src="${user.avatar_url}" alt="Avatar" class="w-full h-full object-cover">`;
-            profileButton.innerHTML = avatarImg;
-            dropdownAvatar.innerHTML = avatarImg;
-        } else {
-            profileButton.textContent = userInitial;
-            dropdownAvatar.textContent = userInitial;
+        // --- Страница аккаунта ---
+        const isAccountPage = !!document.getElementById('account-tariff');
+        if (isAccountPage) {
+            if (document.getElementById('account-name')) document.getElementById('account-name').textContent = user.name;
+            if (document.getElementById('account-email')) document.getElementById('account-email').textContent = user.email;
+            if (document.getElementById('account-tariff')) document.getElementById('account-tariff').textContent = user.tariff;
+            if (document.getElementById('account-generations')) document.getElementById('account-generations').textContent = user.generations_left;
+            if (document.getElementById('account-expires')) document.getElementById('account-expires').textContent = new Date(user.subscription_expires).toLocaleDateString('ru-RU', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
         }
-        dropdownName.textContent = user.name;
-        dropdownEmail.textContent = user.email;
-        accountTariff.textContent = user.tariff.charAt(0).toUpperCase() + user.tariff.slice(1);
-        accountGenerations.textContent = user.generations_left;
-        accountExpires.textContent = new Date(user.subscription_expires_at).toLocaleDateString('ru-RU');
 
+        // --- Основное приложение (чат, дропдаун профиля) ---
+        const isAppPage = !!document.getElementById('user-profile-button');
+        if (isAppPage) {
+            const profileButton = document.getElementById('user-profile-button');
+            const dropdownAvatar = document.getElementById('dropdown-user-avatar');
+            const dropdownName = document.getElementById('dropdown-user-name');
+            const dropdownEmail = document.getElementById('dropdown-user-email');
+            const accountTariff = document.getElementById('account-tariff');
+            const accountGenerations = document.getElementById('account-generations');
+            const accountExpires = document.getElementById('account-expires');
+
+            if (user.avatar_url) {
+                // Делаем аватар всегда круглым
+                const avatarImg = `<img src="${user.avatar_url}" alt="Avatar" class="w-full h-full object-cover rounded-full">`;
+                if (profileButton) profileButton.innerHTML = avatarImg;
+                if (dropdownAvatar) dropdownAvatar.innerHTML = avatarImg;
+            } else {
+                if (profileButton) profileButton.textContent = userInitial;
+                if (dropdownAvatar) dropdownAvatar.textContent = userInitial;
+            }
+            if (dropdownName) dropdownName.textContent = user.name;
+            if (dropdownEmail) dropdownEmail.textContent = user.email;
+            if (accountTariff) accountTariff.textContent = user.tariff.charAt(0).toUpperCase() + user.tariff.slice(1);
+            if (accountGenerations) accountGenerations.textContent = user.generations_left;
+            if (accountExpires) accountExpires.textContent = new Date(user.subscription_expires).toLocaleDateString('ru-RU');
+        }
     } catch (error) {
-        console.error('Failed to fetch user data:', error);
-        // apiCall will trigger logout on 401
+        alert('Ошибка загрузки данных пользователя: ' + (error.message || 'Нет соединения с сервером'));
+    } finally {
+        hideLoader();
     }
 }
 
@@ -86,7 +128,7 @@ async function handleEmailRegister(event) {
     }
 }
 
-async function handleEmailLogin(event) {
+window.handleEmailLogin = async function(event) {
     event.preventDefault();
     const form = event.target;
     const email = form.email.value;
@@ -98,12 +140,16 @@ async function handleEmailLogin(event) {
         localStorage.setItem('jwt_token', data.token);
         hideAuthModal();
         updateAuthState(true);
+        // --- КРИТИЧЕСКОЕ ДОБАВЛЕНИЕ ---
+        if (typeof window.renderUserProfile === 'function') {
+            window.renderUserProfile();
+        }
     } catch (error) {
         errorEl.textContent = error.message;
     }
 }
 
-async function handleForgotPasswordRequest(event) {
+window.handleForgotPasswordRequest = async function(event) {
     event.preventDefault();
     const form = event.target;
     const email = form.email.value;

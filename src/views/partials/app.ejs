@@ -3,7 +3,7 @@
     <aside id="history-panel" class="hidden md:flex flex-col w-72 bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-xl transition-all duration-300">
         <!-- Верхний блок: Новый чат -->
         <div class="flex flex-col items-center gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
-            <button id="new-chat-button" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold text-lg shadow-lg hover:from-purple-700 hover:to-pink-600 transition-all duration-300">
+            <button id="new-chat-button" class="w-full md:w-auto flex items-center justify-center py-3 px-6 text-lg rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold transition-all duration-200 shadow-lg md:shadow-none bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 dark:bg-gradient-to-r dark:from-purple-800 dark:to-pink-900 dark:text-purple-200 dark:hover:from-purple-900 dark:hover:to-pink-900">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                 Новый чат
             </button>
@@ -16,84 +16,13 @@
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col h-full relative">
-        <!-- App Header with Account Dropdown -->
-        <header class="fixed top-0 right-0 p-4 z-30">
-            <div class="relative">
-                <button id="user-profile-button" class="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold overflow-hidden shadow-lg hover:ring-2 hover:ring-purple-400 transition-all">
-                    <!-- Avatar or Initial will be injected here -->
-                </button>
-                <!-- Account Dropdown -->
-                <div id="account-dropdown" class="hidden absolute top-14 right-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-1 animate__animated animate__fadeIn animate__faster">
-                    <div class="p-3">
-                        <div class="flex items-center gap-4 mb-3">
-                            <div id="dropdown-user-avatar" class="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center text-xl font-bold overflow-hidden"></div>
-                            <div>
-                                <div id="dropdown-user-name" class="font-semibold text-gray-900 dark:text-white truncate"></div>
-                                <div id="dropdown-user-email" class="text-sm text-gray-500 dark:text-gray-400 truncate"></div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-300">Тариф: <b id="account-tariff" class="text-gray-800 dark:text-white"></b></span>
-                                <a href="/pricing" class="text-purple-600 dark:text-purple-400 hover:underline font-medium">Сменить</a>
-                            </div>
-                            <div class="mt-2">
-                                <p class="text-gray-600 dark:text-gray-300">Осталось генераций: <b id="account-generations" class="text-gray-800 dark:text-white"></b></p>
-                                <p class="text-gray-600 dark:text-gray-300">Активен до: <b id="account-expires" class="text-gray-800 dark:text-white"></b></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                    <div class="p-1 text-gray-700 dark:text-gray-300">
-                        <div class="px-3 py-2 flex justify-between items-center text-sm">
-                            <span>Темная тема</span>
-                            <label for="theme-toggle" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="theme-toggle" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-                            </label>
-                        </div>
-                        <div class="px-3 py-2 flex justify-between items-center text-sm">
-                            <span>Язык</span>
-                            <div class="flex items-center gap-1">
-                                <button id="lang-ru-btn" class="px-2 py-1 rounded-md bg-gray-200 dark:bg-gray-700 font-bold" data-lang-btn="RU">RU</button>
-                                <button id="lang-en-btn" class="px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700" data-lang-btn="EN">EN</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                    <div class="p-1">
-                        <a href="/privacy" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Privacy Policy</a>
-                        <a href="/terms" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Terms of Use</a>
-                        <button id="logout-button" class="block w-full text-left mt-1 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Выйти</button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main id="chat-container" class="flex-1 flex flex-col h-full min-h-0 items-center justify-center transition-all duration-500 overflow-auto">
-            <!-- Initial Centered View -->
-            <div id="initial-view" class="text-center sticky top-16 z-20 bg-white dark:bg-gray-800 py-8">
-                <svg class="w-16 h-16 mb-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300">Как я могу помочь?</h2>
-                <p class="text-gray-500">Выберите модель и задайте вопрос ниже</p>
-            </div>
-            <div id="chat-messages" class="w-full max-w-4xl flex-1 overflow-y-auto p-4 md:p-6 space-y-8 hidden" style="min-height:0; flex: 1 1 auto;">
-                <!-- Chat messages will be injected here -->
-            </div>
-
-            <!-- Prompt Input Area -->
-            <div id="prompt-wrapper" class="w-full p-4 md:p-6 sticky bottom-0 bg-white dark:bg-gray-800 z-10">
-                <div class="max-w-4xl mx-auto mt-auto">
-                    <div class="relative p-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 shadow-lg focus-within:ring-2 focus-within:ring-purple-500">
-                        <textarea
-                            id="prompt-input"
-                            class="w-full min-h-[56px] max-h-40 p-2 pr-28 bg-transparent resize-none focus:outline-none text-base overflow-y-auto transition-all duration-200"
-                            rows="1"
-                            placeholder="Введите ваш запрос..."
-                        ></textarea>
-                        <div class="flex items-center gap-3 mt-3 justify-end">
+        <!-- Визуальное разделение header и блока выбора моделей -->
+        <div class="w-full h-4 bg-gradient-to-r from-purple-100/60 via-pink-100/60 to-blue-100/60 dark:from-purple-900/40 dark:via-pink-900/40 dark:to-blue-900/40 shadow-md animate__animated animate__fadeIn"></div>
+        <!-- Блок выбора ИИ и модели -->
+        <div class="w-full max-w-4xl mx-auto flex flex-col md:flex-row gap-2 md:gap-4 items-center justify-center mt-6 mb-6 px-4 z-30 relative">
+            <div class="w-full bg-white/70 dark:bg-gray-900/70 rounded-2xl shadow-lg p-4 flex flex-col md:flex-row gap-2 items-center animate__animated animate__fadeIn">
                             <!-- Кастомный dropdown для ИИ агента -->
-                            <div class="relative group w-40">
+                <div class="relative group w-full md:w-1/3">
                                 <button id="agent-dropdown-btn" type="button"
                                     class="flex items-center w-full px-4 py-2 rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 shadow-sm text-sm font-semibold text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
                                 >
@@ -108,7 +37,7 @@
                                     </svg>
                                 </button>
                                 <div id="agent-dropdown-menu"
-                                    class="absolute left-0 top-full mt-2 w-full z-20 bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-xl shadow-lg opacity-0 pointer-events-none group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200"
+                        class="absolute left-0 top-full mt-2 w-full z-40 bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-xl shadow-lg opacity-0 pointer-events-none group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200"
                                     style="display:none"
                                 >
                                     <ul>
@@ -120,7 +49,7 @@
                                 </div>
                             </div>
                             <!-- Кастомный dropdown для модели -->
-                            <div class="relative group w-44">
+                <div class="relative group w-full md:w-1/3">
                                 <button id="model-dropdown-btn" type="button"
                                     class="flex items-center w-full px-4 py-2 rounded-lg border border-pink-300 dark:border-pink-700 bg-white dark:bg-gray-800 shadow-sm text-sm font-semibold text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-200"
                                 >
@@ -136,7 +65,7 @@
                                     </svg>
                                 </button>
                                 <div id="model-dropdown-menu"
-                                    class="absolute left-0 top-full mt-2 w-full z-20 bg-white dark:bg-gray-800 border border-pink-200 dark:border-pink-700 rounded-xl shadow-lg opacity-0 pointer-events-none group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200"
+                        class="absolute left-0 top-full mt-2 w-full z-40 bg-white dark:bg-gray-800 border border-pink-200 dark:border-pink-700 rounded-xl shadow-lg opacity-0 pointer-events-none group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200"
                                     style="display:none"
                                 >
                                     <ul id="model-dropdown-list">
@@ -144,11 +73,121 @@
                                     </ul>
                                 </div>
                             </div>
-                            <button id="generate-button" class="p-3 px-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-semibold text-lg shadow-lg hover:from-purple-700 hover:to-pink-600 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed relative">
-                                <span id="generate-btn-text" data-lang="generate">Генерировать</span>
-                                <span id="generate-btn-spinner" class="hidden ml-2"><span class="loader"></span></span>
+            </div>
+        </div>
+        <!-- Контейнер для кнопок FAQ и профиля -->
+        <div class="fixed top-6 right-6 flex gap-4 z-40">
+            <button id="faq-btn" aria-label="Справка / FAQ" class="w-12 h-12 flex items-center justify-center rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all text-2xl">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-2m0-4h.01"/></svg>
+            </button>
+            <button id="user-profile-button" aria-label="Профиль" class="w-12 h-12 flex items-center justify-center rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all text-2xl font-bold">
+                П
                             </button>
                         </div>
+        <!-- FAQ Modal (обязательно для работы кнопки FAQ, управляется main.js) -->
+        <!--
+            faq-modal должен быть sibling (или child) относительно app-page, чтобы main.js мог его найти по id.
+            faqClose — кнопка закрытия, faq-modal — overlay.
+        -->
+        <div id="faq-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center animate__animated animate__fadeIn animate__faster">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl relative p-8">
+                <button id="faq-close" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">FAQ / Справка</h2>
+                <div class="space-y-4 text-gray-700 dark:text-gray-200">
+                    <div>
+                        <b>Как пользоваться сервисом?</b>
+                        <p>Выберите модель, введите запрос и нажмите "Генерировать". История чатов сохраняется автоматически.</p>
+                    </div>
+                    <div>
+                        <b>Какие есть тарифы?</b>
+                        <p>Бесплатный тариф — 10 генераций в день, PRO — 100 генераций и доступ ко всем моделям. Подробнее на странице <a href="/pricing" class="text-purple-600 underline">Тарифы</a>.</p>
+                    </div>
+                    <div>
+                        <b>Как оплатить подписку?</b>
+                        <p>Перейдите на страницу <a href="/pricing" class="text-purple-600 underline">Тарифы</a> и выберите подходящий план.</p>
+                    </div>
+                    <div>
+                        <b>Возникли вопросы?</b>
+                        <p>Пишите на <a href="mailto:support@contentgenhub.ru" class="text-purple-600 underline">support@contentgenhub.ru</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- PRO Modal (аналог FAQ, для уведомления о PRO) -->
+        <!--
+            pro-modal должен быть sibling (или child) относительно app-page, чтобы main.js мог его найти по id.
+            pro-modal-close — кнопка закрытия, pro-modal — overlay.
+        -->
+        <div id="pro-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center animate__animated animate__fadeIn animate__faster">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl relative p-8">
+                <button id="pro-modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">PRO-доступ</h2>
+                <div class="space-y-4 text-gray-700 dark:text-gray-200">
+                    <div>
+                        <b>Эта модель доступна только в PRO-версии.</b>
+                        <p>Оформите подписку, чтобы получить доступ ко всем возможностям и моделям.</p>
+                    </div>
+                    <div>
+                        <a href="/pricing" class="inline-block mt-4 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors">Перейти к тарифам</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Delete Chat Modal (аналог FAQ/PRO, для подтверждения удаления чата) -->
+        <!--
+            delete-chat-modal должен быть sibling (или child) относительно app-page, чтобы JS мог его найти по id.
+            delete-chat-confirm/delete-chat-cancel — кнопки подтверждения/отмены.
+        -->
+        <div id="delete-chat-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center animate__animated animate__fadeIn animate__faster">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md relative p-8">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Удалить чат?</h2>
+                <div class="text-gray-700 dark:text-gray-200 mb-6">Вы действительно хотите удалить этот чат? Это действие необратимо.</div>
+                <div class="flex justify-end gap-4">
+                    <button id="delete-chat-cancel" class="px-6 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Отмена</button>
+                    <button id="delete-chat-confirm" class="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">Удалить</button>
+                </div>
+            </div>
+        </div>
+        <!-- Баннер перехода на PRO -->
+        <div id="pro-banner" class="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-center py-3 px-4 font-bold shadow-lg hidden">
+            Хотите больше возможностей? <a href="/pricing" class="underline font-semibold">Перейти на PRO →</a>
+            <button id="pro-banner-close" class="ml-4 text-white text-xl font-bold align-middle hover:text-gray-200">&times;</button>
+        </div>
+
+        <main id="chat-container" class="flex-1 flex flex-col h-full min-h-0 items-center justify-center transition-all duration-500 overflow-auto">
+            <!-- Initial Centered View -->
+            <div id="initial-view" class="text-center sticky top-16 z-20 bg-gradient-to-br from-white via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 py-12 px-8 animate__animated animate__fadeIn rounded-2xl shadow-xl mx-auto max-w-3xl mt-6 mb-6">
+                <svg class="w-16 h-16 mb-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">Как я могу помочь?</h2>
+                <p class="text-gray-500 dark:text-gray-400">Выберите модель и задайте вопрос ниже</p>
+            </div>
+            <div id="chat-messages" class="w-full max-w-4xl flex-1 overflow-y-auto p-4 md:p-6 space-y-8 hidden" style="min-height:0; flex: 1 1 auto;">
+                <!-- Chat messages will be injected here -->
+            </div>
+
+            <!-- Prompt Input Area -->
+            <div id="prompt-wrapper" class="w-full p-4 md:p-6 sticky bottom-0 bg-white dark:bg-gray-800 z-10 border-t border-gray-200 dark:border-gray-700 shadow-lg animate__animated animate__fadeIn">
+                <div class="max-w-4xl mx-auto mt-auto">
+                    <div class="mb-2 flex flex-wrap gap-2 justify-start">
+                        <button type="button" class="quick-template-btn flex items-center gap-2 px-4 py-2 rounded-full border border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-100/80 to-pink-100/80 dark:from-purple-900/60 dark:to-pink-900/60 text-purple-700 dark:text-purple-200 font-semibold text-sm hover:bg-purple-200 dark:hover:bg-purple-800 transition-all animate__animated animate__fadeIn" data-template="Составь резюме для junior frontend разработчика"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 7V5a2 2 0 012-2h8a2 2 0 012 2v2M6 7h12M6 7v10a2 2 0 002 2h8a2 2 0 002-2V7M6 7l6 5 6-5"/></svg>Резюме</button>
+                        <button type="button" class="quick-template-btn flex items-center gap-2 px-4 py-2 rounded-full border border-pink-200 dark:border-pink-700 bg-gradient-to-r from-pink-100/80 to-blue-100/80 dark:from-pink-900/60 dark:to-blue-900/60 text-pink-700 dark:text-pink-200 font-semibold text-sm hover:bg-pink-200 dark:hover:bg-pink-800 transition-all animate__animated animate__fadeIn" data-template="Напиши деловое письмо партнёру о переносе встречи"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Письмо</button>
+                        <button type="button" class="quick-template-btn flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-blue-900/60 dark:to-purple-900/60 text-blue-700 dark:text-blue-200 font-semibold text-sm hover:bg-blue-200 dark:hover:bg-blue-800 transition-all animate__animated animate__fadeIn" data-template="Создай пост для соцсетей о запуске нового AI-сервиса"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8a9 9 0 100-18 9 9 0 000 18z"/></svg>Пост для соцсетей</button>
+                    </div>
+                    <div class="relative p-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 shadow-lg focus-within:ring-2 focus-within:ring-purple-500 flex flex-col md:flex-row items-end gap-2">
+                        <textarea
+                            id="prompt-input"
+                            class="w-full min-h-[56px] max-h-40 p-2 pr-28 bg-transparent resize-none focus:outline-none text-base overflow-y-auto transition-all duration-200"
+                            rows="1"
+                            placeholder="Введите ваш запрос..."
+                        ></textarea>
+                        <button id="generate-button" type="button" class="w-full md:w-auto flex items-center justify-center py-3 px-6 text-lg rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold transition-all duration-200 mt-2 md:mt-0 shadow-lg md:shadow-none fixed md:static bottom-20 right-6 md:bottom-auto md:right-auto z-40 md:z-auto animate__animated animate__fadeIn dark:bg-gradient-to-r dark:from-purple-800 dark:to-pink-900 dark:text-purple-200 dark:hover:from-purple-900 dark:hover:to-pink-900">
+                            <span class="hidden md:inline">Генерировать</span>
+                            <svg class="inline w-6 h-6 ml-1 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-require('dotenv').config(); // Load .env file
+require('dotenv').config({ path: path.join(__dirname, '.env') }); // Load .env file from project dir
 
 const app = express();
 const port = process.env.PORT || 3000;

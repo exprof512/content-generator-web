@@ -1,0 +1,1 @@
+window.ADMIN_EMAIL = "exprof512@gmail.com"; 

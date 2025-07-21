@@ -1,4 +1,5 @@
-let postLoginAction = null; // Global variable to store intended action
+// Удаляю неиспользуемые переменные
+// let postLoginAction = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     // --- DOM Elements ---
@@ -7,8 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const generateButton = document.getElementById('generate-button');
     const modelSelect = document.getElementById('model-select');
     const submodelSelect = document.getElementById('submodel-select');
-    const profileButton = document.getElementById('user-profile-button');
-    const accountDropdown = document.getElementById('account-dropdown');
+    // const profileButton = document.getElementById('user-profile-button');
+    // const accountDropdown = document.getElementById('account-dropdown');
     const agentDropdownBtn = document.getElementById('agent-dropdown-btn');
     const agentDropdownMenu = document.getElementById('agent-dropdown-menu');
     const agentDropdownLabel = document.getElementById('agent-dropdown-label');
@@ -28,8 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             { value: 'gpt-4.1', label: 'GPT-4.1' }
         ],
         gemini: [
-            { value: 'gemini-pro', label: 'Gemini Pro' },
-            { value: 'gemini-1.5', label: 'Gemini 1.5' }
+            { value: 'gemini-1.5', label: 'Gemini 1.5' },
+            { value: 'gemini-pro', label: 'Gemini Pro' }
         ],
         deepseek: [
             { value: 'deepseek-chat', label: 'DeepSeek Chat' },
@@ -46,118 +47,223 @@ document.addEventListener('DOMContentLoaded', async () => {
         chatgpt: ['gpt-4o-mini'],
         gemini: ['gemini-1.5'],
         deepseek: ['deepseek-chat'],
-        dalle: ['dall-e-2']
+        dalle: ['gpt-image-1']
     };
     const PRO_IMAGE_LIMIT = 3;
     const PRO_TEXT_LIMIT = 10;
 
     let userTariff = 'free'; // default, обновляется после запроса /api/me
+    let userEmail = '';
+    let isAdmin = false;
     let imageGenCount = 0;
     let textGenCount = 0;
 
+    // Loader
+    function showLoader() {
+        let loader = document.getElementById('global-loader');
+        if (!loader) {
+            loader = document.createElement('div');
+            loader.id = 'global-loader';
+            loader.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30';
+            loader.innerHTML = '<div class="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-500"></div>';
+            document.body.appendChild(loader);
+        }
+        loader.style.display = 'flex';
+    }
+    function hideLoader() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.style.display = 'none';
+    }
+
     async function fetchUserTariff() {
+        showLoader();
         try {
             const user = await apiCall('/api/me');
             userTariff = user.tariff || 'free';
+            userEmail = user.email || '';
             imageGenCount = user.image_gen_count || 0;
             textGenCount = user.text_gen_count || 0;
+            isAdmin = (window.ADMIN_EMAIL && userEmail === window.ADMIN_EMAIL);
         } catch (e) {
             userTariff = 'free';
+            userEmail = '';
+            isAdmin = false;
+        } finally {
+            hideLoader();
         }
+    }
+
+    // --- Кастомное модальное окно для PRO ---
+    function showProModal() {
+        let modal = document.getElementById('pro-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        // Закрытие по кнопке или overlay
+        const closeBtn = document.getElementById('pro-modal-close');
+        if (closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
+        modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
     }
 
     function renderModelDropdown(agentKey) {
         modelDropdownList.innerHTML = '';
-        let options = MODEL_OPTIONS[agentKey] || [];
-        if (userTariff === 'free') {
-            // Показываем только базовые модели
-            options = options.filter(opt => FREE_MODELS[agentKey]?.includes(opt.value));
-        }
+        const options = MODEL_OPTIONS[agentKey] || [];
+        const freeModelsForAgent = FREE_MODELS[agentKey] || [];
+
         options.forEach(opt => {
+            const isProModel = !freeModelsForAgent.includes(opt.value);
             const li = document.createElement('li');
-            li.innerHTML = `<button type="button" class="dropdown-item flex items-center w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}">${opt.label}</button>`;
-            li.querySelector('button').addEventListener('click', () => {
+
+            const proBadge = isProModel
+                ? '<span class="ml-2 text-xs font-semibold text-pink-600 bg-pink-100 dark:bg-pink-800 dark:text-pink-200 px-2 py-0.5 rounded-full">PRO</span>'
+                : '';
+
+            li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}"><span>${opt.label}</span>${proBadge}</button>`;
+
+            const button = li.querySelector('button');
+            button.addEventListener('click', () => {
+                if (!isAdmin && isProModel && userTariff === 'free') {
+                    showProModal(); // Был alert, теперь кастомная модалка
+                    modelDropdownMenu.style.display = 'none';
+                    return;
+                }
                 selectedModel = opt.value;
                 modelDropdownLabel.textContent = opt.label;
                 modelDropdownMenu.style.display = 'none';
             });
+
             modelDropdownList.appendChild(li);
         });
-        // Выбрать первую модель по умолчанию
-        if (options.length > 0) {
-            selectedModel = options[0].value;
-            modelDropdownLabel.textContent = options[0].label;
+
+        // Выбрать первую доступную модель по умолчанию
+        let defaultOption;
+        if (isAdmin) {
+            defaultOption = options[0];
+        } else {
+            defaultOption = options.find(opt => freeModelsForAgent.includes(opt.value)) || options[0];
+        }
+        if (defaultOption) {
+            selectedModel = defaultOption.value;
+            modelDropdownLabel.textContent = defaultOption.label;
+        } else {
+            selectedModel = null;
+            modelDropdownLabel.textContent = 'Нет доступных моделей';
+            if (generateButton) generateButton.disabled = true;
         }
     }
 
-    // --- Dropdown logic ---
-    agentDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        agentDropdownMenu.style.display = agentDropdownMenu.style.display === 'block' ? 'none' : 'block';
-    });
-    document.addEventListener('click', () => {
-        agentDropdownMenu.style.display = 'none';
-        modelDropdownMenu.style.display = 'none';
-    });
-    agentDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedAgent = btn.getAttribute('data-value');
-            agentDropdownLabel.textContent = btn.textContent.trim();
-            agentDropdownMenu.style.display = 'none';
-            renderModelDropdown(selectedAgent);
-        });
-    });
+    // Маппинг placeholder по модели
+    const PLACEHOLDERS = {
+        chatgpt: 'Задайте вопрос или напишите, что нужно сгенерировать...',
+        dalle: 'Опишите картинку, которую хотите получить...',
+        gemini: 'Введите аналитический запрос или идею...',
+        deepseek: 'Опишите задачу по коду или вопрос по программированию...'
+    };
 
-    modelDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        modelDropdownMenu.style.display = modelDropdownMenu.style.display === 'block' ? 'none' : 'block';
-    });
+    function updatePromptPlaceholder() {
+        let agent = selectedAgent;
+        promptInput.placeholder = PLACEHOLDERS[agent] || 'Введите ваш запрос...';
+    }
 
-    // Инициализация при загрузке
-    await fetchUserTariff();
-    renderModelDropdown(selectedAgent);
+    // Кнопка отправки с иконкой
+    function updateSendButton() {
+        if (generateButton) {
+            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-1 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            generateButton.classList.add('py-3', 'px-6', 'text-lg', 'rounded-xl', 'bg-purple-600', 'hover:bg-purple-700', 'text-white', 'w-full', 'md:w-auto');
+        }
+    }
+
+    // Тосты/уведомления
+    function showToast(message, type = 'info') {
+        let toast = document.createElement('div');
+        toast.className = `fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg text-white text-base font-semibold transition-all duration-300 ${type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-purple-600'}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+        setTimeout(() => { toast.remove(); }, 3000);
+    }
+
+    // Баннер о скором окончании подписки
+    function showWarningBanner(warning) {
+        let banner = document.getElementById('warning-banner');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'warning-banner';
+            banner.className = 'fixed top-0 left-0 w-full z-40 bg-yellow-100 text-yellow-900 text-center py-2 px-4 font-semibold shadow-md';
+            document.body.appendChild(banner);
+        }
+        banner.textContent = warning;
+        banner.style.display = 'block';
+        setTimeout(() => { banner.style.display = 'none'; }, 8000);
+    }
 
     // --- Core Logic ---
+    // Добавляем мини-спиннер для генерации
+    function showMiniSpinner() {
+        let spinner = document.getElementById('mini-spinner');
+        if (!spinner) {
+            spinner = document.createElement('div');
+            spinner.id = 'mini-spinner';
+            spinner.className = 'inline-block align-middle ml-2';
+            spinner.innerHTML = '<svg class="animate-spin h-6 w-6 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>';
+            const btn = document.getElementById('generate-button');
+            if (btn) btn.parentNode.insertBefore(spinner, btn.nextSibling);
+        }
+        spinner.style.display = 'inline-block';
+    }
+    function hideMiniSpinner() {
+        const spinner = document.getElementById('mini-spinner');
+        if (spinner) spinner.style.display = 'none';
+    }
+
     async function handleGeneration() {
         const prompt = promptInput.value.trim();
         if (!prompt) return;
-
-        const model = selectedAgent;
-        const submodel = selectedModel;
-        const chat_id = window.currentChatId || (window.currentChatId = generateChatId());
-
-        // Лимиты для free и pro
-        const isImageModel = model === 'dalle' || submodel.startsWith('dall-e');
-        if (userTariff === 'free' || userTariff === 'pro') {
-            if (isImageModel && imageGenCount >= PRO_IMAGE_LIMIT) {
-                addMessageToChat('Лимит генераций картинок исчерпан для вашего тарифа.', 'ai-error');
-                return;
-            }
-            if (!isImageModel && textGenCount >= PRO_TEXT_LIMIT) {
-                addMessageToChat('Лимит текстовых запросов исчерпан для вашего тарифа.', 'ai-error');
-                return;
-            }
-        }
-
-        addMessageToChat(prompt, 'user');
+        showMiniSpinner();
+        generateButton.disabled = true;
+        promptInput.disabled = true;
         promptInput.value = '';
         promptInput.style.height = 'auto';
         updateGenerateButtonState();
-        showLoader();
-
+        let subscription;
+        try {
+            subscription = await checkSubscription();
+        } catch (e) {
+            hideMiniSpinner();
+            promptInput.disabled = false;
+            generateButton.disabled = false;
+            showToast('Ошибка проверки подписки: ' + (e.message || 'Нет соединения с сервером'), 'error');
+            return;
+        }
+        if (subscription.warning) {
+            addMessageToChat(subscription.warning, 'ai-warning');
+            showWarningBanner(subscription.warning);
+            if (subscription.warning.includes('скоро закончится')) {
+                showPaymentNotification(subscription.plan || 'pro');
+            }
+        }
+        if (!subscription.can_generate) {
+            hideMiniSpinner();
+            promptInput.disabled = false;
+            generateButton.disabled = false;
+            showToast('Генерация недоступна. Пожалуйста, оплатите подписку.', 'error');
+            showPaymentNotification(subscription.plan || 'pro');
+            return;
+        }
+        const model = selectedAgent;
+        const submodel = selectedModel;
+        const chat_id = window.currentChatId || (window.currentChatId = generateChatId());
         try {
             const result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id });
-            removeLoader();
             addMessageToChat(result.content, 'ai');
             fetchAndRenderHistory();
-            // Увеличиваем счетчики
-            if (userTariff === 'free' || userTariff === 'pro') {
-                if (isImageModel) imageGenCount++;
-                else textGenCount++;
-            }
+            showToast('Генерация завершена!', 'success');
         } catch (error) {
-            removeLoader();
-            addMessageToChat(`Ошибка: ${error.message}`, 'ai-error');
+            showToast('Ошибка: ' + (error.message || 'Нет соединения с сервером'), 'error');
+        } finally {
+            hideMiniSpinner();
+            promptInput.disabled = false;
+            generateButton.disabled = false;
+            updateGenerateButtonState();
         }
     }
 
@@ -185,6 +291,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Быстрые шаблоны
+    document.querySelectorAll('.quick-template-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            promptInput.value = btn.dataset.template;
+            promptInput.focus();
+            updateGenerateButtonState();
+        });
+    });
+
     document.getElementById('new-chat-button')?.addEventListener('click', resetChatLayout);
 
     // --- Auth Modal Listeners ---
@@ -197,9 +312,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('show-login-view')?.addEventListener('click', () => showAuthModal('login'));
     document.getElementById('show-forgot-password-view')?.addEventListener('click', () => showAuthModal('forgot'));
     document.getElementById('back-to-login-view')?.addEventListener('click', () => showAuthModal('login'));
-    document.getElementById('login-form')?.addEventListener('submit', handleEmailLogin);
-    document.getElementById('register-form')?.addEventListener('submit', handleEmailRegister);
-    document.getElementById('forgot-password-form')?.addEventListener('submit', handleForgotPasswordRequest);
+    document.getElementById('login-form')?.addEventListener('submit', window.handleEmailLogin);
+    document.getElementById('register-form')?.addEventListener('submit', window.handleEmailRegister);
+    document.getElementById('forgot-password-form')?.addEventListener('submit', window.handleForgotPasswordRequest);
     // Close modal on overlay click
     document.getElementById('auth-modal')?.addEventListener('click', (e) => {
         if (e.target.id === 'auth-modal') {
@@ -218,17 +333,145 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- Account Dropdown Listeners ---
-    profileButton?.addEventListener('click', (e) => {
+    // --- Dropdown logic ---
+    agentDropdownBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        accountDropdown.classList.toggle('hidden');
+        agentDropdownMenu.style.display = agentDropdownMenu.style.display === 'block' ? 'none' : 'block';
+        modelDropdownMenu.style.display = 'none';
+    });
+    modelDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        modelDropdownMenu.style.display = modelDropdownMenu.style.display === 'block' ? 'none' : 'block';
+        agentDropdownMenu.style.display = 'none';
+    });
+    document.addEventListener('click', () => {
+        agentDropdownMenu.style.display = 'none';
+        modelDropdownMenu.style.display = 'none';
+    });
+    agentDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedAgent = btn.getAttribute('data-value');
+            agentDropdownLabel.textContent = btn.textContent.trim();
+            agentDropdownMenu.style.display = 'none';
+            renderModelDropdown(selectedAgent);
+            updatePromptPlaceholder();
+        });
+    });
+    modelDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedModel = btn.getAttribute('data-value');
+            modelDropdownLabel.textContent = btn.textContent.trim();
+            modelDropdownMenu.style.display = 'none';
+        });
     });
 
-    document.addEventListener('click', (e) => {
-        if (!profileButton?.contains(e.target) && !accountDropdown?.contains(e.target)) {
-            accountDropdown?.classList.add('hidden');
+    // FAQ и профиль — обработчики только после DOMContentLoaded
+    const faqBtn = document.getElementById('faq-btn');
+    const faqModal = document.getElementById('faq-modal');
+    const faqClose = document.getElementById('faq-close');
+    const profileButton = document.getElementById('user-profile-button');
+    let accountDropdown = document.getElementById('account-dropdown');
+
+    // Восстановление/рендер аватара
+    async function renderUserProfile() {
+        try {
+            const user = await apiCall('/api/me');
+            if (profileButton) {
+                if (user.avatar_url) {
+                    profileButton.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" class="w-full h-full object-cover rounded-full">`;
+                } else {
+                    profileButton.textContent = user.name ? user.name.charAt(0).toUpperCase() : 'П';
+                }
+            }
+            // dropdown
+            if (!accountDropdown) {
+                accountDropdown = document.createElement('div');
+                accountDropdown.id = 'account-dropdown';
+                accountDropdown.className = 'hidden absolute top-14 right-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-1 animate__animated animate__fadeIn animate__faster';
+                profileButton.parentNode.appendChild(accountDropdown);
+            }
+            accountDropdown.innerHTML = `
+                <div class="p-3">
+                    <div class="flex items-center gap-4 mb-3">
+                        <div id="dropdown-user-avatar" class="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center text-xl font-bold overflow-hidden">${user.avatar_url ? `<img src='${user.avatar_url}' class='w-full h-full object-cover rounded-full'>` : (user.name ? user.name.charAt(0).toUpperCase() : 'П')}</div>
+                        <div>
+                            <div id="dropdown-user-name" class="font-semibold text-gray-900 dark:text-white truncate">${user.name || ''}</div>
+                            <div id="dropdown-user-email" class="text-sm text-gray-500 dark:text-gray-400 truncate">${user.email || ''}</div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 dark:text-gray-300">Тариф: <b id="account-tariff" class="text-gray-800 dark:text-white">${user.tariff || ''}</b></span>
+                            <a href="/pricing" class="text-purple-600 dark:text-purple-400 hover:underline font-medium">Сменить</a>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-gray-600 dark:text-gray-300">Осталось генераций: <b id="account-generations" class="text-gray-800 dark:text-white">${user.generations_left || ''}</b></p>
+                            <p class="text-gray-600 dark:text-gray-300">Активен до: <b id="account-expires" class="text-gray-800 dark:text-white">${user.subscription_expires ? new Date(user.subscription_expires).toLocaleDateString('ru-RU') : ''}</b></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                <div class="p-1 text-gray-700 dark:text-gray-300">
+                    <div class="px-3 py-2 flex justify-between items-center text-sm">
+                        <span>Темная тема</span>
+                        <label for="theme-toggle" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="theme-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                        </label>
+                    </div>
+                    <div class="px-3 py-2 flex justify-between items-center text-sm">
+                        <span>Язык</span>
+                        <div class="flex items-center gap-1">
+                            <button id="lang-ru-btn" class="px-2 py-1 rounded-md bg-gray-200 dark:bg-gray-700 font-bold" data-lang-btn="RU">RU</button>
+                            <button id="lang-en-btn" class="px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700" data-lang-btn="EN">EN</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                <div class="p-1">
+                    <a href="/privacy" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Privacy Policy</a>
+                    <a href="/terms" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Terms of Use</a>
+                    <button id="logout-button" class="block w-full text-left mt-1 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Выйти</button>
+                </div>
+            `;
+        } catch (e) {
+            // fallback: просто буква
+            if (profileButton) profileButton.textContent = 'П';
         }
-    });
+    }
+    // Экспортируем функцию для вызова из других файлов (auth.js)
+    window.renderUserProfile = renderUserProfile;
+    // Навешиваем обработчики на профиль и FAQ
+    if (profileButton) {
+        profileButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (accountDropdown) {
+                accountDropdown.classList.toggle('hidden');
+                if (!accountDropdown.classList.contains('hidden')) {
+                    if (faqModal) faqModal.classList.add('hidden');
+                }
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (accountDropdown && !profileButton.contains(e.target) && !accountDropdown.contains(e.target)) {
+                accountDropdown.classList.add('hidden');
+            }
+        });
+    }
+    if (faqBtn && faqModal && faqClose) {
+        faqBtn.addEventListener('click', () => {
+            faqModal.classList.remove('hidden');
+            if (accountDropdown) accountDropdown.classList.add('hidden');
+        });
+        faqClose.addEventListener('click', () => {
+            faqModal.classList.add('hidden');
+        });
+        faqModal.addEventListener('click', (e) => {
+            if (e.target === faqModal) faqModal.classList.add('hidden');
+        });
+    }
+    // После авторизации рендерим профиль
+    await renderUserProfile();
 
     document.getElementById('logout-button')?.addEventListener('click', window.logout);
 
@@ -240,10 +483,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // FAQ/Справка модалка
+    if (typeof faqBtn !== 'undefined' && faqBtn && typeof faqModal !== 'undefined' && faqModal && typeof faqClose !== 'undefined' && faqClose) {
+        faqBtn.addEventListener('click', () => {
+            faqModal.classList.remove('hidden');
+            if (typeof accountDropdown !== 'undefined' && accountDropdown) accountDropdown.classList.add('hidden');
+        });
+        faqClose.addEventListener('click', () => {
+            faqModal.classList.add('hidden');
+        });
+        faqModal.addEventListener('click', (e) => {
+            if (e.target === faqModal) faqModal.classList.add('hidden');
+        });
+    }
+
+    // PRO banner
+    function showProBanner() {
+        const banner = document.getElementById('pro-banner');
+        if (banner) {
+            banner.style.display = 'block';
+            const closeBtn = document.getElementById('pro-banner-close');
+            if (closeBtn) closeBtn.onclick = () => { banner.style.display = 'none'; };
+            setTimeout(() => { banner.style.display = 'none'; }, 8000);
+        }
+    }
+
+    // --- Hero CTA ---
+    const heroCtaBtn = document.getElementById('hero-cta-btn');
+    if (heroCtaBtn) {
+        heroCtaBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (typeof showAuthModal === 'function') showAuthModal('register');
+        });
+    }
+
     // --- Initial Setup ---
     const token = localStorage.getItem('jwt_token');
     updateAuthState(!!token);
     updateGenerateButtonState();
+    updatePromptPlaceholder();
+    updateSendButton();
 
     // --- Dark Mode ---
     window.toggleDarkMode = function() {
@@ -255,5 +534,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.classList.add('dark');
+    }
+
+    // Переключатель языка
+    // const langSwitcher = document.getElementById('lang-switcher');
+    // if (langSwitcher) {
+    //     langSwitcher.addEventListener('click', () => {
+    //         const nextLang = i18n.currentLang === 'ru' ? 'en' : 'ru';
+    //         i18n.setLanguage(nextLang);
+    //     });
+    // }
+
+    // После авторизации и показа app-page — инициализируем меню моделей
+    renderModelDropdown(selectedAgent);
+    modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
+
+    // --- Google Auth: блокировка без согласия только для регистрации ---
+    const googleAuthLinkRegister = document.getElementById('google-auth-link-register');
+    const googleAcceptRegister = document.getElementById('google-accept-register');
+    if (googleAuthLinkRegister && googleAcceptRegister) {
+        googleAuthLinkRegister.addEventListener('click', function(e) {
+            if (!googleAcceptRegister.checked) {
+                e.preventDefault();
+                googleAcceptRegister.focus();
+                googleAcceptRegister.classList.add('ring', 'ring-red-400');
+                setTimeout(() => googleAcceptRegister.classList.remove('ring', 'ring-red-400'), 1200);
+            }
+        });
+    }
+    // --- Google Auth: блокировка без согласия ---
+    const googleAuthLinkLogin = document.getElementById('google-auth-link-login');
+    const googleAcceptLogin = document.getElementById('google-accept-login');
+    if (googleAuthLinkLogin && googleAcceptLogin) {
+        googleAuthLinkLogin.addEventListener('click', function(e) {
+            if (!googleAcceptLogin.checked) {
+                e.preventDefault();
+                googleAcceptLogin.focus();
+                googleAcceptLogin.classList.add('ring', 'ring-red-400');
+                setTimeout(() => googleAcceptLogin.classList.remove('ring', 'ring-red-400'), 1200);
+            }
+        });
     }
 });
