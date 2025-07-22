@@ -44,6 +44,10 @@ app.get('/reset-password', (req, res) => {
     res.render('reset-password');
 });
 
+app.get('/auth/callback.html', (req, res) => {
+    res.render('auth/callback');
+});
+
 app.listen(port, () => {
     console.log(`Frontend server is running on http://localhost:${port}`);
 });

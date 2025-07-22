@@ -36,18 +36,29 @@ async function fetchAndRenderHistory() {
             const chatBlock = document.createElement('div');
             chatBlock.className = 'mb-4 p-3 rounded-xl bg-white dark:bg-gray-800 shadow border border-purple-100 dark:border-gray-700 cursor-pointer hover:border-purple-400 transition-all';
 
-            // Заголовок чата (можно добавить дату первого сообщения)
-            const firstDate = chatItems[0].created_at ? new Date(chatItems[0].created_at).toLocaleDateString('ru-RU') : '';
-            chatBlock.innerHTML = `<div class="font-bold text-purple-700 dark:text-purple-300 mb-2 text-sm">Чат от ${firstDate}</div>`;
+            // --- Название чата (теперь только с сервера) ---
+            let chatTitle = chatItems[0].chat_title;
+            if (!chatTitle) {
+                const firstDate = chatItems[0].created_at ? new Date(chatItems[0].created_at).toLocaleDateString('ru-RU') : '';
+                chatTitle = `Чат от ${firstDate}`;
+            }
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'font-bold text-purple-700 dark:text-purple-300 mb-2 text-sm inline-block';
+            titleDiv.textContent = chatTitle;
+            chatBlock.appendChild(titleDiv);
 
-            // Краткое описание (первые 1-2 промпта)
-            const previewPrompts = chatItems.slice(0, 2).map(i => i.prompt).join(' | ');
-            const previewDiv = document.createElement('div');
-            previewDiv.className = 'text-gray-600 dark:text-gray-400 text-xs truncate mb-2';
-            previewDiv.textContent = previewPrompts;
-            chatBlock.appendChild(previewDiv);
+            // --- Кнопка переименовать ---
+            const renameBtn = document.createElement('button');
+            renameBtn.className = 'rename-chat-btn p-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors ml-2';
+            renameBtn.title = 'Переименовать чат';
+            renameBtn.innerHTML = `<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-2.828 0L9 13zm-6 6h12"/></svg>`;
+            renameBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showRenameChatModal(chatId, titleDiv);
+            });
+            chatBlock.appendChild(renameBtn);
 
-            // Кнопка удалить чат
+            // --- Кнопка удалить чат ---
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-history-btn p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition-colors ml-2 float-right';
             deleteBtn.title = 'Удалить чат';
@@ -115,3 +126,42 @@ document.getElementById('new-chat-button')?.addEventListener('click', () => {
     currentChatId = generateChatId();
     resetChatLayout();
 });
+
+// --- Модалка для переименования чата ---
+function showRenameChatModal(chatId, titleDiv) {
+    let modal = document.getElementById('rename-chat-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'rename-chat-modal';
+        modal.className = 'fixed inset-0 z-50 bg-black/60 flex items-center justify-center animate__animated animate__fadeIn animate__faster';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md relative p-8">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Переименовать чат</h2>
+                <input id="rename-chat-input" type="text" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500 mb-4" placeholder="Новое название чата">
+                <div class="flex justify-end gap-4">
+                    <button id="rename-chat-cancel" class="px-6 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Отмена</button>
+                    <button id="rename-chat-confirm" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">Сохранить</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    modal.classList.remove('hidden');
+    const input = document.getElementById('rename-chat-input');
+    input.value = titleDiv.textContent;
+    input.focus();
+    document.getElementById('rename-chat-cancel').onclick = () => modal.classList.add('hidden');
+    document.getElementById('rename-chat-confirm').onclick = async () => {
+        const newTitle = input.value.trim();
+        if (newTitle) {
+            try {
+                await apiCall(`/api/history/title`, 'PATCH', { chat_id: chatId, chat_title: newTitle });
+                titleDiv.textContent = newTitle;
+            } catch (e) {
+                showToast('Ошибка при переименовании чата', 'error');
+            }
+        }
+        modal.classList.add('hidden');
+    };
+    modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
+}

@@ -550,8 +550,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
 
     // --- Google Auth: блокировка без согласия только для регистрации ---
+    const googleAuthLinkLogin = document.getElementById('google-auth-link-login');
     const googleAuthLinkRegister = document.getElementById('google-auth-link-register');
     const googleAcceptRegister = document.getElementById('google-accept-register');
+    // --- Google Auth: абсолютные переходы на backend ---
+    if (googleAuthLinkLogin) {
+        googleAuthLinkLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            let baseUrl = window.API_BASE_URL || '';
+            if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+            window.location.href = baseUrl + '/auth/google/login';
+        });
+    }
     if (googleAuthLinkRegister && googleAcceptRegister) {
         googleAuthLinkRegister.addEventListener('click', function(e) {
             if (!googleAcceptRegister.checked) {
@@ -559,20 +569,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 googleAcceptRegister.focus();
                 googleAcceptRegister.classList.add('ring', 'ring-red-400');
                 setTimeout(() => googleAcceptRegister.classList.remove('ring', 'ring-red-400'), 1200);
+                return;
             }
-        });
-    }
-    // --- Google Auth: блокировка без согласия ---
-    const googleAuthLinkLogin = document.getElementById('google-auth-link-login');
-    const googleAcceptLogin = document.getElementById('google-accept-login');
-    if (googleAuthLinkLogin && googleAcceptLogin) {
-        googleAuthLinkLogin.addEventListener('click', function(e) {
-            if (!googleAcceptLogin.checked) {
-                e.preventDefault();
-                googleAcceptLogin.focus();
-                googleAcceptLogin.classList.add('ring', 'ring-red-400');
-                setTimeout(() => googleAcceptLogin.classList.remove('ring', 'ring-red-400'), 1200);
-            }
+            e.preventDefault();
+            let baseUrl = window.API_BASE_URL || '';
+            if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+            window.location.href = baseUrl + '/auth/google/login?register=1';
         });
     }
 });
