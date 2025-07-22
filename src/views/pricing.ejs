@@ -3,77 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тарифы - ContentGen Hub</title>
+    <title>Тарифы — ContentGen Hub</title>
+    <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
-        }
-    </script>
+    <script>window.API_BASE_URL = "<%= API_BASE_URL %>";</script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
-    <section id="pricing" class="py-20 px-4">
-        <div class="max-w-screen-xl mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Управление подпиской</h2>
-                <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Выберите план, который подходит именно вам.</p>
-                <a href="/" class="mt-6 inline-block text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300">← Вернуться в чат</a>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+    <div class="max-w-4xl mx-auto py-12 px-4">
+        <h1 class="text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">Тарифы</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- FREE -->
+            <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-purple-200 dark:border-purple-700">
+                <h2 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">FREE</h2>
+                <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">0 ₽</div>
+                <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
+                    <li>10 генераций в день</li>
+                    <li>Доступ ко всем моделям</li>
+                    <li>Без привязки карты</li>
+                </ul>
+                <a href="/" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all text-center block">Начать бесплатно</a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                <!-- Free Plan -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center flex flex-col">
-                    <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Бесплатный</h3>
-                    <p class="text-gray-500 dark:text-gray-400 mb-6">Для старта и личных проектов</p>
-                    <p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">0₽<span class="text-lg font-medium">/мес</span></p>
-                    <ul class="text-left space-y-2 mb-8 flex-grow">
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Только базовые модели: GPT-4o-mini, Gemini 1.5, DeepSeek Chat, DALL-E 2</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 3 генерации картинок DALL-E 2 в день</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 10 текстовых запросов в день</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Сохранение истории</li>
-                    </ul>
-                    <a href="/payment?plan=free" class="mt-auto w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-colors">
-                        Начать бесплатно
-                    </a>
-                </div>
-
-                <!-- Pro Plan -->
-                <div class="border-2 border-purple-500 rounded-lg p-8 text-center flex flex-col shadow-2xl relative">
-                    <span class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">ПОПУЛЯРНЫЙ</span>
-                    <h3 class="text-2xl font-bold mb-2 text-purple-500">Pro</h3>
-                    <p class="text-gray-500 dark:text-gray-400 mb-6">Для профессионалов и команд</p>
-                    <p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">499₽<span class="text-lg font-medium">/мес</span></p>
-                    <ul class="text-left space-y-2 mb-8 flex-grow">
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Все модели: GPT-4, Gemini Pro, DeepSeek Reasoner, DALL-E 3 и др.</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 3 генерации картинок DALL-E 2/3 в день</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 10 текстовых запросов в день</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Приоритетная поддержка</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Ранний доступ к новым функциям</li>
-                    </ul>
-                    <a href="/payment?plan=pro" class="mt-auto w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors">
-                        Выбрать Pro
-                    </a>
-                </div>
-
-                <!-- Enterprise Plan -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center flex flex-col">
-                    <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Enterprise</h3>
-                    <p class="text-gray-500 dark:text-gray-400 mb-6">Для крупного бизнеса</p>
-                    <p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">Индивидуально</p>
-                    <ul class="text-left space-y-2 mb-8 flex-grow">
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Безлимитные генерации</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Персональный менеджер</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Кастомные интеграции</li>
-                    </ul>
-                    <a href="mailto:sales@example.com" class="mt-auto w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-colors">
-                        Связаться с нами
-                    </a>
-                </div>
+            <!-- PRO -->
+            <div class="rounded-2xl shadow-2xl bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-4 border-purple-500 relative">
+                <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow">Рекомендуем</div>
+                <h2 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">PRO</h2>
+                <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">499 ₽<span class="text-base font-normal">/мес</span></div>
+                <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
+                    <li>100 генераций в день</li>
+                    <li>Доступ ко всем моделям</li>
+                    <li>Приоритетная поддержка</li>
+                </ul>
+                <button onclick="payYookassa('pro')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2">Оформить PRO</button>
+                <button onclick="payTelegram('pro')" class="w-full py-2 px-6 rounded-xl border border-purple-400 text-purple-700 dark:text-purple-200 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900 transition-all">Оплатить через Telegram</button>
+            </div>
+            <!-- MAX -->
+            <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-indigo-300 dark:border-indigo-700">
+                <h2 class="text-2xl font-bold mb-2 text-indigo-700 dark:text-indigo-300">MAX</h2>
+                <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">1999 ₽<span class="text-base font-normal">/мес</span></div>
+                <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
+                    <li>Безлимитные генерации</li>
+                    <li>Доступ ко всем моделям</li>
+                    <li>VIP-поддержка</li>
+                </ul>
+                <button onclick="payYookassa('max')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2">Оформить MAX</button>
+                <button onclick="payTelegram('max')" class="w-full py-2 px-6 rounded-xl border border-indigo-400 text-indigo-700 dark:text-indigo-200 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all">Оплатить через Telegram</button>
             </div>
         </div>
-    </section>
+        <div class="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
+            Оплата через ЮKassa (карты РФ, СБП) и Telegram. После оплаты тариф активируется автоматически.<br>
+            По вопросам пишите: <a href="mailto:support@contentgenhub.ru" class="underline text-purple-600">support@contentgenhub.ru</a>
+        </div>
+    </div>
+    <!-- Модальное окно оплаты -->
+    <div id="payment-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center animate__animated animate__fadeIn animate__faster">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md relative p-8">
+            <button onclick="hidePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Оплата через ЮKassa</h2>
+            <div class="mb-4 text-gray-700 dark:text-gray-200">Выберите способ оплаты и следуйте инструкциям. После успешной оплаты тариф активируется автоматически.</div>
+            <button onclick="payYookassa(document.getElementById('payment-tariff').value)" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all">Оплатить через ЮKassa</button>
+            <input type="hidden" name="tariff" id="payment-tariff" value="">
+        </div>
+    </div>
+    <script>
+        function showPaymentModal(tariff) {
+            document.getElementById('payment-modal').classList.remove('hidden');
+            document.getElementById('payment-tariff').value = tariff;
+        }
+        function hidePaymentModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+        }
+        function showTelegramPay(tariff) {
+            window.open('https://t.me/your_telegram_bot?start=' + tariff, '_blank');
+        }
+        async function payYookassa(tariff) {
+            try {
+                const token = localStorage.getItem('jwt_token');
+                if (!token) {
+                    showToast('Сначала войдите в аккаунт', 'error');
+                    return;
+                }
+                const res = await fetch((window.API_BASE_URL || '') + '/api/payment/yookassa', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tariff })
+                });
+                if (!res.ok) throw new Error((await res.json()).error || 'Ошибка оплаты');
+                showToast('Тариф успешно активирован!', 'success');
+                if (window.updateUserTariff) window.updateUserTariff();
+                // Показываем кнопку возврата и редиректим через 2 сек
+                showReturnToAppButton();
+                setTimeout(() => { window.location.href = '/'; }, 2000);
+            } catch (e) {
+                showToast('Ошибка оплаты: ' + (e.message || 'Неизвестная ошибка'), 'error');
+            }
+        }
+        function showReturnToAppButton() {
+            let btn = document.getElementById('return-to-app-btn');
+            if (!btn) {
+                btn = document.createElement('a');
+                btn.id = 'return-to-app-btn';
+                btn.href = '/';
+                btn.className = 'mt-6 inline-block px-6 py-2 bg-purple-600 text-white rounded-lg';
+                btn.textContent = 'Вернуться к генерации';
+                document.body.appendChild(btn);
+            }
+            btn.style.display = 'inline-block';
+        }
+        async function payTelegram(tariff) {
+            try {
+                const token = localStorage.getItem('jwt_token');
+                if (!token) {
+                    showToast('Сначала войдите в аккаунт', 'error');
+                    return;
+                }
+                const res = await fetch((window.API_BASE_URL || '') + '/api/payment/telegram', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tariff })
+                });
+                if (!res.ok) throw new Error((await res.json()).error || 'Ошибка оплаты');
+                showToast('Тариф успешно активирован через Telegram!', 'success');
+                if (window.updateUserTariff) window.updateUserTariff();
+            } catch (e) {
+                showToast('Ошибка оплаты: ' + (e.message || 'Неизвестная ошибка'), 'error');
+            }
+        }
+        function showToast(message, type = 'info') {
+            let toast = document.createElement('div');
+            toast.className = `fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg text-white text-base font-semibold transition-all duration-300 ${type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-purple-600'}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+    </script>
 </body>
 </html>

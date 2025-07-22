@@ -3,7 +3,6 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
     // --- DOM Elements ---
-    await i18n.init();
     const promptInput = document.getElementById('prompt-input');
     const generateButton = document.getElementById('generate-button');
     const modelSelect = document.getElementById('model-select');
@@ -22,41 +21,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedModel = 'gpt-4o-mini';
 
     // --- Модели для каждого ИИ ---
-    const MODEL_OPTIONS = {
-        chatgpt: [
-            { value: 'gpt-4o-mini', label: 'GPT-4o-mini' },
-            { value: 'gpt-4', label: 'GPT-4' },
-            { value: 'gpt-4.1', label: 'GPT-4.1' }
-        ],
-        gemini: [
-            { value: 'gemini-1.5', label: 'Gemini 1.5' },
-            { value: 'gemini-pro', label: 'Gemini Pro' }
-        ],
-        deepseek: [
-            { value: 'deepseek-chat', label: 'DeepSeek Chat' },
-            { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' },
-            { value: 'deepseek-coder', label: 'DeepSeek Coder' }
-        ],
-        dalle: [
-            { value: 'gpt-image-1', label: 'GPT Image 1' },
-            { value: 'dall-e-2', label: 'DALL-E 2' },
-            { value: 'dall-e-3', label: 'DALL-E 3' }
-        ]
-    };
-    const FREE_MODELS = {
-        chatgpt: ['gpt-4o-mini'],
-        gemini: ['gemini-1.5'],
-        deepseek: ['deepseek-chat'],
-        dalle: ['gpt-image-1']
-    };
-    const PRO_IMAGE_LIMIT = 3;
-    const PRO_TEXT_LIMIT = 10;
-
+    let MODEL_OPTIONS = {};
+    let AVAILABLE_MODELS = {};
     let userTariff = 'free'; // default, обновляется после запроса /api/me
     let userEmail = '';
     let isAdmin = false;
     let imageGenCount = 0;
     let textGenCount = 0;
+
+    async function fetchAvailableModels() {
+        try {
+            const data = await apiCall('/api/available-models', 'GET');
+            userTariff = data.tariff || 'free';
+            AVAILABLE_MODELS = data.available_models || {};
+            // Преобразуем в формат для выпадающего списка
+            MODEL_OPTIONS = {};
+            Object.keys(AVAILABLE_MODELS).forEach(agent => {
+                MODEL_OPTIONS[agent] = (AVAILABLE_MODELS[agent] || []).map(model => {
+                    // Человеко-читабельные лейблы
+                    let label = model;
+                    if (model === 'gpt-4o-mini') label = 'GPT-4o-mini';
+                    if (model === 'gpt-4') label = 'GPT-4';
+                    if (model === 'gpt-4.1') label = 'GPT-4.1';
+                    if (model === 'gemini-1.5') label = 'Gemini 1.5';
+                    if (model === 'gemini-pro') label = 'Gemini Pro';
+                    if (model === 'deepseek-chat') label = 'DeepSeek Chat';
+                    if (model === 'deepseek-reasoner') label = 'DeepSeek Reasoner';
+                    if (model === 'deepseek-coder') label = 'DeepSeek Coder';
+                    if (model === 'gpt-image-1') label = 'GPT Image 1';
+                    if (model === 'dall-e-2') label = 'DALL-E 2';
+                    if (model === 'dall-e-3') label = 'DALL-E 3';
+                    return { value: model, label };
+                });
+            });
+        } catch (e) {
+            // fallback: дефолтные модели
+            MODEL_OPTIONS = {
+                chatgpt: [
+                    { value: 'gpt-4o-mini', label: 'GPT-4o-mini' },
+                    { value: 'gpt-4', label: 'GPT-4' },
+                    { value: 'gpt-4.1', label: 'GPT-4.1' }
+                ],
+                gemini: [
+                    { value: 'gemini-1.5', label: 'Gemini 1.5' },
+                    { value: 'gemini-pro', label: 'Gemini Pro' }
+                ],
+                deepseek: [
+                    { value: 'deepseek-chat', label: 'DeepSeek Chat' },
+                    { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' },
+                    { value: 'deepseek-coder', label: 'DeepSeek Coder' }
+                ],
+                dalle: [
+                    { value: 'gpt-image-1', label: 'GPT Image 1' },
+                    { value: 'dall-e-2', label: 'DALL-E 2' },
+                    { value: 'dall-e-3', label: 'DALL-E 3' }
+                ]
+            };
+        }
+    }
 
     // Loader
     function showLoader() {
@@ -104,51 +126,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
     }
 
+    // --- Обновление тарифа пользователя после оплаты ---
+    window.updateUserTariff = async function() {
+        await fetchUserTariff();
+        if (typeof renderUserProfile === 'function') renderUserProfile();
+    }
+
     function renderModelDropdown(agentKey) {
         modelDropdownList.innerHTML = '';
         const options = MODEL_OPTIONS[agentKey] || [];
-        const freeModelsForAgent = FREE_MODELS[agentKey] || [];
-
+        if (!options.length) {
+            selectedModel = null;
+            modelDropdownLabel.textContent = 'Нет доступных моделей';
+            if (generateButton) generateButton.disabled = true;
+            return;
+        }
         options.forEach(opt => {
-            const isProModel = !freeModelsForAgent.includes(opt.value);
             const li = document.createElement('li');
-
-            const proBadge = isProModel
-                ? '<span class="ml-2 text-xs font-semibold text-pink-600 bg-pink-100 dark:bg-pink-800 dark:text-pink-200 px-2 py-0.5 rounded-full">PRO</span>'
-                : '';
-
-            li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}"><span>${opt.label}</span>${proBadge}</button>`;
-
+            li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}"><span>${opt.label}</span></button>`;
             const button = li.querySelector('button');
             button.addEventListener('click', () => {
-                if (!isAdmin && isProModel && userTariff === 'free') {
-                    showProModal(); // Был alert, теперь кастомная модалка
-                    modelDropdownMenu.style.display = 'none';
-                    return;
-                }
                 selectedModel = opt.value;
                 modelDropdownLabel.textContent = opt.label;
                 modelDropdownMenu.style.display = 'none';
             });
-
             modelDropdownList.appendChild(li);
         });
-
         // Выбрать первую доступную модель по умолчанию
-        let defaultOption;
-        if (isAdmin) {
-            defaultOption = options[0];
-        } else {
-            defaultOption = options.find(opt => freeModelsForAgent.includes(opt.value)) || options[0];
-        }
-        if (defaultOption) {
-            selectedModel = defaultOption.value;
-            modelDropdownLabel.textContent = defaultOption.label;
-        } else {
-            selectedModel = null;
-            modelDropdownLabel.textContent = 'Нет доступных моделей';
-            if (generateButton) generateButton.disabled = true;
-        }
+        selectedModel = options[0].value;
+        modelDropdownLabel.textContent = options[0].label;
+        if (generateButton) generateButton.disabled = false;
     }
 
     // Маппинг placeholder по модели
@@ -218,20 +225,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleGeneration() {
         const prompt = promptInput.value.trim();
         if (!prompt) return;
-        showMiniSpinner();
         generateButton.disabled = true;
         promptInput.disabled = true;
         promptInput.value = '';
         promptInput.style.height = 'auto';
         updateGenerateButtonState();
+        // 1. Добавить вопрос пользователя в чат
+        addMessageToChat(prompt, 'user');
+        // 2. Добавить спиннер для ответа ИИ
+        showLoaderAfterUserMessage();
         let subscription;
         try {
             subscription = await checkSubscription();
         } catch (e) {
-            hideMiniSpinner();
+            replaceLoaderWithAIResponse('Ошибка проверки подписки: ' + (e.message || 'Нет соединения с сервером'));
             promptInput.disabled = false;
             generateButton.disabled = false;
-            showToast('Ошибка проверки подписки: ' + (e.message || 'Нет соединения с сервером'), 'error');
             return;
         }
         if (subscription.warning) {
@@ -242,25 +251,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         if (!subscription.can_generate) {
-            hideMiniSpinner();
+            replaceLoaderWithAIResponse('Генерация недоступна. Пожалуйста, оплатите подписку.');
             promptInput.disabled = false;
             generateButton.disabled = false;
-            showToast('Генерация недоступна. Пожалуйста, оплатите подписку.', 'error');
             showPaymentNotification(subscription.plan || 'pro');
             return;
         }
         const model = selectedAgent;
         const submodel = selectedModel;
-        const chat_id = window.currentChatId || (window.currentChatId = generateChatId());
+        const chat_id = window.currentChatId;
         try {
             const result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id });
-            addMessageToChat(result.content, 'ai');
+            replaceLoaderWithAIResponse(result.content);
             fetchAndRenderHistory();
             showToast('Генерация завершена!', 'success');
         } catch (error) {
-            showToast('Ошибка: ' + (error.message || 'Нет соединения с сервером'), 'error');
+            replaceLoaderWithAIResponse('Ошибка: ' + (error.message || 'Нет соединения с сервером'));
         } finally {
-            hideMiniSpinner();
             promptInput.disabled = false;
             generateButton.disabled = false;
             updateGenerateButtonState();
@@ -300,7 +307,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    document.getElementById('new-chat-button')?.addEventListener('click', resetChatLayout);
+    // --- Chat ID logic ---
+    if (!window.currentChatId) {
+        window.currentChatId = sessionStorage.getItem('currentChatId') || generateChatId();
+        sessionStorage.setItem('currentChatId', window.currentChatId);
+    }
+    document.getElementById('new-chat-button')?.addEventListener('click', () => {
+        window.currentChatId = generateChatId();
+        sessionStorage.setItem('currentChatId', window.currentChatId);
+        resetChatLayout();
+    });
 
     // --- Auth Modal Listeners ---
     document.getElementById('show-auth-modal-btn')?.addEventListener('click', (e) => {
@@ -516,6 +532,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof showAuthModal === 'function') showAuthModal('register');
         });
     }
+    document.getElementById('hero-cta-btn-2')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('show-auth-modal-btn')?.click();
+    });
 
     // --- Initial Setup ---
     const token = localStorage.getItem('jwt_token');
@@ -536,16 +556,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.documentElement.classList.add('dark');
     }
 
-    // Переключатель языка
-    // const langSwitcher = document.getElementById('lang-switcher');
-    // if (langSwitcher) {
-    //     langSwitcher.addEventListener('click', () => {
-    //         const nextLang = i18n.currentLang === 'ru' ? 'en' : 'ru';
-    //         i18n.setLanguage(nextLang);
-    //     });
-    // }
-
     // После авторизации и показа app-page — инициализируем меню моделей
+    await fetchAvailableModels();
     renderModelDropdown(selectedAgent);
     modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
 
@@ -577,4 +589,237 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = baseUrl + '/auth/google/login?register=1';
         });
     }
+
+    // --- PROMPT TEMPLATES ---
+    const PROMPT_TEMPLATES = [
+      {
+        title: 'Резюме для вакансии',
+        text: 'Составь резюме для позиции {должность}, укажи опыт работы в {отрасль}, навыки: {ключевые навыки}.',
+      },
+      {
+        title: 'Письмо партнёру',
+        text: 'Напиши деловое письмо партнёру компании {название}, цель письма: {описание цели}.',
+      },
+      {
+        title: 'Пост для соцсетей',
+        text: 'Создай пост для {соцсеть} о запуске нового продукта {название продукта}.',
+      },
+      {
+        title: 'SEO-описание товара',
+        text: 'Напиши SEO-описание для товара {название}, целевая аудитория: {описание аудитории}.',
+      },
+      {
+        title: 'Сценарий видео',
+        text: 'Напиши сценарий для видео на тему {тема}, длительность: {минуты} минут.',
+      },
+      {
+        title: 'Инструкция для пользователя',
+        text: 'Составь пошаговую инструкцию по использованию {продукт/сервис}.',
+      },
+      {
+        title: 'План статьи',
+        text: 'Составь подробный план статьи на тему: {тема статьи}.',
+      },
+      {
+        title: 'Перевод текста',
+        text: 'Переведи следующий текст на {язык}: {текст для перевода}',
+      },
+      {
+        title: 'Письмо поддержки',
+        text: 'Составь письмо в поддержку сервиса {название}, опиши проблему: {описание проблемы}.',
+      },
+      {
+        title: 'Промпт для генерации изображения',
+        text: 'Сгенерируй изображение: {описание сцены}, стиль: {стиль}, цветовая гамма: {цвета}.',
+      },
+      {
+        title: 'План маркетинговой кампании',
+        text: 'Разработай план маркетинговой кампании для продукта {название}, бюджет: {сумма}, целевая аудитория: {описание аудитории}.',
+      },
+      {
+        title: 'Пост для Telegram-канала',
+        text: 'Напиши пост для Telegram-канала на тему {тема}, стиль: {информативный/развлекательный}.',
+      },
+      {
+        title: 'Письмо клиенту',
+        text: 'Составь письмо клиенту, который интересовался {услуга/товар}, цель письма: {цель}.',
+      },
+      {
+        title: 'Сценарий для подкаста',
+        text: 'Напиши сценарий для подкаста на тему {тема}, продолжительность: {минуты} минут.',
+      },
+      {
+        title: 'Промпт для генерации кода',
+        text: 'Напиши код на {язык программирования} для задачи: {описание задачи}.',
+      },
+      {
+        title: 'План обучения',
+        text: 'Составь план обучения по теме {тема}, уровень: {начальный/продвинутый}.',
+      },
+      {
+        title: 'Промпт для анализа данных',
+        text: 'Проанализируй данные: {описание данных}, цель анализа: {цель}.',
+      },
+      {
+        title: 'Промпт для генерации презентации',
+        text: 'Составь структуру презентации на тему {тема}, количество слайдов: {число}.',
+      },
+      {
+        title: 'Промпт для генерации email-рассылки',
+        text: 'Напиши текст email-рассылки для аудитории {описание аудитории}, цель письма: {цель}.',
+      },
+      {
+        title: 'Промпт для генерации FAQ',
+        text: 'Составь список часто задаваемых вопросов и ответов по теме {тема}.',
+      },
+      {
+        title: 'Промпт для генерации слогана',
+        text: 'Придумай слоган для компании {название}, ниша: {описание ниши}.',
+      },
+      {
+        title: 'Промпт для генерации описания вакансии',
+        text: 'Составь описание вакансии для позиции {должность}, требования: {ключевые требования}.',
+      },
+      {
+        title: 'Промпт для генерации roadmap',
+        text: 'Составь roadmap для проекта {название}, этапы: {описание этапов}.',
+      },
+      {
+        title: 'Промпт для генерации user story',
+        text: 'Составь user story для функционала {описание функционала}, роль пользователя: {роль}.',
+      },
+      {
+        title: 'Промпт для генерации тест-кейсов',
+        text: 'Составь тест-кейсы для проверки {описание функционала/продукта}.',
+      },
+      {
+        title: 'Промпт для генерации бизнес-плана',
+        text: 'Составь бизнес-план для стартапа {название}, ниша: {описание ниши}, целевая аудитория: {описание аудитории}.',
+      },
+      {
+        title: 'Промпт для генерации пресс-релиза',
+        text: 'Напиши пресс-релиз о запуске {продукт/сервис}, основные преимущества: {описание преимуществ}.',
+      },
+      {
+        title: 'Промпт для генерации customer journey map',
+        text: 'Составь customer journey map для клиента {описание клиента}, этапы: {описание этапов}.',
+      },
+      {
+        title: 'Промпт для генерации mindmap',
+        text: 'Составь mindmap по теме {тема}, основные ветви: {описание ветвей}.',
+      },
+      {
+        title: 'Промпт для генерации отчёта',
+        text: 'Составь отчёт по результатам {описание исследования/проекта}, основные выводы: {выводы}.',
+      },
+      {
+        title: 'Промпт для генерации инструкции по безопасности',
+        text: 'Составь инструкцию по безопасности для {описание процесса/оборудования}.',
+      },
+    ];
+
+    function renderPromptTemplates() {
+      const list = document.getElementById('prompt-templates-list');
+      if (!list) return;
+      list.innerHTML = '';
+      PROMPT_TEMPLATES.forEach((tpl, idx) => {
+        const card = document.createElement('div');
+        card.className = 'bg-purple-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-xl p-4 shadow flex flex-col gap-2';
+        card.innerHTML = `<div class="font-semibold text-purple-700 dark:text-purple-200 mb-2">${tpl.title}</div>
+          <textarea readonly class="w-full bg-transparent text-gray-700 dark:text-gray-200 text-sm resize-none outline-none" rows="3">${tpl.text}</textarea>
+          <div class="flex gap-2 mt-2">
+            <button class="copy-template-btn px-3 py-1 rounded-lg bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-all" data-idx="${idx}">Копировать</button>
+            <button class="insert-template-btn px-3 py-1 rounded-lg bg-pink-600 text-white text-xs font-semibold hover:bg-pink-700 transition-all" data-idx="${idx}">Вставить в чат</button>
+          </div>`;
+        list.appendChild(card);
+      });
+      // Навешиваем обработчики
+      list.querySelectorAll('.copy-template-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = btn.getAttribute('data-idx');
+          navigator.clipboard.writeText(PROMPT_TEMPLATES[idx].text);
+          btn.textContent = 'Скопировано!';
+          setTimeout(() => { btn.textContent = 'Копировать'; }, 1500);
+        });
+      });
+      list.querySelectorAll('.insert-template-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = btn.getAttribute('data-idx');
+          const promptInput = document.getElementById('prompt-input');
+          if (promptInput) {
+            promptInput.value = PROMPT_TEMPLATES[idx].text;
+            promptInput.focus();
+            // Автоматически закрыть модалку
+            document.getElementById('prompt-templates-modal').classList.add('hidden');
+          }
+        });
+      });
+    }
+
+    document.getElementById('prompt-templates-btn')?.addEventListener('click', () => {
+      document.getElementById('prompt-templates-modal').classList.remove('hidden');
+      renderPromptTemplates();
+    });
+    document.getElementById('prompt-templates-close')?.addEventListener('click', () => {
+      document.getElementById('prompt-templates-modal').classList.add('hidden');
+    });
+
+    // --- Helper buttons visibility logic ---
+    function updateHelperButtonsVisibility() {
+      const promptInput = document.getElementById('prompt-input');
+      const helperButtons = document.getElementById('helper-buttons');
+      const inlineHelper = document.getElementById('inline-helper-buttons');
+      if (!promptInput || !helperButtons || !inlineHelper) return;
+      if (promptInput.value.trim() === '') {
+        helperButtons.style.display = 'flex';
+        inlineHelper.style.display = 'none';
+      } else {
+        helperButtons.style.display = 'none';
+        inlineHelper.style.display = 'flex';
+      }
+    }
+    document.getElementById('prompt-input')?.addEventListener('input', updateHelperButtonsVisibility);
+    document.addEventListener('DOMContentLoaded', updateHelperButtonsVisibility);
+
+    // --- FAQ/modal open/close logic ---
+    function openFAQModal() {
+      document.getElementById('faq-modal').classList.remove('hidden');
+    }
+    function closeFAQModal() {
+      document.getElementById('faq-modal').classList.add('hidden');
+    }
+    function openTemplatesModal() {
+      document.getElementById('prompt-templates-modal').classList.remove('hidden');
+      renderPromptTemplates();
+    }
+    function closeTemplatesModal() {
+      document.getElementById('prompt-templates-modal').classList.add('hidden');
+    }
+    // Кнопки в initial-view
+    const showFaqBtn = document.getElementById('show-faq-btn');
+    const showTemplatesBtn = document.getElementById('show-templates-btn');
+    showFaqBtn?.addEventListener('click', openFAQModal);
+    showTemplatesBtn?.addEventListener('click', openTemplatesModal);
+    // Кнопки в inline-helper-buttons
+    const inlineFaqBtn = document.getElementById('inline-faq-btn');
+    const inlineTemplatesBtn = document.getElementById('inline-templates-btn');
+    inlineFaqBtn?.addEventListener('click', openFAQModal);
+    inlineTemplatesBtn?.addEventListener('click', openTemplatesModal);
+    // Закрытие по крестику
+    const faqCloseBtn = document.getElementById('faq-close');
+    faqCloseBtn?.addEventListener('click', closeFAQModal);
+    document.getElementById('prompt-templates-close')?.addEventListener('click', closeTemplatesModal);
+    // Автоматическое закрытие по клику вне модального окна
+    window.addEventListener('mousedown', (e) => {
+      const faqModal = document.getElementById('faq-modal');
+      if (faqModal && !faqModal.classList.contains('hidden')) {
+        const inner = faqModal.children[0];
+        if (inner && !inner.contains(e.target)) closeFAQModal();
+      }
+      const tplModal = document.getElementById('prompt-templates-modal');
+      if (tplModal && !tplModal.classList.contains('hidden')) {
+        const inner = tplModal.children[0];
+        if (inner && !inner.contains(e.target)) closeTemplatesModal();
+      }
+    });
 });

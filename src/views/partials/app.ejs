@@ -77,13 +77,24 @@
         </div>
         <!-- Контейнер для кнопок FAQ и профиля -->
         <div class="fixed top-6 right-6 flex gap-4 z-40">
-            <button id="faq-btn" aria-label="Справка / FAQ" class="w-12 h-12 flex items-center justify-center rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all text-2xl">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-2m0-4h.01"/></svg>
-            </button>
             <button id="user-profile-button" aria-label="Профиль" class="w-12 h-12 flex items-center justify-center rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all text-2xl font-bold">
                 П
-                            </button>
-                        </div>
+            </button>
+        </div>
+        <!-- Prompt Templates Modal -->
+        <div id="prompt-templates-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center animate__animated animate__fadeIn animate__faster">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl relative p-8 max-h-[90vh] overflow-y-auto">
+                <button id="prompt-templates-close" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Шаблоны промптов</h2>
+                <div class="space-y-4 text-gray-700 dark:text-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="prompt-templates-list">
+                        <!-- Шаблоны будут подгружаться через JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- FAQ Modal (обязательно для работы кнопки FAQ, управляется main.js) -->
         <!--
             faq-modal должен быть sibling (или child) относительно app-page, чтобы main.js мог его найти по id.
@@ -163,14 +174,24 @@
             <div id="initial-view" class="text-center sticky top-16 z-20 bg-gradient-to-br from-white via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 py-12 px-8 animate__animated animate__fadeIn rounded-2xl shadow-xl mx-auto max-w-3xl mt-6 mb-6">
                 <svg class="w-16 h-16 mb-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">Как я могу помочь?</h2>
-                <p class="text-gray-500 dark:text-gray-400">Выберите модель и задайте вопрос ниже</p>
+                <p class="text-gray-500 dark:text-gray-400 mb-4">Выберите модель и задайте вопрос ниже</p>
+                <div id="helper-buttons" class="flex flex-wrap justify-center gap-4 mt-4">
+                    <button id="show-faq-btn" type="button" class="flex items-center gap-2 px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-2m0-4h.01"/></svg>
+                        FAQ
+                    </button>
+                    <button id="show-templates-btn" type="button" class="flex items-center gap-2 px-5 py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        Шаблоны
+                    </button>
+                </div>
             </div>
             <div id="chat-messages" class="w-full max-w-4xl flex-1 overflow-y-auto p-4 md:p-6 space-y-8 hidden" style="min-height:0; flex: 1 1 auto;">
                 <!-- Chat messages will be injected here -->
             </div>
 
             <!-- Prompt Input Area -->
-            <div id="prompt-wrapper" class="w-full p-4 md:p-6 sticky bottom-0 bg-white dark:bg-gray-800 z-10 border-t border-gray-200 dark:border-gray-700 shadow-lg animate__animated animate__fadeIn">
+            <div id="prompt-wrapper" class="w-full p-4 md:p-6 fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 z-30 border-t border-gray-200 dark:border-gray-700 shadow-lg animate__animated animate__fadeIn">
                 <div class="max-w-4xl mx-auto mt-auto">
                     <div class="mb-2 flex flex-wrap gap-2 justify-start">
                         <button type="button" class="quick-template-btn flex items-center gap-2 px-4 py-2 rounded-full border border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-100/80 to-pink-100/80 dark:from-purple-900/60 dark:to-pink-900/60 text-purple-700 dark:text-purple-200 font-semibold text-sm hover:bg-purple-200 dark:hover:bg-purple-800 transition-all animate__animated animate__fadeIn" data-template="Составь резюме для junior frontend разработчика"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 7V5a2 2 0 012-2h8a2 2 0 012 2v2M6 7h12M6 7v10a2 2 0 002 2h8a2 2 0 002-2V7M6 7l6 5 6-5"/></svg>Резюме</button>
@@ -188,6 +209,16 @@
                             <span class="hidden md:inline">Генерировать</span>
                             <svg class="inline w-6 h-6 ml-1 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </button>
+                        <div id="inline-helper-buttons" class="flex gap-2 ml-2" style="display:none">
+                            <button id="inline-faq-btn" type="button" class="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-700 text-xs font-semibold transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-2m0-4h.01"/></svg>
+                                FAQ
+                            </button>
+                            <button id="inline-templates-btn" type="button" class="flex items-center gap-1 px-3 py-1 rounded-lg bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-semibold transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                Шаблоны
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

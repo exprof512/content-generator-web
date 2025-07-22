@@ -72,7 +72,8 @@ async function fetchAndRenderHistory() {
             // Клик по чату — показать все сообщения этого чата
             chatBlock.addEventListener('click', () => {
                 loadChatMessages(chatItems);
-                currentChatId = chatId;
+                window.currentChatId = chatId;
+                sessionStorage.setItem('currentChatId', chatId);
             });
 
             historyList.appendChild(chatBlock);

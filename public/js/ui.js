@@ -96,7 +96,7 @@ function clearAppState() {
     resetChatLayout();
 }
 
-function addMessageToChat(content, type, historyId = null) {
+function addMessageToChat(content, type, historyId = null, isLoader = false) {
     activateChatLayout();
     const chatMessages = document.getElementById('chat-messages');
     const messageWrapper = document.createElement('div');
@@ -137,6 +137,10 @@ function addMessageToChat(content, type, historyId = null) {
             messageElement.remove();
         });
         messageWrapper.appendChild(messageElement);
+    } else if (isLoader) {
+        // Спиннер для ответа ИИ
+        messageElement.innerHTML = `<div class="flex items-center gap-2"><span class="loader inline-block w-6 h-6 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></span><span class="text-gray-500">Генерируется ответ...</span></div>`;
+        messageWrapper.appendChild(messageElement);
     } else {
         const aiBubble = document.createElement('div');
         aiBubble.className = `prose dark:prose-invert max-w-3xl w-full bg-gray-50 dark:bg-gray-900 border border-purple-100 dark:border-gray-700 px-6 py-5 rounded-2xl shadow-lg ${isError ? 'border-red-500' : ''}`;
@@ -174,9 +178,39 @@ function addMessageToChat(content, type, historyId = null) {
         messageWrapper.appendChild(messageElement);
     }
     chatMessages.appendChild(messageWrapper);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
     chatMessages.classList.remove('hidden');
-    chatMessages.parentNode.scrollTop = chatMessages.parentNode.scrollHeight;
+    // --- Новый UX: не скроллить вниз, а делать scrollIntoView для вопроса пользователя ---
+    if (type === 'user' || isLoader) {
+        messageWrapper.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+}
+
+function showLoaderAfterUserMessage() {
+    // Добавляет спиннер сразу после последнего сообщения пользователя
+    addMessageToChat('', 'ai', null, true);
+}
+
+function replaceLoaderWithAIResponse(aiContent, historyId = null) {
+    const chatMessages = document.getElementById('chat-messages');
+    // Найти последний спиннер
+    const loaders = chatMessages.querySelectorAll('.chat-message.ai');
+    const lastLoader = loaders[loaders.length - 1];
+    if (lastLoader) {
+        // Заменить на ответ ИИ
+        const newWrapper = document.createElement('div');
+        newWrapper.className = 'flex w-full gap-4 mb-4 justify-start';
+        const messageElement = document.createElement('div');
+        messageElement.className = 'chat-message group animate__animated animate__fadeInUp ai bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl shadow-lg px-5 py-4 max-w-xl lg:max-w-3xl';
+        messageElement.style.border = '2px solid #e5e7eb';
+        messageElement.style.marginBottom = '12px';
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'prose dark:prose-invert max-w-3xl w-full bg-gray-50 dark:bg-gray-900 border border-purple-100 dark:border-gray-700 px-6 py-5 rounded-2xl shadow-lg';
+        aiBubble.innerHTML = marked.parse(aiContent);
+        messageElement.appendChild(aiBubble);
+        newWrapper.appendChild(messageElement);
+        chatMessages.replaceChild(newWrapper, lastLoader.parentNode);
+        // Не скроллим вниз
+    }
 }
 
 function showLoader() {
@@ -276,10 +310,10 @@ function updateGenerateButtonState() {
 }
 
 // Переключатель языка
-const langSwitcher = document.getElementById('lang-switcher');
-if (langSwitcher) {
-    langSwitcher.addEventListener('click', () => {
-        const nextLang = i18n.currentLang === 'ru' ? 'en' : 'ru';
-        i18n.setLanguage(nextLang);
-    });
-}
+// const langSwitcher = document.getElementById('lang-switcher');
+// if (langSwitcher) {
+//     langSwitcher.addEventListener('click', () => {
+//         const nextLang = i18n.currentLang === 'ru' ? 'en' : 'ru';
+//         i18n.setLanguage(nextLang);
+//     });
+// }

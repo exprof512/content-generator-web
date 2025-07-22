@@ -5,7 +5,6 @@
             <a href="/" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">ContentGen Hub</a>
             <nav class="hidden md:flex items-center gap-6 text-gray-600 dark:text-gray-300 font-medium">
                 <a href="#pricing" class="hover:text-purple-600 dark:hover:text-purple-400">Тарифы</a>
-                <a href="#testimonials" class="hover:text-purple-600 dark:hover:text-purple-400">Отзывы</a>
             </nav>
             <div class="flex items-center gap-2">
                 <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
@@ -13,13 +12,8 @@
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                     </span>
                 </button>
-                <div class="relative">
-                    <button id="lang-switch" class="px-3 py-2 rounded-lg font-semibold bg-gradient-to-r from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-900 text-purple-700 dark:text-white shadow hover:from-purple-200 hover:to-pink-200 dark:hover:from-gray-600 dark:hover:to-gray-800 transition-all">
-                        <span id="lang-label">RU</span>
-                    </button>
-                </div>
                 <button id="show-auth-modal-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
-                    <span data-lang="login">Войти</span>
+                    Войти
                 </button>
             </div>
         </div>
@@ -29,184 +23,147 @@
         <!-- Hero Section -->
         <section class="text-center py-20 md:py-32 px-4 animate__animated animate__fadeInDown animate__faster">
             <div class="max-w-3xl mx-auto">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4">Ваш <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">универсальный</span> AI-инструмент</h1>
-                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">Объединяем лучшие AI-модели в одном месте. Генерируйте тексты и изображения быстрее, чем когда-либо.</p>
-                <a id="hero-cta-btn" href="#" class="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold rounded-xl shadow-lg transition-all animate__animated animate__pulse animate__infinite">Начать бесплатно</a>
-            </div>
-        </section>
-
-        <!-- AI Models Showcase Section + Преимущества платформы -->
-        <section id="models" class="py-20 px-4 animate__animated animate__fadeInUp animate__faster">
-            <div class="max-w-screen-xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Один интерфейс для всех задач</h2>
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Мы объединили лучшие нейросети, чтобы вы могли решать любые задачи в одном окне.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-                    <!-- ChatGPT Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
-                        <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="ChatGPT иконка"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-14l2-2 2 2m-4 4l2 2 2-2m-4 4l2 2 2-2m-4 4l2 2 2-2"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">ChatGPT</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Генерация текстов, статей, писем, резюме. <b>До 10 текстовых запросов в день бесплатно.</b></p>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4">AI для жизни и бизнеса — <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">без лишних сложностей</span></h1>
+                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">Генерируйте тексты, изображения, идеи и код за секунды. Всё, что нужно для продуктивности и роста — в одном окне.</p>
+                <button id="hero-cta-btn" class="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold rounded-xl shadow-lg transition-all animate__animated animate__pulse animate__infinite">Попробовать бесплатно</button>
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl px-6 py-4 shadow text-left max-w-xs">
+                        <div class="font-bold text-purple-700 dark:text-purple-300 mb-1">Безлимитные возможности</div>
+                        <div class="text-gray-600 dark:text-gray-400 text-sm">Доступ к ChatGPT, Gemini, DALL-E, DeepSeek и другим топовым AI — без переключения между сервисами.</div>
                     </div>
-                    <!-- DALL-E Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="DALL-E иконка"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l2-2a2 2 0 012.828 0l2 2m-4 5h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">DALL-E</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Генерация уникальных изображений по описанию. <b>3 бесплатные картинки в день.</b></p>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl px-6 py-4 shadow text-left max-w-xs">
+                        <div class="font-bold text-purple-700 dark:text-purple-300 mb-1">Моментальный старт</div>
+                        <div class="text-gray-600 dark:text-gray-400 text-sm">Регистрация за 10 секунд. Не нужно вводить карту для бесплатного тарифа.</div>
                     </div>
-                    <!-- Gemini Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
-                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Gemini иконка"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Gemini</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Аналитика, идеи, сложные задачи. <b>Бесплатный доступ к Gemini 1.5.</b></p>
-                    </div>
-                    <!-- DeepSeek Card -->
-                    <div class="bg-gray-100/50 dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate__animated animate__fadeInUp animate__delay-1s">
-                        <div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-xl flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="DeepSeek иконка"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">DeepSeek Coder</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Генерация и рефакторинг кода, помощь с программированием. <b>Бесплатный доступ к DeepSeek Chat.</b></p>
-                    </div>
-                </div>
-                <!-- Преимущества платформы (бывший блок "О платформе") -->
-                <div class="max-w-4xl mx-auto text-center mt-16 animate__animated animate__fadeInUp animate__delay-2s">
-                    <h2 class="text-2xl font-bold mb-6">Почему выбирают ContentGen Hub?</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
-                            <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-400 text-white">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Все топовые AI-модели"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m4 0h-1v-4h-1"></path></svg>
-                            </div>
-                            <h3 class="font-bold text-lg mb-2">Все топовые AI-модели</h3>
-                            <p class="text-gray-500 dark:text-gray-400">ChatGPT, Gemini, DALL-E, DeepSeek и другие — в одном аккаунте. <b>Без переключения между сервисами.</b></p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
-                            <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 text-white">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Скорость и простота"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"></path></svg>
-                            </div>
-                            <h3 class="font-bold text-lg mb-2">Скорость и простота</h3>
-                            <p class="text-gray-500 dark:text-gray-400">Генерация за 5 секунд, минималистичный интерфейс, ничего лишнего. <b>Всё для продуктивности.</b></p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center">
-                            <div class="w-12 h-12 mb-3 flex items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-purple-400 text-white">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Выгодно и честно"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <h3 class="font-bold text-lg mb-2">Выгодно и честно</h3>
-                            <p class="text-gray-500 dark:text-gray-400">Прозрачные тарифы, бесплатный старт, <b>поддержка 24/7</b>, безопасность данных.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Как это работает -->
-        <section class="py-20 px-4 bg-white dark:bg-gray-900 animate__animated animate__fadeInUp animate__delay-3s">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-3xl font-extrabold mb-8">Как это работает?</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div>
-                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">1</div>
-                        <p>Зарегистрируйтесь или войдите</p>
-                    </div>
-                    <div>
-                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">2</div>
-                        <p>Выберите AI-модель</p>
-                    </div>
-                    <div>
-                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">3</div>
-                        <p>Опишите задачу или вопрос</p>
-                    </div>
-                    <div>
-                        <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold">4</div>
-                        <p>Получите результат за секунды!</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Партнёры -->
-        <!-- (секция удалена по требованию) -->
-        <!-- FAQ с микроразметкой -->
-        <section class="py-20 px-4 bg-white dark:bg-gray-900 animate__animated animate__fadeInUp animate__delay-5s" itemscope itemtype="https://schema.org/FAQPage">
-            <div class="max-w-3xl mx-auto">
-                <h2 class="text-3xl font-extrabold mb-8">Частые вопросы</h2>
-                <div class="space-y-6">
-                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 class="text-lg font-bold mb-2" itemprop="name">Как начать пользоваться сервисом?</h3>
-                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                            <p itemprop="text">Зарегистрируйтесь или войдите, выберите модель и начните генерировать тексты или изображения.</p>
-                        </div>
-                    </div>
-                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 class="text-lg font-bold mb-2" itemprop="name">Какие есть бесплатные возможности?</h3>
-                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                            <p itemprop="text">10 текстовых генераций и 3 картинки DALL-E 2 в день бесплатно. Доступ к базовым моделям без ограничений.</p>
-                        </div>
-                    </div>
-                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 class="text-lg font-bold mb-2" itemprop="name">Как оплатить подписку?</h3>
-                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                            <p itemprop="text">Перейдите на страницу <a href="/pricing" class="text-purple-600 underline">Тарифы</a> и выберите подходящий план.</p>
-                        </div>
-                    </div>
-                    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 class="text-lg font-bold mb-2" itemprop="name">Как связаться с поддержкой?</h3>
-                        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                            <p itemprop="text">Пишите на <a href="mailto:support@contentgenhub.ru" class="text-purple-600 underline">support@contentgenhub.ru</a> или используйте чат поддержки на сайте.</p>
-                        </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl px-6 py-4 shadow text-left max-w-xs">
+                        <div class="font-bold text-purple-700 dark:text-purple-300 mb-1">Для работы и творчества</div>
+                        <div class="text-gray-600 dark:text-gray-400 text-sm">Пишите статьи, создавайте маркетинговые тексты, генерируйте изображения, автоматизируйте задачи и код.</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Pricing Section -->
-        <section id="pricing" class="py-20 px-4 bg-gray-50 dark:bg-gray-800/50 animate__animated animate__fadeInUp animate__delay-1s animate__faster">
-            <div class="max-w-screen-xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Простые и понятные тарифы</h2>
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Начните бесплатно и выбирайте план по мере необходимости.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                    <!-- Free Plan -->
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center flex flex-col"><h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Бесплатный</h3><p class="text-gray-500 dark:text-gray-400 mb-6">Для старта и личных проектов</p><p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">0₽<span class="text-lg font-medium">/мес</span></p><ul class="text-left space-y-2 mb-8 flex-grow"><li class="flex items-center gap-2"><span class="text-green-500">✔</span> 10 генераций в день</li><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Доступ к базовым моделям</li><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Сохранение истории</li></ul><a href="/payment?plan=free" class="mt-auto w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-colors">Начать бесплатно</a></div>
-                    <!-- Pro Plan -->
-                    <div class="border-2 border-purple-500 rounded-lg p-8 text-center flex flex-col shadow-2xl relative"><span class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">ПОПУЛЯРНЫЙ</span><h3 class="text-2xl font-bold mb-2 text-purple-500">Pro</h3><p class="text-gray-500 dark:text-gray-400 mb-6">Для профессионалов и команд</p><p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">499₽<span class="text-lg font-medium">/мес</span></p><ul class="text-left space-y-2 mb-8 flex-grow"><li class="flex items-center gap-2"><span class="text-green-500">✔</span> 100 генераций в день</li><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Доступ ко всем моделям</li><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Приоритетная поддержка</li><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Ранний доступ к новым функциям</li></ul><a href="/payment?plan=pro" class="mt-auto w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors">Выбрать Pro</a></div>
-                    <!-- Enterprise Plan -->
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center flex flex-col"><h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Enterprise</h3><p class="text-gray-500 dark:text-gray-400 mb-6">Для крупного бизнеса</p><p class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">Индивидуально</p><ul class="text-left space-y-2 mb-8 flex-grow"><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Безлимитные генерации</li><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Персональный менеджер</li><li class="flex items-center gap-2"><span class="text-green-500">✔</span> Кастомные интеграции</li></ul><a href="mailto:sales@example.com" class="mt-auto w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-colors">Связаться с нами</a></div>
+        <!-- Возможности лучших AI-моделей -->
+        <section class="py-12 px-4 animate__animated animate__fadeInUp animate__faster">
+          <div class="max-w-5xl mx-auto">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-center mb-10 text-gray-900 dark:text-white">Возможности лучших AI-моделей</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div class="flex flex-col items-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+                <img src="/img/chatgpt.svg" alt="ChatGPT" class="w-14 h-14 mb-4">
+                <div class="font-bold text-lg mb-2 text-gray-900 dark:text-white">ChatGPT</div>
+                <div class="text-gray-600 dark:text-gray-300 text-sm text-center">Генерация текстов, писем, статей, идей. Универсальный ассистент для любых задач.</div>
+              </div>
+              <div class="flex flex-col items-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+                <img src="/img/gemini.svg" alt="Gemini" class="w-14 h-14 mb-4">
+                <div class="font-bold text-lg mb-2 text-gray-900 dark:text-white">Gemini</div>
+                <div class="text-gray-600 dark:text-gray-300 text-sm text-center">Аналитика, генерация идей, сложные задачи. Мощь Google AI для бизнеса и обучения.</div>
+              </div>
+              <div class="flex flex-col items-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+                <img src="/img/dalle.svg" alt="DALL-E" class="w-14 h-14 mb-4">
+                <div class="font-bold text-lg mb-2 text-gray-900 dark:text-white">DALL-E</div>
+                <div class="text-gray-600 dark:text-gray-300 text-sm text-center">Генерация уникальных изображений по описанию. Вдохновение для дизайнеров и маркетологов.</div>
+              </div>
+              <div class="flex flex-col items-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+                <img src="/img/deepseek.svg" alt="DeepSeek" class="w-14 h-14 mb-4">
+                <div class="font-bold text-lg mb-2 text-gray-900 dark:text-white">DeepSeek Coder</div>
+                <div class="text-gray-600 dark:text-gray-300 text-sm text-center">Генерация и рефакторинг кода, помощь с программированием. Ваш AI для разработки.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="py-20 px-4 animate__animated animate__fadeInUp animate__faster">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-12 text-gray-900 dark:text-white">Что вы сможете делать с ContentGen Hub?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-2xl p-8 shadow-lg flex flex-col items-start">
+                        <div class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-200">Писать тексты и статьи</div>
+                        <div class="text-gray-600 dark:text-gray-300 mb-2">Генерируйте уникальные тексты, письма, посты, резюме, SEO-описания и многое другое.</div>
+                        <span class="inline-block bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full mt-auto">Экономия времени</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 rounded-2xl p-8 shadow-lg flex flex-col items-start">
+                        <div class="text-2xl font-bold mb-2 text-blue-700 dark:text-blue-200">Создавать изображения</div>
+                        <div class="text-gray-600 dark:text-gray-300 mb-2">Генерируйте иллюстрации, баннеры, обложки, визуалы для соцсетей и рекламы.</div>
+                        <span class="inline-block bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full mt-auto">Вдохновение для дизайна</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900 rounded-2xl p-8 shadow-lg flex flex-col items-start">
+                        <div class="text-2xl font-bold mb-2 text-pink-700 dark:text-pink-200">Генерировать идеи и аналитику</div>
+                        <div class="text-gray-600 dark:text-gray-300 mb-2">Получайте свежие идеи для бизнеса, маркетинга, стартапов, анализируйте данные и тренды.</div>
+                        <span class="inline-block bg-pink-600 text-white text-xs font-semibold px-3 py-1 rounded-full mt-auto">Рост и развитие</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-lg flex flex-col items-start">
+                        <div class="text-2xl font-bold mb-2 text-gray-700 dark:text-gray-200">Автоматизировать рутину</div>
+                        <div class="text-gray-600 dark:text-gray-300 mb-2">Генерируйте код, автоматизируйте задачи, ускоряйте рабочие процессы.</div>
+                        <span class="inline-block bg-gray-700 text-white text-xs font-semibold px-3 py-1 rounded-full mt-auto">Больше времени на важное</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-2xl p-8 shadow-lg flex flex-col items-start">
+                        <div class="text-2xl font-bold mb-2 text-indigo-700 dark:text-indigo-200">Учиться и развиваться</div>
+                        <div class="text-gray-600 dark:text-gray-300 mb-2">Изучайте новые темы, получайте объяснения, готовьтесь к экзаменам и собеседованиям.</div>
+                        <span class="inline-block bg-indigo-600 text-white text-xs font-semibold px-3 py-1 rounded-full mt-auto">AI-репетитор</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-100 to-blue-100 dark:from-pink-900 dark:to-blue-900 rounded-2xl p-8 shadow-lg flex flex-col items-start">
+                        <div class="text-2xl font-bold mb-2 text-pink-700 dark:text-pink-200">Экспериментировать и творить</div>
+                        <div class="text-gray-600 dark:text-gray-300 mb-2">Пробуйте новые форматы, создавайте креативные проекты, удивляйте себя и других.</div>
+                        <span class="inline-block bg-pink-700 text-white text-xs font-semibold px-3 py-1 rounded-full mt-auto">AI для творчества</span>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Testimonials Section -->
-        <section id="testimonials" class="py-20 px-4 animate__animated animate__fadeInUp animate__delay-2s animate__faster">
-            <div class="max-w-screen-xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Что говорят наши пользователи</h2>
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Нам доверяют специалисты из разных областей.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Testimonial 1 -->
-                    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg flex flex-col">
-                        <p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow">"Готовлюсь к экзаменам, и этот инструмент — просто спасение. Gemini помогает структурировать информацию для рефератов, а ChatGPT быстро пишет эссе на заданные темы. Сэкономил кучу времени и получил высший балл!"</p>
-                        <div class="font-bold text-gray-900 dark:text-white mt-auto">Алексей, студент</div>
-                    </div>
-                    <!-- Testimonial 2 -->
-                    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg flex flex-col">
-                        <p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow">"Я веду небольшой интернет-магазин. С помощью DALL-E я генерирую уникальные изображения для карточек товаров, а ChatGPT пишет для них продающие описания. Конверсия выросла, а затраты на контент-менеджера сократились."</p>
-                        <div class="font-bold text-gray-900 dark:text-white mt-auto">Ирина, предприниматель</div>
-                    </div>
-                    <!-- Testimonial 3 -->
-                    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg flex flex-col">
-                        <p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow">"Использую DeepSeek Coder для рефакторинга старого кода и написания юнит-тестов. Он предлагает элегантные решения и находит баги, которые я мог пропустить. Лучший ассистент для кодинга, который я пробовал."</p>
-                        <div class="font-bold text-gray-900 dark:text-white mt-auto">Виктор, Full-stack разработчик</div>
-                    </div>
-                </div>
+        <!-- Call to Action Section -->
+        <section class="py-20 px-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 animate__animated animate__fadeInUp animate__faster">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl font-extrabold mb-6 text-gray-900 dark:text-white">Начните прямо сейчас — бесплатно</h2>
+                <p class="text-lg text-gray-700 dark:text-gray-200 mb-8">Откройте для себя новые возможности. Попробуйте ContentGen Hub — и убедитесь, как просто и быстро можно решать любые задачи с помощью AI.</p>
+                <button id="hero-cta-btn-2" class="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold rounded-xl shadow-lg transition-all animate__animated animate__pulse animate__infinite">Начать бесплатно</button>
+                <div class="mt-8 text-gray-500 dark:text-gray-400 text-sm">Без привязки карты. Бесплатный тариф — навсегда.</div>
             </div>
+        </section>
+
+        <!-- Pricing Section (оставляем) -->
+        <section id="tariffs" class="py-16 px-4 bg-gray-50 dark:bg-gray-900">
+          <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">Тарифы</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <!-- FREE -->
+              <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-purple-200 dark:border-purple-700">
+                <h3 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">FREE</h3>
+                <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">0 ₽</div>
+                <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
+                  <li>10 генераций в день</li>
+                  <li>Доступ ко всем моделям</li>
+                  <li>Без привязки карты</li>
+                </ul>
+                <a href="/" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all text-center">Начать бесплатно</a>
+              </div>
+              <!-- PRO -->
+              <div class="rounded-2xl shadow-2xl bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-4 border-purple-500 relative">
+                <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow">Рекомендуем</div>
+                <h3 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">PRO</h3>
+                <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">499 ₽<span class="text-base font-normal">/мес</span></div>
+                <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
+                  <li>100 генераций в день</li>
+                  <li>Доступ ко всем моделям</li>
+                  <li>Приоритетная поддержка</li>
+                </ul>
+                <a href="/pricing" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all text-center mb-2">Оформить PRO</a>
+                <a href="/pricing" class="w-full py-2 px-6 rounded-xl border border-purple-400 text-purple-700 dark:text-purple-200 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900 transition-all text-center">Оплатить через Telegram</a>
+              </div>
+              <!-- MAX -->
+              <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-indigo-300 dark:border-indigo-700">
+                <h3 class="text-2xl font-bold mb-2 text-indigo-700 dark:text-indigo-300">MAX</h3>
+                <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">1999 ₽<span class="text-base font-normal">/мес</span></div>
+                <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
+                  <li>Безлимитные генерации</li>
+                  <li>Доступ ко всем моделям</li>
+                  <li>VIP-поддержка</li>
+                </ul>
+                <a href="/pricing" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all text-center mb-2">Оформить MAX</a>
+                <a href="/pricing" class="w-full py-2 px-6 rounded-xl border border-indigo-400 text-indigo-700 dark:text-indigo-200 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all text-center">Оплатить через Telegram</a>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- Footer -->
