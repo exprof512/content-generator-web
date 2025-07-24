@@ -56,9 +56,14 @@ async function fetchUserData() {
             if (document.getElementById('account-email')) document.getElementById('account-email').textContent = user.email;
             if (document.getElementById('account-tariff')) document.getElementById('account-tariff').textContent = user.tariff;
             if (document.getElementById('account-generations')) document.getElementById('account-generations').textContent = user.generations_left;
-            if (document.getElementById('account-expires')) document.getElementById('account-expires').textContent = new Date(user.subscription_expires).toLocaleDateString('ru-RU', {
-                year: 'numeric', month: 'long', day: 'numeric'
-            });
+            if (document.getElementById('account-expires')) {
+                const { text, isActive } = formatSubscriptionDate(user.subscription_expires, user.tariff);
+                const el = document.getElementById('account-expires');
+                el.textContent = text;
+                el.className = isActive
+                    ? 'text-lg font-semibold text-green-700 dark:text-green-400'
+                    : 'text-lg font-semibold text-gray-400 dark:text-gray-500';
+            }
         }
 
         // --- Основное приложение (чат, дропдаун профиля) ---
@@ -92,6 +97,15 @@ async function fetchUserData() {
     } finally {
         hideLoader();
     }
+}
+
+function formatSubscriptionDate(expires, tariff) {
+    if (tariff === 'free' || !expires || new Date(expires) < new Date()) {
+        return { text: 'Нет активной подписки', isActive: false };
+    }
+    const date = new Date(expires);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return { text: 'до ' + date.toLocaleDateString('ru-RU', options), isActive: true };
 }
 
 async function handleEmailRegister(event) {
