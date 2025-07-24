@@ -1,0 +1,207 @@
+// PROMPT TEMPLATES
+const PROMPT_TEMPLATES = [
+    {
+      "title": "Резюме для вакансии",
+      "text": "Создай профессиональное резюме для должности {должность}. Укажи релевантный опыт в сфере {отрасль}, ключевые навыки: {ключевые навыки}, и достижения."
+    },
+    {
+      "title": "Письмо партнёру",
+      "text": "Составь деловое письмо партнёру компании {название}. Укажи цель обращения: {описание цели}, сохрани официальный и уважительный стиль."
+    },
+    {
+      "title": "Пост для соцсетей",
+      "text": "Напиши engaging-пост для {соцсеть} о запуске нового продукта: {название продукта}. Используй стиль, характерный для этой платформы, и добавь призыв к действию."
+    },
+    {
+      "title": "SEO-описание товара",
+      "text": "Создай SEO-оптимизированное описание для товара {название}. Определи преимущества для аудитории: {описание аудитории}, используй ключевые слова."
+    },
+    {
+      "title": "Сценарий видео",
+      "text": "Составь сценарий для видео на тему {тема}. Укажи структуру, хронометраж до {минуты} минут, и добавь интересные визуальные элементы."
+    },
+    {
+      "title": "Инструкция для пользователя",
+      "text": "Напиши пошаговую инструкцию по использованию {продукт/сервис}. Сделай её понятной, с подзаголовками и пояснениями."
+    },
+    {
+      "title": "План статьи",
+      "text": "Разработай подробный план статьи по теме: {тема статьи}. Укажи введение, ключевые разделы и заключение."
+    },
+    {
+      "title": "Перевод текста",
+      "text": "Переведи следующий текст на язык {язык}, сохрани стиль и смысл оригинала: {текст для перевода}."
+    },
+    {
+      "title": "Письмо в поддержку",
+      "text": "Составь корректное письмо в техподдержку сервиса {название}. Опиши проблему подробно: {описание проблемы}, и укажи ожидаемое решение."
+    },
+    {
+      "title": "Промпт для генерации изображения",
+      "text": "Создай изображение по описанию: {описание сцены}. Стиль: {стиль}, цветовая палитра: {цвета}, дополнительные детали: {детали}."
+    },
+    {
+      "title": "План маркетинговой кампании",
+      "text": "Разработай пошаговый маркетинговый план для продукта {название}. Бюджет: {сумма}, целевая аудитория: {описание аудитории}."
+    },
+    {
+      "title": "Пост для Telegram-канала",
+      "text": "Напиши пост для Telegram-канала на тему {тема}. Стиль: {информативный/развлекательный}, добавь эмодзи и CTA при необходимости."
+    },
+    {
+      "title": "Письмо клиенту",
+      "text": "Составь персонализированное письмо клиенту, интересующемуся {услуга/товар}. Цель письма: {цель}, стиль — дружелюбный и профессиональный."
+    },
+    {
+      "title": "Сценарий подкаста",
+      "text": "Напиши сценарий для подкаста на тему {тема}. Продолжительность: {минуты} минут. Включи вступление, основную часть и завершение."
+    },
+    {
+      "title": "Генерация кода",
+      "text": "Напиши эффективный и читаемый код на {язык программирования} для задачи: {описание задачи}. Включи комментарии и проверку ошибок."
+    },
+    {
+      "title": "План обучения",
+      "text": "Составь подробный учебный план по теме {тема}. Уровень: {начальный/продвинутый}, структура: модули, темы, упражнения."
+    },
+    {
+      "title": "Анализ данных",
+      "text": "Проанализируй данные: {описание данных}. Определи цель анализа: {цель}, предложи инсайты и возможные выводы."
+    },
+    {
+      "title": "Презентация",
+      "text": "Составь структуру презентации по теме {тема}. Укажи количество слайдов: {число}, и краткое содержание каждого."
+    },
+    {
+      "title": "Email-рассылка",
+      "text": "Напиши текст email-рассылки для аудитории: {описание аудитории}. Цель письма: {цель}, добавь заголовок и CTA."
+    },
+    {
+      "title": "FAQ",
+      "text": "Создай список часто задаваемых вопросов и ответов по теме {тема}. Структура: вопрос — краткий и чёткий ответ."
+    },
+    {
+      "title": "Слоган",
+      "text": "Придумай креативный слоган для компании {название}, ниша: {описание ниши}. Сделай его запоминающимся и коротким."
+    },
+    {
+      "title": "Описание вакансии",
+      "text": "Напиши привлекательное описание вакансии для позиции {должность}. Укажи обязанности, требования: {ключевые требования}, и условия."
+    },
+    {
+      "title": "Roadmap проекта",
+      "text": "Создай roadmap проекта {название}. Опиши ключевые этапы: {описание этапов}, укажи сроки и приоритеты."
+    },
+    {
+      "title": "User Story",
+      "text": "Составь user story для функционала {описание функционала}. Роль пользователя: {роль}, цель: {цель}, результат: {ожидаемый результат}."
+    },
+    {
+      "title": "Тест-кейсы",
+      "text": "Напиши тест-кейсы для проверки функционала: {описание функционала/продукта}. Укажи шаги, входные данные и ожидаемый результат."
+    },
+    {
+      "title": "Бизнес-план",
+      "text": "Составь краткий бизнес-план для стартапа {название}. Ниша: {описание ниши}, аудитория: {описание аудитории}, стратегия и монетизация."
+    },
+    {
+      "title": "Пресс-релиз",
+      "text": "Напиши пресс-релиз о запуске продукта/сервиса {продукт/сервис}. Укажи ключевые преимущества: {описание преимуществ}, и контактную информацию."
+    },
+    {
+      "title": "Customer Journey Map",
+      "text": "Составь карту пути клиента: {описание клиента}, этапы: {описание этапов}, точки контакта и боли клиента."
+    },
+    {
+      "title": "Mindmap",
+      "text": "Создай mindmap по теме {тема}. Основные ветви: {описание ветвей}, выдели ключевые идеи и связи."
+    },
+    {
+      "title": "Отчёт",
+      "text": "Составь аналитический отчёт по результатам {описание исследования/проекта}. Основные выводы: {выводы}, рекомендации."
+    },
+    {
+      "title": "Инструкция по безопасности",
+      "text": "Составь инструкцию по технике безопасности для процесса/оборудования: {описание процесса/оборудования}. Укажи пошаговые действия и предупреждения."
+    },
+    {
+      "title": "AI-картинка: продукт",
+      "text": "Сгенерируй реалистичное изображение продукта {название}. Стиль: {реализм/рендер}, фон: {фон}, цветовая гамма: {цвета}."
+    },
+    {
+      "title": "AI-картинка: персонаж",
+      "text": "Сгенерируй изображение персонажа: {описание персонажа}, стиль: {аниме/реализм/мультфильм}, поза: {описание позы}, настроение: {эмоции}."
+    },
+    {
+      "title": "AI-картинка: сцена",
+      "text": "Создай изображение сцены: {описание сцены}. Укажи стиль: {киберпанк/фэнтези/ретрофутуризм}, свет: {тип освещения}, детали: {детали окружения}."
+    }
+  ];
+
+function renderPromptTemplates() {
+  const list = document.getElementById('prompt-templates-list');
+  if (!list) return;
+  list.innerHTML = '';
+  PROMPT_TEMPLATES.forEach((tpl, idx) => {
+    const card = document.createElement('div');
+    card.className = 'bg-purple-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-xl p-4 shadow flex flex-col gap-2';
+    card.innerHTML = `<div class="font-semibold text-purple-700 dark:text-purple-200 mb-2">${tpl.title}</div>
+      <textarea readonly class="w-full bg-transparent text-gray-700 dark:text-gray-200 text-sm resize-none outline-none" rows="3">${tpl.text}</textarea>
+      <div class="flex gap-2 mt-2">
+        <button class="copy-template-btn px-3 py-1 rounded-lg bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-all" data-idx="${idx}">Копировать</button>
+        <button class="insert-template-btn px-3 py-1 rounded-lg bg-pink-600 text-white text-xs font-semibold hover:bg-pink-700 transition-all" data-idx="${idx}">Вставить в чат</button>
+      </div>`;
+    list.appendChild(card);
+  });
+  // Навешиваем обработчики
+  list.querySelectorAll('.copy-template-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = btn.getAttribute('data-idx');
+      navigator.clipboard.writeText(PROMPT_TEMPLATES[idx].text);
+      btn.textContent = 'Скопировано!';
+      setTimeout(() => { btn.textContent = 'Копировать'; }, 1500);
+    });
+  });
+  list.querySelectorAll('.insert-template-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = btn.getAttribute('data-idx');
+      const promptInput = document.getElementById('prompt-input');
+      if (promptInput) {
+        promptInput.value = PROMPT_TEMPLATES[idx].text;
+        promptInput.focus();
+        document.getElementById('prompt-templates-modal').classList.add('hidden');
+      }
+    });
+  });
+}
+
+function openTemplatesModal() {
+  document.getElementById('prompt-templates-modal').classList.remove('hidden');
+  renderPromptTemplates();
+}
+function closeTemplatesModal() {
+  document.getElementById('prompt-templates-modal').classList.add('hidden');
+}
+
+function setupTemplatesHandlers() {
+  const showTemplatesBtn = document.getElementById('show-templates-btn');
+  showTemplatesBtn?.addEventListener('click', openTemplatesModal);
+  const inlineTemplatesBtn = document.getElementById('inline-templates-btn');
+  inlineTemplatesBtn?.addEventListener('click', openTemplatesModal);
+  document.getElementById('prompt-templates-close')?.addEventListener('click', closeTemplatesModal);
+  window.addEventListener('mousedown', (e) => {
+    const tplModal = document.getElementById('prompt-templates-modal');
+    if (tplModal && !tplModal.classList.contains('hidden')) {
+      const inner = tplModal.children[0];
+      if (inner && !inner.contains(e.target)) closeTemplatesModal();
+    }
+  });
+  document.getElementById('fixed-templates-btn')?.addEventListener('click', openTemplatesModal);
+  // prompt-helper-buttons
+  const promptTemplatesBtn = document.querySelector('#prompt-helper-buttons #show-templates-btn');
+  if (promptTemplatesBtn) {
+    promptTemplatesBtn.addEventListener('click', openTemplatesModal);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', setupTemplatesHandlers); 
