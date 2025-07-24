@@ -1,14 +1,9 @@
-// Удаляю неиспользуемые переменные
-// let postLoginAction = null;
-
 document.addEventListener('DOMContentLoaded', async () => {
     // --- DOM Elements ---
     const promptInput = document.getElementById('prompt-input');
     const generateButton = document.getElementById('generate-button');
     const modelSelect = document.getElementById('model-select');
     const submodelSelect = document.getElementById('submodel-select');
-    // const profileButton = document.getElementById('user-profile-button');
-    // const accountDropdown = document.getElementById('account-dropdown');
     const agentDropdownBtn = document.getElementById('agent-dropdown-btn');
     const agentDropdownMenu = document.getElementById('agent-dropdown-menu');
     const agentDropdownLabel = document.getElementById('agent-dropdown-label');
@@ -43,8 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (model === 'gpt-4o-mini') label = 'GPT-4o-mini';
                     if (model === 'gpt-4') label = 'GPT-4';
                     if (model === 'gpt-4.1') label = 'GPT-4.1';
-                    if (model === 'gemini-1.5') label = 'Gemini 1.5';
-                    if (model === 'gemini-pro') label = 'Gemini Pro';
+                    if (model === 'gemini-2.0-flash') label = 'Gemini 2.0 Flash';
+                    if (model === 'gemini-2.5-flash') label = 'Gemini 2.5 Flash';
+                    if (model === 'gemini-2.5-pro') label = 'Gemini 2.5 Pro';
                     if (model === 'deepseek-chat') label = 'DeepSeek Chat';
                     if (model === 'deepseek-reasoner') label = 'DeepSeek Reasoner';
                     if (model === 'deepseek-coder') label = 'DeepSeek Coder';
@@ -57,26 +53,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
             // fallback: дефолтные модели
             MODEL_OPTIONS = {
-                chatgpt: [
-                    { value: 'gpt-4o-mini', label: 'GPT-4o-mini' },
-                    { value: 'gpt-4', label: 'GPT-4' },
-                    { value: 'gpt-4.1', label: 'GPT-4.1' }
-                ],
-                gemini: [
-                    { value: 'gemini-1.5', label: 'Gemini 1.5' },
-                    { value: 'gemini-pro', label: 'Gemini Pro' }
-                ],
-                deepseek: [
-                    { value: 'deepseek-chat', label: 'DeepSeek Chat' },
-                    { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' },
-                    { value: 'deepseek-coder', label: 'DeepSeek Coder' }
-                ],
-                dalle: [
-                    { value: 'gpt-image-1', label: 'GPT Image 1' },
-                    { value: 'dall-e-2', label: 'DALL-E 2' },
-                    { value: 'dall-e-3', label: 'DALL-E 3' }
-                ]
-            };
+        chatgpt: [
+            { value: 'gpt-4o-mini', label: 'GPT-4o-mini' },
+            { value: 'gpt-4', label: 'GPT-4' },
+            { value: 'gpt-4.1', label: 'GPT-4.1' }
+        ],
+        gemini: [
+                    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
+                    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+                    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' }
+        ],
+        deepseek: [
+            { value: 'deepseek-chat', label: 'DeepSeek Chat' },
+            { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' },
+            { value: 'deepseek-coder', label: 'DeepSeek Coder' }
+        ],
+        dalle: [
+            { value: 'gpt-image-1', label: 'GPT Image 1' },
+            { value: 'dall-e-2', label: 'DALL-E 2' },
+            { value: 'dall-e-3', label: 'DALL-E 3' }
+        ]
+    };
         }
     }
 
@@ -222,6 +219,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (spinner) spinner.style.display = 'none';
     }
 
+    let promptHelpersVisible = false;
+    function showPromptHelpers() {
+        if (!promptHelpersVisible) {
+            document.getElementById('prompt-helper-buttons').style.display = 'flex';
+            promptHelpersVisible = true;
+        }
+    }
+    function hidePromptHelpers() {
+        document.getElementById('prompt-helper-buttons').style.display = 'none';
+        promptHelpersVisible = false;
+    }
+
+    let currentAbortController = null;
+
     async function handleGeneration() {
         const prompt = promptInput.value.trim();
         if (!prompt) return;
@@ -234,6 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addMessageToChat(prompt, 'user');
         // 2. Добавить спиннер для ответа ИИ
         showLoaderAfterUserMessage();
+        showPromptHelpers(); // показываем FAQ/Шаблоны после первого промта
         let subscription;
         try {
             subscription = await checkSubscription();
@@ -255,21 +267,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             promptInput.disabled = false;
             generateButton.disabled = false;
             showPaymentNotification(subscription.plan || 'pro');
-            return;
-        }
+                return;
+            }
         const model = selectedAgent;
         const submodel = selectedModel;
         const chat_id = window.currentChatId;
+        // --- STOP BUTTON LOGIC ---
+        if (!currentAbortController) {
+            currentAbortController = new AbortController();
+        }
+        generateButton.innerHTML = '<span class="hidden md:inline">Стоп</span> <svg class="inline w-6 h-6 ml-1 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6L18 18M6 18L18 6"/></svg>';
+        generateButton.disabled = false;
+        generateButton.onclick = () => {
+            if (currentAbortController) currentAbortController.abort();
+            generateButton.disabled = true;
+        };
+        let result;
         try {
-            const result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id });
+            result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id }, { signal: currentAbortController.signal });
             replaceLoaderWithAIResponse(result.content);
             fetchAndRenderHistory();
             showToast('Генерация завершена!', 'success');
         } catch (error) {
-            replaceLoaderWithAIResponse('Ошибка: ' + (error.message || 'Нет соединения с сервером'));
+            if (error.name === 'AbortError') {
+                replaceLoaderWithAIResponse('Генерация отменена.');
+            } else {
+                replaceLoaderWithAIResponse('Ошибка: ' + (error.message || 'Нет соединения с сервером'));
+            }
         } finally {
             promptInput.disabled = false;
             generateButton.disabled = false;
+            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            generateButton.onclick = handleGeneration;
+            currentAbortController = null;
             updateGenerateButtonState();
         }
     }
@@ -316,6 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.currentChatId = generateChatId();
         sessionStorage.setItem('currentChatId', window.currentChatId);
         resetChatLayout();
+        hidePromptHelpers(); // скрываем FAQ/Шаблоны при новом чате
     });
 
     // --- Auth Modal Listeners ---
@@ -434,13 +465,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <input type="checkbox" id="theme-toggle" class="sr-only peer">
                             <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                         </label>
-                    </div>
-                    <div class="px-3 py-2 flex justify-between items-center text-sm">
-                        <span>Язык</span>
-                        <div class="flex items-center gap-1">
-                            <button id="lang-ru-btn" class="px-2 py-1 rounded-md bg-gray-200 dark:bg-gray-700 font-bold" data-lang-btn="RU">RU</button>
-                            <button id="lang-en-btn" class="px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700" data-lang-btn="EN">EN</button>
-                        </div>
                     </div>
                 </div>
                 <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
@@ -767,7 +791,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Helper buttons visibility logic ---
     function updateHelperButtonsVisibility() {
       const promptInput = document.getElementById('prompt-input');
-      const helperButtons = document.getElementById('helper-buttons');
+      const helperButtons = document.getElementById('prompt-helper-buttons');
       const inlineHelper = document.getElementById('inline-helper-buttons');
       if (!promptInput || !helperButtons || !inlineHelper) return;
       if (promptInput.value.trim() === '') {
@@ -822,4 +846,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (inner && !inner.contains(e.target)) closeTemplatesModal();
       }
     });
+
+    document.getElementById('fixed-faq-btn')?.addEventListener('click', () => {
+        document.getElementById('faq-modal').classList.remove('hidden');
+    });
+    document.getElementById('fixed-templates-btn')?.addEventListener('click', () => {
+        document.getElementById('prompt-templates-modal').classList.remove('hidden');
+        renderPromptTemplates();
+    });
+
+    // --- Навешиваем обработчики на FAQ/Шаблоны в prompt-helper-buttons ---
+    const promptFaqBtn = document.querySelector('#prompt-helper-buttons #show-faq-btn');
+    const promptTemplatesBtn = document.querySelector('#prompt-helper-buttons #show-templates-btn');
+    if (promptFaqBtn) {
+        promptFaqBtn.addEventListener('click', openFAQModal);
+    }
+    if (promptTemplatesBtn) {
+        promptTemplatesBtn.addEventListener('click', openTemplatesModal);
+    }
 });

@@ -1,10 +1,10 @@
 // Централизованная функция для API вызовов, требующих аутентификации
 async function apiCall(endpoint, method = 'GET', body = null) {
     const API_URL = window.API_BASE_URL || 'http://localhost:8080';
-    const token = localStorage.getItem('jwt_token');
+    let token = localStorage.getItem('jwt_token');
 
     if (!token) {
-        window.logout();
+        await window.logout();
         throw new Error('Not authenticated');
     }
 
@@ -28,7 +28,30 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     }
 
     if (response.status === 401) {
-        window.logout(); // Токен невалиден или истек
+        // Попробовать refresh
+        try {
+            const refreshResp = await fetch(`${API_URL}/auth/refresh`, { method: 'POST', credentials: 'include' });
+            if (refreshResp.ok) {
+                const data = await refreshResp.json();
+                if (data.token) {
+                    localStorage.setItem('jwt_token', data.token);
+                    // Повторить исходный запрос с новым токеном
+                    options.headers['Authorization'] = `Bearer ${data.token}`;
+                    response = await fetch(`${API_URL}${endpoint}`, options);
+                    if (response.status !== 401) {
+                        if (!response.ok) {
+                            let errorData = {};
+                            try { errorData = await response.json(); } catch {}
+                            throw new Error(errorData.error || 'API request failed');
+                        }
+                        return response.json();
+                    }
+                }
+            }
+        } catch {}
+        // Если refresh не сработал — logout
+        await window.logout();
+        if (typeof showSessionExpiredModal === 'function') showSessionExpiredModal();
         throw new Error('Session expired');
     }
 

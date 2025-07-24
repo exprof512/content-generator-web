@@ -19,12 +19,6 @@ function updateAuthState(isAuthenticated) {
     }
 }
 
-window.logout = function() {
-    localStorage.removeItem('jwt_token');
-    clearAppState(); // Clear all UI elements related to the user session
-    updateAuthState(false);
-};
-
 async function fetchUserData() {
     const profileButton = document.getElementById('user-profile-button');
     const dropdownAvatar = document.getElementById('dropdown-user-avatar');
@@ -128,6 +122,78 @@ async function handleEmailRegister(event) {
     }
 }
 
+// --- JWT session expiration logic ---
+function getTokenExp(token) {
+    if (!token) return null;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp ? payload.exp * 1000 : null;
+    } catch {
+        return null;
+    }
+}
+
+let sessionExpTimer = null;
+let sessionWarnTimer = null;
+
+function clearSessionTimers() {
+    if (sessionExpTimer) clearTimeout(sessionExpTimer);
+    if (sessionWarnTimer) clearTimeout(sessionWarnTimer);
+    sessionExpTimer = null;
+    sessionWarnTimer = null;
+}
+
+function setupSessionTimers() {
+    clearSessionTimers();
+    const token = localStorage.getItem('jwt_token');
+    const exp = getTokenExp(token);
+    if (!exp) return;
+    const now = Date.now();
+    const warnTime = exp - 2 * 60 * 1000; // за 2 минуты
+    if (warnTime > now) {
+        sessionWarnTimer = setTimeout(() => {
+            showSessionExpiringModal();
+        }, warnTime - now);
+    }
+    if (exp > now) {
+        sessionExpTimer = setTimeout(() => {
+            window.logout();
+            showSessionExpiredModal();
+        }, exp - now);
+    } else {
+        window.logout();
+        showSessionExpiredModal();
+    }
+}
+
+function showSessionExpiringModal() {
+    showAuthModal('login');
+    const modal = document.getElementById('auth-modal');
+    const loginView = document.getElementById('login-view');
+    const loginError = document.getElementById('login-error');
+    if (modal && loginView && loginError) {
+        loginError.textContent = 'Сессия истекает через 2 минуты. Пожалуйста, войдите снова.';
+        loginError.className = 'text-yellow-500 text-sm text-center';
+    }
+}
+
+function showSessionExpiredModal() {
+    showAuthModal('login');
+    const modal = document.getElementById('auth-modal');
+    const loginView = document.getElementById('login-view');
+    const loginError = document.getElementById('login-error');
+    if (modal && loginView && loginError) {
+        loginError.textContent = 'Сессия истекла. Пожалуйста, войдите снова.';
+        loginError.className = 'text-red-500 text-sm text-center';
+    }
+}
+
+// При логине и старте приложения запускать таймеры
+window.addEventListener('DOMContentLoaded', () => {
+    setupSessionTimers();
+});
+
+// После успешного логина запускать таймеры
 window.handleEmailLogin = async function(event) {
     event.preventDefault();
     const form = event.target;
@@ -140,7 +206,7 @@ window.handleEmailLogin = async function(event) {
         localStorage.setItem('jwt_token', data.token);
         hideAuthModal();
         updateAuthState(true);
-        // --- КРИТИЧЕСКОЕ ДОБАВЛЕНИЕ ---
+        setupSessionTimers(); // <-- добавлено
         if (typeof window.renderUserProfile === 'function') {
             window.renderUserProfile();
         }
@@ -168,3 +234,13 @@ window.handleForgotPasswordRequest = async function(event) {
         errorEl.textContent = error.message;
     }
 }
+
+window.logout = async function() {
+    try {
+        localStorage.removeItem('jwt_token');
+        await fetch((window.API_BASE_URL || 'http://localhost:8080') + '/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch {}
+    updateAuthState(false);
+    clearSessionTimers();
+    if (typeof hideAuthModal === 'function') hideAuthModal();
+};

@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
+app.get('/generator', (req, res) => {
+    res.render('partials/app');
+});
+
 app.get('/pricing', (req, res) => {
     res.render('pricing');
 });
