@@ -19,10 +19,10 @@
         </div>
     </header>
     <div class="max-w-4xl mx-auto py-12 px-4">
-        <h1 class="text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">Тарифы</h1>
+        <h1 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">Тарифы</h1>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- FREE -->
-            <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-purple-200 dark:border-purple-700">
+            <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-6 sm:p-8 flex flex-col items-center border-2 border-purple-200 dark:border-purple-700">
                 <h2 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">FREE</h2>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">0 ₽</div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
@@ -33,8 +33,8 @@
                 <a href="/" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all text-center block">Начать бесплатно</a>
             </div>
             <!-- PRO -->
-            <div class="rounded-2xl shadow-2xl bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-4 border-purple-500 relative">
-                <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow">Рекомендуем</div>
+            <div class="rounded-2xl shadow-2xl bg-white dark:bg-gray-800 p-6 sm:p-8 flex flex-col items-center border-4 border-purple-500 relative">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow">Рекомендуем</div>
                 <h2 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">PRO</h2>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">499 ₽<span class="text-base font-normal">/мес</span></div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
@@ -42,11 +42,11 @@
                     <li>Доступ ко всем моделям</li>
                     <li>Приоритетная поддержка</li>
                 </ul>
-                <button onclick="payYookassa('pro')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2 pay-btn">Оформить PRO</button>
-                <button onclick="payTelegram('pro')" class="w-full py-2 px-6 rounded-xl border border-purple-400 text-purple-700 dark:text-purple-200 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900 transition-all pay-btn">Оплатить через Telegram</button>
+                <button data-tariff="pro" data-system="yookassa" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2 pay-btn">Оформить PRO</button>
+                <button data-tariff="pro" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-purple-400 text-purple-700 dark:text-purple-200 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900 transition-all pay-btn">Оплатить через Telegram</button>
             </div>
             <!-- MAX -->
-            <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-indigo-300 dark:border-indigo-700">
+            <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-6 sm:p-8 flex flex-col items-center border-2 border-indigo-300 dark:border-indigo-700">
                 <h2 class="text-2xl font-bold mb-2 text-indigo-700 dark:text-indigo-300">MAX</h2>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">1999 ₽<span class="text-base font-normal">/мес</span></div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
@@ -54,8 +54,8 @@
                     <li>Доступ ко всем моделям</li>
                     <li>VIP-поддержка</li>
                 </ul>
-                <button onclick="payYookassa('max')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2 pay-btn">Оформить MAX</button>
-                <button onclick="payTelegram('max')" class="w-full py-2 px-6 rounded-xl border border-indigo-400 text-indigo-700 dark:text-indigo-200 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all pay-btn">Оплатить через Telegram</button>
+                <button data-tariff="max" data-system="yookassa" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2 pay-btn">Оформить MAX</button>
+                <button data-tariff="max" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-indigo-400 text-indigo-700 dark:text-indigo-200 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all pay-btn">Оплатить через Telegram</button>
             </div>
         </div>
         <div class="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
@@ -63,192 +63,17 @@
             По вопросам пишите: <a href="mailto:support@contentgenhub.ru" class="underline text-purple-600">support@contentgenhub.ru</a>
         </div>
     </div>
-    <!-- Модальное окно оплаты -->
-    <div id="payment-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center animate__animated animate__fadeIn animate__faster">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md relative p-8">
-            <button onclick="hidePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Оплата через ЮKassa</h2>
-            <div class="mb-4 text-gray-700 dark:text-gray-200">Выберите способ оплаты и следуйте инструкциям. После успешной оплаты тариф активируется автоматически.</div>
-            <button onclick="payYookassa(document.getElementById('payment-tariff').value)" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all">Оплатить через ЮKassa</button>
-            <input type="hidden" name="tariff" id="payment-tariff" value="">
-        </div>
-    </div>
     <%- include('partials/auth_modal'); %>
-    <script>
-        function showPaymentModal(tariff) {
-            document.getElementById('payment-modal').classList.remove('hidden');
-            document.getElementById('payment-tariff').value = tariff;
-        }
-        function hidePaymentModal() {
-            document.getElementById('payment-modal').classList.add('hidden');
-        }
-        function showTelegramPay(tariff) {
-            window.open('https://t.me/your_telegram_bot?start=' + tariff, '_blank');
-        }
-        async function payYookassa(tariff) {
-            try {
-                const token = localStorage.getItem('jwt_token');
-                if (!token) {
-                    showToast('Сначала войдите в аккаунт', 'error');
-                    return;
-                }
-                const res = await fetch((window.API_BASE_URL || '') + '/api/payment/yookassa', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ tariff })
-                });
-                if (!res.ok) throw new Error((await res.json()).error || 'Ошибка оплаты');
-                showToast('Тариф успешно активирован!', 'success');
-                if (window.updateUserTariff) window.updateUserTariff();
-                // Показываем кнопку возврата и редиректим через 2 сек
-                showReturnToAppButton();
-                setTimeout(() => { window.location.href = '/'; }, 2000);
-            } catch (e) {
-                showToast('Ошибка оплаты: ' + (e.message || 'Неизвестная ошибка'), 'error');
-            }
-        }
-        function showReturnToAppButton() {
-            let btn = document.getElementById('return-to-app-btn');
-            if (!btn) {
-                btn = document.createElement('a');
-                btn.id = 'return-to-app-btn';
-                btn.href = '/';
-                btn.className = 'mt-6 inline-block px-6 py-2 bg-purple-600 text-white rounded-lg';
-                btn.textContent = 'Вернуться к генерации';
-                document.body.appendChild(btn);
-            }
-            btn.style.display = 'inline-block';
-        }
-        async function payTelegram(tariff) {
-            try {
-                const token = localStorage.getItem('jwt_token');
-                if (!token) {
-                    showToast('Сначала войдите в аккаунт', 'error');
-                    return;
-                }
-                const res = await fetch((window.API_BASE_URL || '') + '/api/payment/telegram', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ tariff })
-                });
-                if (!res.ok) throw new Error((await res.json()).error || 'Ошибка оплаты');
-                showToast('Тариф успешно активирован через Telegram!', 'success');
-                if (window.updateUserTariff) window.updateUserTariff();
-            } catch (e) {
-                showToast('Ошибка оплаты: ' + (e.message || 'Неизвестная ошибка'), 'error');
-            }
-        }
-        function showToast(message, type = 'info') {
-            let toast = document.createElement('div');
-            toast.className = `fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg text-white text-base font-semibold transition-all duration-300 ${type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-purple-600'}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; }, 2500);
-            setTimeout(() => { toast.remove(); }, 3000);
-        }
-
-        // Логика для блока авторизации/аккаунта на странице тарифов
-        function renderPricingAuthBlock() {
-            const block = document.getElementById('pricing-auth-block');
-            const backBtn = document.getElementById('back-to-generator-btn');
-            if (!block) return;
-            let token = localStorage.getItem('jwt_token');
-            if (token) {
-                if (backBtn) backBtn.classList.remove('hidden');
-                fetch((window.API_BASE_URL || '') + '/api/me', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                })
-                .then(r => r.json())
-                .then(user => {
-                    let avatarHtml = '';
-                    if (user.avatar_url) {
-                        avatarHtml = `<img src="${user.avatar_url}" class="w-10 h-10 rounded-full object-cover" alt="Avatar">`;
-                    } else {
-                        const initial = user.name ? user.name.charAt(0).toUpperCase() : 'П';
-                        avatarHtml = `<span class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-xl font-bold">${initial}</span>`;
-                    }
-                    block.innerHTML = `<div class='relative'><button id="pricing-profile-btn" class="flex items-center justify-center w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold shadow transition-all focus:outline-none">${avatarHtml}</button><div id="pricing-account-dropdown" class="hidden absolute right-0 top-full mt-2 w-80 max-w-xs overflow-x-auto shadow-xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-1 z-50"></div></div>`;
-                    const profileBtn = document.getElementById('pricing-profile-btn');
-                    const dropdown = document.getElementById('pricing-account-dropdown');
-                    if (profileBtn && dropdown) {
-                        profileBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            dropdown.classList.toggle('hidden');
-                        });
-                        document.addEventListener('click', (e) => {
-                            if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
-                                dropdown.classList.add('hidden');
-                            }
-                        });
-                        dropdown.innerHTML = `
-                          <div class="p-3">
-                            <div class="flex items-center gap-4 mb-3">
-                              <div class="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center text-xl font-bold overflow-hidden">${user.avatar_url ? `<img src='${user.avatar_url}' class='w-full h-full object-cover rounded-full'>` : (user.name ? user.name.charAt(0).toUpperCase() : 'П')}</div>
-                              <div>
-                                <div class="font-semibold text-gray-900 dark:text-white truncate">${user.name || ''}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400 truncate">${user.email || ''}</div>
-                              </div>
-                            </div>
-                            <div class="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
-                              <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-300">Тариф: <b class="text-gray-800 dark:text-white">${user.tariff || ''}</b></span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                          <div class="p-1">
-                            <a href="/privacy" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Privacy Policy</a>
-                            <a href="/terms" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Terms of Use</a>
-                            <button id="pricing-logout-btn" class="block w-full text-left mt-1 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Выйти</button>
-                          </div>
-                        `;
-                        document.getElementById('pricing-logout-btn')?.addEventListener('click', async () => {
-                            await window.logout();
-                            window.location.reload();
-                        });
-                    }
-                    // Активировать кнопки оплаты
-                    document.querySelectorAll('.pay-btn').forEach(btn => btn.disabled = false);
-                });
-            } else {
-                if (backBtn) backBtn.classList.add('hidden');
-                block.innerHTML = `<button id="show-auth-modal-btn" class="px-6 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow transition-all">Войти</button>`;
-                document.getElementById('show-auth-modal-btn')?.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (typeof showAuthModal === 'function') showAuthModal('login');
-                });
-                // Деактивировать кнопки оплаты
-                document.querySelectorAll('.pay-btn').forEach(btn => btn.disabled = true);
-            }
-        }
-        document.addEventListener('DOMContentLoaded', renderPricingAuthBlock);
-        document.getElementById('back-to-generator-btn')?.addEventListener('click', () => {
-            window.location.href = '/generator';
-        });
-        // После успешной авторизации обновлять блок аккаунта без редиректа
-        window.afterAuthSuccess = function() {
-            renderPricingAuthBlock();
-        };
-    </script>
-    <!-- Highlight.js для подсветки кода -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Marked.js для Markdown -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- Animate.css для анимаций -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- Marked.js для Markdown (необходимо для общих скриптов, например, ui.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <!-- Основные JS-модули -->
     <script src="/js/api.js"></script>
     <script src="/js/ui.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/js/pricing.js" defer></script>
 </body>
 </html>
