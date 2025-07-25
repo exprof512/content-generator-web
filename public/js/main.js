@@ -130,28 +130,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderModelDropdown(agentKey) {
+        if (!modelDropdownList || !modelDropdownLabel) return;
         modelDropdownList.innerHTML = '';
         const options = MODEL_OPTIONS[agentKey] || [];
         if (!options.length) {
             selectedModel = null;
-            modelDropdownLabel.textContent = 'Нет доступных моделей';
+            if (modelDropdownLabel) modelDropdownLabel.textContent = 'Нет доступных моделей';
             if (generateButton) generateButton.disabled = true;
             return;
         }
         options.forEach(opt => {
-            const li = document.createElement('li');
+            const li = document.createElement('div');
             li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}"><span>${opt.label}</span></button>`;
             const button = li.querySelector('button');
             button.addEventListener('click', () => {
                 selectedModel = opt.value;
-                modelDropdownLabel.textContent = opt.label;
-                modelDropdownMenu.style.display = 'none';
+                if (modelDropdownLabel) modelDropdownLabel.textContent = opt.label;
+                if (modelDropdownMenu) modelDropdownMenu.style.display = 'none';
             });
             modelDropdownList.appendChild(li);
         });
         // Выбрать первую доступную модель по умолчанию
         selectedModel = options[0].value;
-        modelDropdownLabel.textContent = options[0].label;
+        if (modelDropdownLabel) modelDropdownLabel.textContent = options[0].label;
         if (generateButton) generateButton.disabled = false;
     }
 
@@ -165,7 +166,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updatePromptPlaceholder() {
         let agent = selectedAgent;
-        promptInput.placeholder = PLACEHOLDERS[agent] || 'Введите ваш запрос...';
+        if (promptInput) {
+            promptInput.placeholder = PLACEHOLDERS[agent] || 'Введите ваш запрос...';
+        }
     }
 
     // Кнопка отправки с иконкой
@@ -331,6 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Быстрые шаблоны
     document.querySelectorAll('.quick-template-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+            if (!promptInput) return;
             promptInput.value = btn.dataset.template;
             promptInput.focus();
             updateGenerateButtonState();
@@ -342,75 +346,102 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.currentChatId = sessionStorage.getItem('currentChatId') || generateChatId();
         sessionStorage.setItem('currentChatId', window.currentChatId);
     }
-    document.getElementById('new-chat-button')?.addEventListener('click', () => {
-        window.currentChatId = generateChatId();
-        sessionStorage.setItem('currentChatId', window.currentChatId);
-        resetChatLayout();
-        hidePromptHelpers(); // скрываем FAQ/Шаблоны при новом чате
-    });
+    const newChatButton = document.getElementById('new-chat-button');
+    if (newChatButton) {
+        newChatButton.addEventListener('click', () => {
+            window.currentChatId = generateChatId();
+            sessionStorage.setItem('currentChatId', window.currentChatId);
+            resetChatLayout();
+            hidePromptHelpers(); // скрываем FAQ/Шаблоны при новом чате
+        });
+    }
 
     // --- Auth Modal Listeners ---
-    document.getElementById('show-auth-modal-btn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showAuthModal('login');
-    });
-    document.getElementById('auth-modal-close')?.addEventListener('click', hideAuthModal);
-    document.getElementById('show-register-view')?.addEventListener('click', () => showAuthModal('register'));
-    document.getElementById('show-login-view')?.addEventListener('click', () => showAuthModal('login'));
-    document.getElementById('show-forgot-password-view')?.addEventListener('click', () => showAuthModal('forgot'));
-    document.getElementById('back-to-login-view')?.addEventListener('click', () => showAuthModal('login'));
-    document.getElementById('login-form')?.addEventListener('submit', window.handleEmailLogin);
-    document.getElementById('register-form')?.addEventListener('submit', window.handleEmailRegister);
-    document.getElementById('forgot-password-form')?.addEventListener('submit', window.handleForgotPasswordRequest);
-    // Close modal on overlay click
-    document.getElementById('auth-modal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'auth-modal') {
-            hideAuthModal();
-        }
-    });
-
-    document.getElementById('leave-review-btn')?.addEventListener('click', () => {
-        const token = localStorage.getItem('jwt_token');
-        if (token) {
-            // User is authenticated
-            alert('Спасибо! Функционал добавления отзывов скоро появится.');
-        } else {
-            // User is not authenticated, show login modal
+    const showAuthModalBtn = document.getElementById('show-auth-modal-btn');
+    if (showAuthModalBtn) {
+        showAuthModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             showAuthModal('login');
-        }
-    });
+        });
+    }
+    const authModalClose = document.getElementById('auth-modal-close');
+    if (authModalClose) authModalClose.addEventListener('click', hideAuthModal);
+    const showRegisterView = document.getElementById('show-register-view');
+    if (showRegisterView) showRegisterView.addEventListener('click', () => showAuthModal('register'));
+    const showLoginView = document.getElementById('show-login-view');
+    if (showLoginView) showLoginView.addEventListener('click', () => showAuthModal('login'));
+    const showForgotPasswordView = document.getElementById('show-forgot-password-view');
+    if (showForgotPasswordView) showForgotPasswordView.addEventListener('click', () => showAuthModal('forgot'));
+    const backToLoginView = document.getElementById('back-to-login-view');
+    if (backToLoginView) backToLoginView.addEventListener('click', () => showAuthModal('login'));
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) loginForm.addEventListener('submit', window.handleEmailLogin);
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) registerForm.addEventListener('submit', window.handleEmailRegister);
+    const forgotPasswordForm = document.getElementById('forgot-password-form');
+    if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', window.handleForgotPasswordRequest);
+    // Close modal on overlay click
+    const authModal = document.getElementById('auth-modal');
+    if (authModal) {
+        authModal.addEventListener('click', (e) => {
+            if (e.target.id === 'auth-modal') {
+                hideAuthModal();
+            }
+        });
+    }
+    const leaveReviewBtn = document.getElementById('leave-review-btn');
+    if (leaveReviewBtn) {
+        leaveReviewBtn.addEventListener('click', () => {
+            const token = localStorage.getItem('jwt_token');
+            if (!token) {
+                showAuthModal('login');
+                return;
+            }
+            showFeedbackModal();
+        });
+    }
 
     // --- Dropdown logic ---
-    agentDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        agentDropdownMenu.style.display = agentDropdownMenu.style.display === 'block' ? 'none' : 'block';
-        modelDropdownMenu.style.display = 'none';
-    });
-    modelDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        modelDropdownMenu.style.display = modelDropdownMenu.style.display === 'block' ? 'none' : 'block';
-        agentDropdownMenu.style.display = 'none';
-    });
-    document.addEventListener('click', () => {
-        agentDropdownMenu.style.display = 'none';
-        modelDropdownMenu.style.display = 'none';
-    });
-    agentDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedAgent = btn.getAttribute('data-value');
-            agentDropdownLabel.textContent = btn.textContent.trim();
-            agentDropdownMenu.style.display = 'none';
-            renderModelDropdown(selectedAgent);
-            updatePromptPlaceholder();
-        });
-    });
-    modelDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedModel = btn.getAttribute('data-value');
-            modelDropdownLabel.textContent = btn.textContent.trim();
+    if (agentDropdownBtn && agentDropdownMenu && modelDropdownMenu) {
+        agentDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            agentDropdownMenu.style.display = agentDropdownMenu.style.display === 'block' ? 'none' : 'block';
             modelDropdownMenu.style.display = 'none';
         });
-    });
+    }
+    if (modelDropdownBtn && modelDropdownMenu && agentDropdownMenu) {
+        modelDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            modelDropdownMenu.style.display = modelDropdownMenu.style.display === 'block' ? 'none' : 'block';
+            agentDropdownMenu.style.display = 'none';
+        });
+    }
+    if (agentDropdownMenu && modelDropdownMenu) {
+        document.addEventListener('click', () => {
+            agentDropdownMenu.style.display = 'none';
+            modelDropdownMenu.style.display = 'none';
+        });
+    }
+    if (agentDropdownMenu && agentDropdownLabel) {
+        agentDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedAgent = btn.getAttribute('data-value');
+                if (agentDropdownLabel) agentDropdownLabel.textContent = btn.textContent.trim();
+                agentDropdownMenu.style.display = 'none';
+                renderModelDropdown(selectedAgent);
+                updatePromptPlaceholder();
+            });
+        });
+    }
+    if (modelDropdownMenu && modelDropdownLabel) {
+        modelDropdownMenu.querySelectorAll('.dropdown-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedModel = btn.getAttribute('data-value');
+                if (modelDropdownLabel) modelDropdownLabel.textContent = btn.textContent.trim();
+                modelDropdownMenu.style.display = 'none';
+            });
+        });
+    }
 
     // FAQ и профиль — обработчики только после DOMContentLoaded
     const faqBtn = document.getElementById('faq-btn');
@@ -565,7 +596,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('jwt_token');
     updateAuthState(!!token);
     updateGenerateButtonState();
-    updatePromptPlaceholder();
+    updatePromptPlaceholder(); // теперь безопасно
     updateSendButton();
 
     // --- Dark Mode ---
@@ -583,7 +614,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // После авторизации и показа app-page — инициализируем меню моделей
     await fetchAvailableModels();
     renderModelDropdown(selectedAgent);
-    modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
+    if (modelDropdownLabel) modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
 
     // --- Google Auth: блокировка без согласия только для регистрации ---
     const googleAuthLinkLogin = document.getElementById('google-auth-link-login');

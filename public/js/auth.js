@@ -5,17 +5,21 @@ function updateAuthState(isAuthenticated) {
     if (isAuthenticated) {
         document.body.classList.remove('is-landing');
         document.body.classList.add('is-app');
-        landingPage.classList.add('hidden');
-        appPage.classList.remove('hidden');
-        appPage.classList.add('flex');
-        fetchUserData();
-        fetchAndRenderHistory();
+        if (landingPage) landingPage.classList.add('hidden');
+        if (appPage) {
+            appPage.classList.remove('hidden');
+            appPage.classList.add('flex');
+            fetchUserData();
+            fetchAndRenderHistory();
+        }
     } else {
         document.body.classList.add('is-landing');
         document.body.classList.remove('is-app');
-        landingPage.classList.remove('hidden');
-        appPage.classList.add('hidden');
-        appPage.classList.remove('flex');
+        if (landingPage) landingPage.classList.remove('hidden');
+        if (appPage) {
+            appPage.classList.add('hidden');
+            appPage.classList.remove('flex');
+        }
     }
 }
 
@@ -52,15 +56,19 @@ async function fetchUserData() {
         // --- Страница аккаунта ---
         const isAccountPage = !!document.getElementById('account-tariff');
         if (isAccountPage) {
-            if (document.getElementById('account-name')) document.getElementById('account-name').textContent = user.name;
-            if (document.getElementById('account-email')) document.getElementById('account-email').textContent = user.email;
-            if (document.getElementById('account-tariff')) document.getElementById('account-tariff').textContent = user.tariff;
-            if (document.getElementById('account-generations')) document.getElementById('account-generations').textContent = user.generations_left;
-            if (document.getElementById('account-expires')) {
+            const accountName = document.getElementById('account-name');
+            if (accountName) accountName.textContent = user.name;
+            const accountEmail = document.getElementById('account-email');
+            if (accountEmail) accountEmail.textContent = user.email;
+            const accountTariff = document.getElementById('account-tariff');
+            if (accountTariff) accountTariff.textContent = user.tariff;
+            const accountGenerations = document.getElementById('account-generations');
+            if (accountGenerations) accountGenerations.textContent = user.generations_left;
+            const accountExpires = document.getElementById('account-expires');
+            if (accountExpires) {
                 const { text, isActive } = formatSubscriptionDate(user.subscription_expires, user.tariff);
-                const el = document.getElementById('account-expires');
-                el.textContent = text;
-                el.className = isActive
+                accountExpires.textContent = text;
+                accountExpires.className = isActive
                     ? 'text-lg font-semibold text-green-700 dark:text-green-400'
                     : 'text-lg font-semibold text-gray-400 dark:text-gray-500';
             }
@@ -131,6 +139,7 @@ async function handleEmailRegister(event) {
             loginErrorEl.textContent = 'Регистрация прошла успешно! Теперь вы можете войти.';
             loginErrorEl.className = 'text-green-500 text-sm mt-2 h-4';
         }
+        if (typeof window.afterAuthSuccess === 'function') window.afterAuthSuccess();
     } catch (error) {
         errorEl.textContent = error.message;
     }
@@ -203,7 +212,7 @@ function showSessionExpiredModal() {
 }
 
 // При логине и старте приложения запускать таймеры
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     setupSessionTimers();
 });
 
@@ -221,6 +230,7 @@ window.handleEmailLogin = async function(event) {
         hideAuthModal();
         updateAuthState(true);
         setupSessionTimers(); // <-- добавлено
+        if (typeof window.afterAuthSuccess === 'function') window.afterAuthSuccess();
         if (typeof window.renderUserProfile === 'function') {
             window.renderUserProfile();
         }

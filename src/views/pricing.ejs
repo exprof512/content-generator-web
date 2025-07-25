@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тарифы — ContentGen Hub</title>
+    <title>Тарифы — StarPromt AI</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>window.API_BASE_URL = "<%= API_BASE_URL %>";</script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300 min-h-screen flex flex-col">
+    <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
+        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">StarPromt AI</a>
+            <div class="flex items-center gap-4">
+                <button id="back-to-generator-btn" class="hidden px-4 py-2 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold transition-all">К генерации</button>
+                <div id="pricing-auth-block" class="flex items-center gap-2"></div>
+            </div>
+        </div>
+    </header>
     <div class="max-w-4xl mx-auto py-12 px-4">
         <h1 class="text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">Тарифы</h1>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -33,8 +42,8 @@
                     <li>Доступ ко всем моделям</li>
                     <li>Приоритетная поддержка</li>
                 </ul>
-                <button onclick="payYookassa('pro')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2">Оформить PRO</button>
-                <button onclick="payTelegram('pro')" class="w-full py-2 px-6 rounded-xl border border-purple-400 text-purple-700 dark:text-purple-200 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900 transition-all">Оплатить через Telegram</button>
+                <button onclick="payYookassa('pro')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2 pay-btn">Оформить PRO</button>
+                <button onclick="payTelegram('pro')" class="w-full py-2 px-6 rounded-xl border border-purple-400 text-purple-700 dark:text-purple-200 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900 transition-all pay-btn">Оплатить через Telegram</button>
             </div>
             <!-- MAX -->
             <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-indigo-300 dark:border-indigo-700">
@@ -45,8 +54,8 @@
                     <li>Доступ ко всем моделям</li>
                     <li>VIP-поддержка</li>
                 </ul>
-                <button onclick="payYookassa('max')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2">Оформить MAX</button>
-                <button onclick="payTelegram('max')" class="w-full py-2 px-6 rounded-xl border border-indigo-400 text-indigo-700 dark:text-indigo-200 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all">Оплатить через Telegram</button>
+                <button onclick="payYookassa('max')" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2 pay-btn">Оформить MAX</button>
+                <button onclick="payTelegram('max')" class="w-full py-2 px-6 rounded-xl border border-indigo-400 text-indigo-700 dark:text-indigo-200 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all pay-btn">Оплатить через Telegram</button>
             </div>
         </div>
         <div class="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
@@ -66,6 +75,7 @@
             <input type="hidden" name="tariff" id="payment-tariff" value="">
         </div>
     </div>
+    <%- include('partials/auth_modal'); %>
     <script>
         function showPaymentModal(tariff) {
             document.getElementById('payment-modal').classList.remove('hidden');
@@ -144,6 +154,101 @@
             setTimeout(() => { toast.style.opacity = '0'; }, 2500);
             setTimeout(() => { toast.remove(); }, 3000);
         }
+
+        // Логика для блока авторизации/аккаунта на странице тарифов
+        function renderPricingAuthBlock() {
+            const block = document.getElementById('pricing-auth-block');
+            const backBtn = document.getElementById('back-to-generator-btn');
+            if (!block) return;
+            let token = localStorage.getItem('jwt_token');
+            if (token) {
+                if (backBtn) backBtn.classList.remove('hidden');
+                fetch((window.API_BASE_URL || '') + '/api/me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(r => r.json())
+                .then(user => {
+                    let avatarHtml = '';
+                    if (user.avatar_url) {
+                        avatarHtml = `<img src="${user.avatar_url}" class="w-10 h-10 rounded-full object-cover" alt="Avatar">`;
+                    } else {
+                        const initial = user.name ? user.name.charAt(0).toUpperCase() : 'П';
+                        avatarHtml = `<span class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-xl font-bold">${initial}</span>`;
+                    }
+                    block.innerHTML = `<div class='relative'><button id="pricing-profile-btn" class="flex items-center justify-center w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold shadow transition-all focus:outline-none">${avatarHtml}</button><div id="pricing-account-dropdown" class="hidden absolute right-0 top-full mt-2 w-80 max-w-xs overflow-x-auto shadow-xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-1 z-50"></div></div>`;
+                    const profileBtn = document.getElementById('pricing-profile-btn');
+                    const dropdown = document.getElementById('pricing-account-dropdown');
+                    if (profileBtn && dropdown) {
+                        profileBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            dropdown.classList.toggle('hidden');
+                        });
+                        document.addEventListener('click', (e) => {
+                            if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                                dropdown.classList.add('hidden');
+                            }
+                        });
+                        dropdown.innerHTML = `
+                          <div class="p-3">
+                            <div class="flex items-center gap-4 mb-3">
+                              <div class="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center text-xl font-bold overflow-hidden">${user.avatar_url ? `<img src='${user.avatar_url}' class='w-full h-full object-cover rounded-full'>` : (user.name ? user.name.charAt(0).toUpperCase() : 'П')}</div>
+                              <div>
+                                <div class="font-semibold text-gray-900 dark:text-white truncate">${user.name || ''}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 truncate">${user.email || ''}</div>
+                              </div>
+                            </div>
+                            <div class="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
+                              <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Тариф: <b class="text-gray-800 dark:text-white">${user.tariff || ''}</b></span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                          <div class="p-1">
+                            <a href="/privacy" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Privacy Policy</a>
+                            <a href="/terms" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Terms of Use</a>
+                            <button id="pricing-logout-btn" class="block w-full text-left mt-1 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Выйти</button>
+                          </div>
+                        `;
+                        document.getElementById('pricing-logout-btn')?.addEventListener('click', async () => {
+                            await window.logout();
+                            window.location.reload();
+                        });
+                    }
+                    // Активировать кнопки оплаты
+                    document.querySelectorAll('.pay-btn').forEach(btn => btn.disabled = false);
+                });
+            } else {
+                if (backBtn) backBtn.classList.add('hidden');
+                block.innerHTML = `<button id="show-auth-modal-btn" class="px-6 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow transition-all">Войти</button>`;
+                document.getElementById('show-auth-modal-btn')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (typeof showAuthModal === 'function') showAuthModal('login');
+                });
+                // Деактивировать кнопки оплаты
+                document.querySelectorAll('.pay-btn').forEach(btn => btn.disabled = true);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', renderPricingAuthBlock);
+        document.getElementById('back-to-generator-btn')?.addEventListener('click', () => {
+            window.location.href = '/generator';
+        });
+        // После успешной авторизации обновлять блок аккаунта без редиректа
+        window.afterAuthSuccess = function() {
+            renderPricingAuthBlock();
+        };
     </script>
+    <!-- Highlight.js для подсветки кода -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Marked.js для Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Animate.css для анимаций -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- Основные JS-модули -->
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

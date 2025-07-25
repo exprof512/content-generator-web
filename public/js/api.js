@@ -129,3 +129,6 @@ async function patchApiCall(endpoint, body = null) {
 async function checkSubscription() {
     return apiCall('/api/subscription/check', 'GET');
 }
+
+window.apiCall = apiCall;
+window.publicApiCall = publicApiCall;
