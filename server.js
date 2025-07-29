@@ -30,11 +30,6 @@ app.get('/pricing', (req, res) => {
     res.render('pricing');
 });
 
-// New route for the account page
-app.get('/account', (req, res) => {
-    res.render('account');
-});
-
 // New pages for Privacy and Terms
 app.get('/privacy', (req, res) => {
     res.render('privacy');

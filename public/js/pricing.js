@@ -28,6 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Показываем "В разработке" для Telegram
+        if (system === 'telegram') {
+            showToast('Оплата через Telegram в разработке', 'info');
+            return;
+        }
+
         try {
             const res = await fetch(`${apiBaseUrl}/api/payment/${system}`, {
                 method: 'POST',
@@ -45,18 +51,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const paymentData = await res.json();
 
-            // Предполагаем, что ЮKassa возвращает URL для редиректа
-            if (paymentData.confirmation_url) {
-                window.location.href = paymentData.confirmation_url;
+            if (system === 'yookassa') {
+                if (paymentData.status === 'ok') {
+                    // Free тариф активирован
+                    showToast('Тариф успешно обновлен!', 'success');
+                    setTimeout(() => { 
+                        window.location.href = '/'; 
+                    }, 2000);
+                } else if (paymentData.status === 'payment_created') {
+                    // Создан платеж для платного тарифа
+                    showToast('Перенаправляем на оплату...', 'info');
+                    // TODO: Здесь будет редирект на страницу оплаты ЮKassa
+                    // Пока что показываем информацию о платеже
+                    console.log('Payment created:', paymentData);
+                    showToast(`Создан платеж на сумму ${paymentData.amount} ₽`, 'info');
+                } else {
+                    showToast('Платеж обработан!', 'success');
+                    setTimeout(() => { 
+                        window.location.href = '/'; 
+                    }, 2000);
+                }
             } else {
-                // Обработка других сценариев (например, оплата через Telegram)
                 showToast('Платеж успешно обработан! Ваш тариф обновлен.', 'success');
-                renderPricingAuthBlock(); // Обновляем инфо о тарифе
-                setTimeout(() => { window.location.href = '/generator'; }, 2000);
+                setTimeout(() => { 
+                    window.location.href = '/'; 
+                }, 2000);
             }
         } catch (e) {
             console.error(`Payment error for ${system}:`, e);
             showToast(`Ошибка оплаты: ${e.message || 'Неизвестная ошибка'}`, 'error');
+        }
+    }
+
+    // --- FREE TARIFF LOGIC ---
+    async function activateFreeTariff() {
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            showToast('Сначала войдите в аккаунт', 'error');
+            return;
+        }
+
+        try {
+            // Проверяем текущий тариф пользователя
+            const userResponse = await fetch(`${apiBaseUrl}/api/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!userResponse.ok) {
+                throw new Error('Ошибка получения данных пользователя');
+            }
+            
+            const user = await userResponse.json();
+            
+            // Если пользователь уже имеет тариф, просто переходим на генерацию
+            if (user.tariff && user.tariff !== 'free') {
+                showToast('Переходим к генерации...', 'info');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+                return;
+            }
+            
+            // Если пользователь на free тарифе или без тарифа, устанавливаем free
+            const res = await fetch(`${apiBaseUrl}/api/payment/yookassa`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tariff: 'free' })
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Ошибка при активации бесплатного тарифа');
+            }
+
+            showToast('Бесплатный тариф активирован!', 'success');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+            
+        } catch (e) {
+            console.error('Free tariff activation error:', e);
+            showToast(`Ошибка: ${e.message || 'Неизвестная ошибка'}`, 'error');
         }
     }
 
@@ -138,6 +216,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZATION ---
     renderPricingAuthBlock();
+
+    // Обработчик для кнопки "Начать бесплатно"
+    document.querySelector('.rounded-2xl a[href="/"]')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        activateFreeTariff();
+    });
 
     document.querySelectorAll('.pay-btn').forEach(btn => {
         btn.addEventListener('click', () => {

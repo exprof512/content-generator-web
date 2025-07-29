@@ -169,39 +169,27 @@ function renderPromptTemplates() {
       if (promptInput) {
         promptInput.value = PROMPT_TEMPLATES[idx].text;
         promptInput.focus();
+        if (typeof updateGenerateButtonState === 'function') updateGenerateButtonState();
         document.getElementById('prompt-templates-modal').classList.add('hidden');
       }
     });
   });
 }
 
-function openTemplatesModal() {
-  document.getElementById('prompt-templates-modal').classList.remove('hidden');
-  renderPromptTemplates();
-}
-function closeTemplatesModal() {
-  document.getElementById('prompt-templates-modal').classList.add('hidden');
-}
-
-function setupTemplatesHandlers() {
-  const showTemplatesBtn = document.getElementById('show-templates-btn');
-  showTemplatesBtn?.addEventListener('click', openTemplatesModal);
-  const inlineTemplatesBtn = document.getElementById('inline-templates-btn');
-  inlineTemplatesBtn?.addEventListener('click', openTemplatesModal);
-  document.getElementById('prompt-templates-close')?.addEventListener('click', closeTemplatesModal);
-  window.addEventListener('mousedown', (e) => {
-    const tplModal = document.getElementById('prompt-templates-modal');
-    if (tplModal && !tplModal.classList.contains('hidden')) {
-      const inner = tplModal.children[0];
-      if (inner && !inner.contains(e.target)) closeTemplatesModal();
-    }
-  });
-  document.getElementById('fixed-templates-btn')?.addEventListener('click', openTemplatesModal);
-  // prompt-helper-buttons
-  const promptTemplatesBtn = document.querySelector('#prompt-helper-buttons #show-templates-btn');
-  if (promptTemplatesBtn) {
-    promptTemplatesBtn.addEventListener('click', openTemplatesModal);
+// Автоматически рендерим шаблоны при открытии модального окна
+document.addEventListener('DOMContentLoaded', () => {
+  // Слушаем изменения видимости модального окна
+  const modal = document.getElementById('prompt-templates-modal');
+  if (modal) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          if (!modal.classList.contains('hidden')) {
+            renderPromptTemplates();
+          }
+        }
+      });
+    });
+    observer.observe(modal, { attributes: true });
   }
-}
-
-document.addEventListener('DOMContentLoaded', setupTemplatesHandlers); 
+}); 

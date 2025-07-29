@@ -1,6 +1,1 @@
-<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="20" cy="20" r="20" fill="#4285F4"/>
-  <ellipse cx="20" cy="20" rx="10" ry="16" fill="#fff"/>
-  <ellipse cx="20" cy="20" rx="7" ry="12" fill="#4285F4"/>
-  <ellipse cx="20" cy="20" rx="4" ry="7" fill="#fff"/>
-</svg> 
+<?xml version="1.0" encoding="UTF-8"?> <svg xmlns="http://www.w3.org/2000/svg" width="33" height="32" viewBox="0 0 33 32" fill="none"><path d="M17.0161 2.06458L17.2782 3.65616C18.3432 10.1216 23.4106 15.1891 29.8761 16.254L31.4677 16.5162L29.8761 16.7783C23.4106 17.8433 18.3432 22.9108 17.2782 29.3762L17.0161 30.9678L16.7539 29.3762C15.6889 22.9108 10.6215 17.8433 4.15604 16.7783L2.56445 16.5162L4.15604 16.254C10.6215 15.1891 15.6889 10.1216 16.7539 3.65616L17.0161 2.06458Z" fill="url(#paint0_linear_434_52)"></path><defs><linearGradient id="paint0_linear_434_52" x1="2.56445" y1="4.42686" x2="31.4677" y2="24.8536" gradientUnits="userSpaceOnUse"><stop offset="0.305085" stop-color="#8E6FBB"></stop><stop offset="0.486666" stop-color="#4B89D4"></stop><stop offset="0.68159" stop-color="#2DACF1"></stop></linearGradient></defs></svg> 

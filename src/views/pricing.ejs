@@ -26,8 +26,8 @@
                 <h2 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">FREE</h2>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">0 ₽</div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
-                    <li>10 генераций в день</li>
-                    <li>Доступ ко всем моделям</li>
+                    <li>10 текстовых + 3 картинки в день</li>
+                    <li>Доступ к базовым моделям</li>
                     <li>Без привязки карты</li>
                 </ul>
                 <a href="/" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all text-center block">Начать бесплатно</a>
@@ -38,12 +38,12 @@
                 <h2 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">PRO</h2>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">499 ₽<span class="text-base font-normal">/мес</span></div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
-                    <li>100 генераций в день</li>
+                    <li>200 текстовых + 50 картинок в месяц</li>
                     <li>Доступ ко всем моделям</li>
                     <li>Приоритетная поддержка</li>
                 </ul>
                 <button data-tariff="pro" data-system="yookassa" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2 pay-btn">Оформить PRO</button>
-                <button data-tariff="pro" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-purple-400 text-purple-700 dark:text-purple-200 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900 transition-all pay-btn">Оплатить через Telegram</button>
+                <button data-tariff="pro" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-gray-400 text-gray-500 dark:text-gray-400 font-semibold cursor-not-allowed pay-btn" disabled>В разработке</button>
             </div>
             <!-- MAX -->
             <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-6 sm:p-8 flex flex-col items-center border-2 border-indigo-300 dark:border-indigo-700">
@@ -55,12 +55,12 @@
                     <li>VIP-поддержка</li>
                 </ul>
                 <button data-tariff="max" data-system="yookassa" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2 pay-btn">Оформить MAX</button>
-                <button data-tariff="max" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-indigo-400 text-indigo-700 dark:text-indigo-200 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all pay-btn">Оплатить через Telegram</button>
+                <button data-tariff="max" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-gray-400 text-gray-500 dark:text-gray-400 font-semibold cursor-not-allowed pay-btn" disabled>В разработке</button>
             </div>
         </div>
         <div class="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
-            Оплата через ЮKassa (карты РФ, СБП) и Telegram. После оплаты тариф активируется автоматически.<br>
-            По вопросам пишите: <a href="mailto:support@contentgenhub.ru" class="underline text-purple-600">support@contentgenhub.ru</a>
+            Оплата через ЮKassa (карты РФ, СБП). Telegram в разработке.<br>
+            По вопросам пишите: <a href="mailto:support@starpromt.io" class="underline text-purple-600">support@starpromt.io</a>
         </div>
     </div>
     <%- include('partials/auth_modal'); %>

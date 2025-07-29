@@ -29,10 +29,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await apiCall('/api/available-models', 'GET');
             userTariff = data.tariff || 'free';
             AVAILABLE_MODELS = data.available_models || {};
+            
+            // Получаем полный список моделей и информацию о доступности
+            const allModels = data.all_models || {};
+            const modelsInfo = data.models_info || {};
+            
             // Преобразуем в формат для выпадающего списка
             MODEL_OPTIONS = {};
-            Object.keys(AVAILABLE_MODELS).forEach(agent => {
-                MODEL_OPTIONS[agent] = (AVAILABLE_MODELS[agent] || []).map(model => {
+            Object.keys(allModels).forEach(agent => {
+                MODEL_OPTIONS[agent] = (allModels[agent] || []).map(model => {
                     // Человеко-читабельные лейблы
                     let label = model;
                     if (model === 'gpt-4o-mini') label = 'GPT-4o-mini';
@@ -47,31 +52,38 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (model === 'gpt-image-1') label = 'GPT Image 1';
                     if (model === 'dall-e-2') label = 'DALL-E 2';
                     if (model === 'dall-e-3') label = 'DALL-E 3';
-                    return { value: model, label };
+                    
+                    // Проверяем доступность модели
+                    const isAvailable = modelsInfo[agent] && modelsInfo[agent][model];
+                    
+                    return { 
+                        value: model, 
+                        label,
+                        available: isAvailable
+                    };
                 });
             });
         } catch (e) {
             // fallback: дефолтные модели
             MODEL_OPTIONS = {
         chatgpt: [
-            { value: 'gpt-4o-mini', label: 'GPT-4o-mini' },
-            { value: 'gpt-4', label: 'GPT-4' },
-            { value: 'gpt-4.1', label: 'GPT-4.1' }
+            { value: 'gpt-4o-mini', label: 'GPT-4o-mini', available: true },
+            { value: 'gpt-4', label: 'GPT-4', available: false },
+            { value: 'gpt-4.1', label: 'GPT-4.1', available: false }
         ],
         gemini: [
-                    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
-                    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
-                    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' }
+                    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash', available: true },
+                    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', available: false },
+                    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', available: false }
         ],
         deepseek: [
-            { value: 'deepseek-chat', label: 'DeepSeek Chat' },
-            { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' },
-            { value: 'deepseek-coder', label: 'DeepSeek Coder' }
+            { value: 'deepseek-chat', label: 'DeepSeek Chat', available: false },
+            { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner', available: false },
+            { value: 'deepseek-coder', label: 'DeepSeek Coder', available: false }
         ],
         dalle: [
-            { value: 'gpt-image-1', label: 'GPT Image 1' },
-            { value: 'dall-e-2', label: 'DALL-E 2' },
-            { value: 'dall-e-3', label: 'DALL-E 3' }
+            { value: 'dall-e-2', label: 'DALL-E 2', available: true },
+            { value: 'dall-e-3', label: 'DALL-E 3', available: false }
         ]
     };
         }
@@ -126,6 +138,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Обновление тарифа пользователя после оплаты ---
     window.updateUserTariff = async function() {
         await fetchUserTariff();
+        await fetchAvailableModels();
+        renderModelDropdown(selectedAgent);
+        if (modelDropdownLabel) modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
+        updateGenerateButtonState();
         if (typeof renderUserProfile === 'function') renderUserProfile();
     }
 
@@ -133,27 +149,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!modelDropdownList || !modelDropdownLabel) return;
         modelDropdownList.innerHTML = '';
         const options = MODEL_OPTIONS[agentKey] || [];
+        
         if (!options.length) {
             selectedModel = null;
             if (modelDropdownLabel) modelDropdownLabel.textContent = 'Нет доступных моделей';
             if (generateButton) generateButton.disabled = true;
             return;
         }
+        
+        // Находим первую доступную модель для выбора по умолчанию
+        let firstAvailableModel = null;
+        let firstModel = null;
+        
         options.forEach(opt => {
             const li = document.createElement('div');
-            li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}"><span>${opt.label}</span></button>`;
-            const button = li.querySelector('button');
-            button.addEventListener('click', () => {
-                selectedModel = opt.value;
-                if (modelDropdownLabel) modelDropdownLabel.textContent = opt.label;
-                if (modelDropdownMenu) modelDropdownMenu.style.display = 'none';
-            });
+            
+            if (opt.available) {
+                // Доступная модель
+                li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}"><span>${opt.label}</span></button>`;
+                const button = li.querySelector('button');
+                button.addEventListener('click', () => {
+                    selectedModel = opt.value;
+                    if (modelDropdownLabel) modelDropdownLabel.textContent = opt.label;
+                    if (modelDropdownMenu) modelDropdownMenu.style.display = 'none';
+                });
+                
+                // Запоминаем первую доступную модель
+                if (firstAvailableModel === null) {
+                    firstAvailableModel = opt.value;
+                }
+            } else {
+                // Заблокированная модель
+                li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm text-gray-400 cursor-not-allowed opacity-60" data-value="${opt.value}" disabled><span>${opt.label}</span><span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">PRO</span></button>`;
+                const button = li.querySelector('button');
+                button.addEventListener('click', () => {
+                    showProModal();
+                    if (modelDropdownMenu) modelDropdownMenu.style.display = 'none';
+                });
+            }
+            
+            // Запоминаем первую модель (любую) для fallback
+            if (firstModel === null) {
+                firstModel = opt.value;
+            }
+            
             modelDropdownList.appendChild(li);
         });
-        // Выбрать первую доступную модель по умолчанию
-        selectedModel = options[0].value;
-        if (modelDropdownLabel) modelDropdownLabel.textContent = options[0].label;
-        if (generateButton) generateButton.disabled = false;
+        
+        // Выбираем первую доступную модель по умолчанию, или первую модель если нет доступных
+        if (firstAvailableModel) {
+            selectedModel = firstAvailableModel;
+            const firstOption = options.find(opt => opt.value === firstAvailableModel);
+            if (modelDropdownLabel && firstOption) modelDropdownLabel.textContent = firstOption.label;
+        } else if (firstModel) {
+            // Если нет доступных моделей, выбираем первую (заблокированную)
+            selectedModel = firstModel;
+            const firstOption = options.find(opt => opt.value === firstModel);
+            if (modelDropdownLabel && firstOption) modelDropdownLabel.textContent = firstOption.label;
+        } else {
+            selectedModel = null;
+            if (modelDropdownLabel) modelDropdownLabel.textContent = 'Нет доступных моделей';
+        }
+        
+        if (generateButton) generateButton.disabled = !selectedModel;
     }
 
     // Маппинг placeholder по модели
@@ -239,16 +297,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleGeneration() {
         const prompt = promptInput.value.trim();
         if (!prompt) return;
+        
+        // Блокируем кнопку и input во время генерации
         generateButton.disabled = true;
         promptInput.disabled = true;
+        
+        // Показываем спиннер в кнопке (как в ChatGPT)
+        generateButton.innerHTML = '<svg class="animate-spin inline w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="hidden md:inline">Генерация...</span>';
+        
         promptInput.value = '';
         promptInput.style.height = 'auto';
         updateGenerateButtonState();
+        
         // 1. Добавить вопрос пользователя в чат
         addMessageToChat(prompt, 'user');
         // 2. Добавить спиннер для ответа ИИ
         showLoaderAfterUserMessage();
         showPromptHelpers(); // показываем FAQ/Шаблоны после первого промта
+        
         let subscription;
         try {
             subscription = await checkSubscription();
@@ -256,35 +322,59 @@ document.addEventListener('DOMContentLoaded', async () => {
             replaceLoaderWithAIResponse('Ошибка проверки подписки: ' + (e.message || 'Нет соединения с сервером'));
             promptInput.disabled = false;
             generateButton.disabled = false;
+            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            updateGenerateButtonState();
             return;
         }
+        
         if (subscription.warning) {
             addMessageToChat(subscription.warning, 'ai-warning');
             showWarningBanner(subscription.warning);
             if (subscription.warning.includes('скоро закончится')) {
-                showPaymentNotification(subscription.plan || 'pro');
+                showProModal();
             }
         }
+        
         if (!subscription.can_generate) {
             replaceLoaderWithAIResponse('Генерация недоступна. Пожалуйста, оплатите подписку.');
             promptInput.disabled = false;
             generateButton.disabled = false;
-            showPaymentNotification(subscription.plan || 'pro');
-                return;
-            }
+            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            updateGenerateButtonState();
+            showProModal();
+            return;
+        }
+        
         const model = selectedAgent;
         const submodel = selectedModel;
         const chat_id = window.currentChatId;
+        
+        // Проверяем доступность выбранной модели
+        const currentOptions = MODEL_OPTIONS[model] || [];
+        const selectedOption = currentOptions.find(opt => opt.value === submodel);
+        if (selectedOption && !selectedOption.available) {
+            replaceLoaderWithAIResponse('Эта модель недоступна для вашего тарифа. Перейдите на PRO для доступа ко всем моделям.');
+            promptInput.disabled = false;
+            generateButton.disabled = false;
+            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            updateGenerateButtonState();
+            showProModal();
+            return;
+        }
+        
         // --- STOP BUTTON LOGIC ---
         if (!currentAbortController) {
             currentAbortController = new AbortController();
         }
+        
+        // Меняем кнопку на "Стоп" с иконкой X
         generateButton.innerHTML = '<span class="hidden md:inline">Стоп</span> <svg class="inline w-6 h-6 ml-1 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6L18 18M6 18L18 6"/></svg>';
         generateButton.disabled = false;
         generateButton.onclick = () => {
             if (currentAbortController) currentAbortController.abort();
             generateButton.disabled = true;
         };
+        
         let result;
         try {
             result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id }, { signal: currentAbortController.signal });
@@ -298,21 +388,80 @@ document.addEventListener('DOMContentLoaded', async () => {
                 replaceLoaderWithAIResponse('Ошибка: ' + (error.message || 'Нет соединения с сервером'));
             }
         } finally {
+            // Восстанавливаем кнопку и input
             promptInput.disabled = false;
             generateButton.disabled = false;
             generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
             generateButton.onclick = handleGeneration;
             currentAbortController = null;
             updateGenerateButtonState();
+            
+            // Обновляем информацию о подписке после генерации
+            try {
+                const updatedSubscription = await checkSubscription();
+                
+                // Обновляем счетчик в UI
+                const generationsCounter = document.getElementById('account-generations');
+                const textCounter = document.getElementById('account-generations-text');
+                const imageCounter = document.getElementById('account-generations-image');
+                if (generationsCounter) {
+                    if (updatedSubscription.tariff === 'free') {
+                        // Для FREE показываем дневной лимит (осталось/лимит)
+                        const textLimit = updatedSubscription.limits?.text_gen_limit || 0;
+                        const imageLimit = updatedSubscription.limits?.image_gen_limit || 0;
+                        const textUsed = updatedSubscription.text_gen_count || 0;
+                        const imageUsed = updatedSubscription.image_gen_count || 0;
+                        const textLeft = Math.max(0, textLimit - textUsed);
+                        const imageLeft = Math.max(0, imageLimit - imageUsed);
+                        const totalLeft = textLeft + imageLeft;
+                        const totalLimit = textLimit + imageLimit;
+                        generationsCounter.textContent = `${totalLeft}/${totalLimit}`;
+                        if (textCounter) textCounter.textContent = `Текст: ${textLeft}/${textLimit}`;
+                        if (imageCounter) imageCounter.textContent = `Картинки: ${imageLeft}/${imageLimit}`;
+                    } else if (updatedSubscription.tariff === 'max') {
+                        // Для MAX показываем "Безлимитно"
+                        generationsCounter.textContent = 'Безлимитно';
+                        if (textCounter) textCounter.textContent = '';
+                        if (imageCounter) imageCounter.textContent = '';
+                    } else {
+                        // Для PRO показываем оставшиеся генерации
+                        generationsCounter.textContent = updatedSubscription.generations_left || 0;
+                        if (textCounter) textCounter.textContent = '';
+                        if (imageCounter) imageCounter.textContent = '';
+                    }
+                }
+            } catch (e) {
+                console.log('Failed to update subscription info:', e);
+            }
         }
     }
 
     function updateGenerateButtonState() {
-        if (promptInput) generateButton.disabled = promptInput.value.trim() === '';
+        if (promptInput && generateButton) {
+            const hasText = promptInput.value.trim() !== '';
+            generateButton.disabled = !hasText;
+            
+            // Визуальная обратная связь
+            if (hasText) {
+                generateButton.classList.remove('opacity-50');
+                generateButton.classList.add('hover:from-purple-600', 'hover:to-pink-600');
+                generateButton.style.cursor = 'pointer';
+            } else {
+                generateButton.classList.add('opacity-50');
+                generateButton.classList.remove('hover:from-purple-600', 'hover:to-pink-600');
+                generateButton.style.cursor = 'not-allowed';
+            }
+        }
     }
 
     // --- Event Listeners ---
-    if (generateButton) generateButton.addEventListener('click', handleGeneration);
+    if (generateButton) {
+        generateButton.addEventListener('click', (e) => {
+            if (!generateButton.disabled) {
+                handleGeneration();
+            }
+        });
+    }
 
     if (promptInput) {
         promptInput.addEventListener('keydown', (e) => {
@@ -330,6 +479,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             promptInput.style.height = Math.min(promptInput.scrollHeight, 160) + 'px'; // 160px = max-h-40
         });
     }
+
+    // Инициализация состояния кнопки при загрузке
+    updateGenerateButtonState();
 
     // Быстрые шаблоны
     document.querySelectorAll('.quick-template-btn').forEach(btn => {
@@ -397,7 +549,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAuthModal('login');
                 return;
             }
-            showFeedbackModal();
+            showToast('Функция отзывов пока недоступна', 'info');
         });
     }
 
@@ -454,6 +606,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function renderUserProfile() {
         try {
             const user = await apiCall('/api/me');
+            const subscription = await apiCall('/api/subscription/check');
+            
             if (profileButton) {
                 if (user.avatar_url) {
                     profileButton.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" class="w-full h-full object-cover rounded-full">`;
@@ -468,6 +622,38 @@ document.addEventListener('DOMContentLoaded', async () => {
                 accountDropdown.className = 'hidden absolute top-14 right-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-1 animate__animated animate__fadeIn animate__faster';
                 profileButton.parentNode.appendChild(accountDropdown);
             }
+            
+            // Подготавливаем данные для счетчиков
+            let generationsText = '';
+            let generationsImage = '';
+            let generationsDisplay = '';
+            let expiresDisplay = '';
+            
+            if (user.tariff === 'free') {
+                const textLimit = subscription.limits?.text_gen_limit || 0;
+                const imageLimit = subscription.limits?.image_gen_limit || 0;
+                const textUsed = subscription.text_gen_count || 0;
+                const imageUsed = subscription.image_gen_count || 0;
+                const textLeft = Math.max(0, textLimit - textUsed);
+                const imageLeft = Math.max(0, imageLimit - imageUsed);
+                const totalLeft = textLeft + imageLeft;
+                const totalLimit = textLimit + imageLimit;
+                generationsDisplay = `${totalLeft}/${totalLimit}`;
+                generationsText = `Текст: ${textLeft}/${textLimit}`;
+                generationsImage = `Картинки: ${imageLeft}/${imageLimit}`;
+                expiresDisplay = 'Без срока';
+            } else if (user.tariff === 'max') {
+                generationsDisplay = 'Безлимитно';
+                generationsText = '';
+                generationsImage = '';
+                expiresDisplay = user.subscription_expires ? new Date(user.subscription_expires).toLocaleDateString('ru-RU') : '';
+            } else {
+                generationsDisplay = user.generations_left || 0;
+                generationsText = '';
+                generationsImage = '';
+                expiresDisplay = user.subscription_expires ? new Date(user.subscription_expires).toLocaleDateString('ru-RU') : '';
+            }
+            
             accountDropdown.innerHTML = `
                 <div class="p-3">
                     <div class="flex items-center gap-4 mb-3">
@@ -483,8 +669,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <a href="/pricing" class="text-purple-600 dark:text-purple-400 hover:underline font-medium">Сменить</a>
                         </div>
                         <div class="mt-2">
-                            <p class="text-gray-600 dark:text-gray-300">Осталось генераций: <b id="account-generations" class="text-gray-800 dark:text-white">${user.generations_left || ''}</b></p>
-                            <p class="text-gray-600 dark:text-gray-300">Активен до: <b id="account-expires" class="text-gray-800 dark:text-white">${user.subscription_expires ? new Date(user.subscription_expires).toLocaleDateString('ru-RU') : ''}</b></p>
+                            <p class="text-gray-600 dark:text-gray-300">Осталось генераций: <b id="account-generations" class="text-gray-800 dark:text-white">${generationsDisplay}</b></p>
+                            ${(user.tariff === 'free') ? `<div id="account-generations-details" class="mt-1 text-xs">
+                                <span id="account-generations-text" class="text-purple-600 dark:text-purple-400 mr-3">${generationsText}</span>
+                                <span id="account-generations-image" class="text-pink-600 dark:text-pink-400">${generationsImage}</span>
+                            </div>` : ''}
+                            <p class="text-gray-600 dark:text-gray-300">Активен до: <b id="account-expires" class="text-gray-800 dark:text-white">${expiresDisplay}</b></p>
                         </div>
                     </div>
                 </div>
@@ -613,8 +803,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // После авторизации и показа app-page — инициализируем меню моделей
     await fetchAvailableModels();
+    await fetchUserTariff();
     renderModelDropdown(selectedAgent);
     if (modelDropdownLabel) modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
+    
+    // Обновляем состояние кнопки после загрузки моделей
+    updateGenerateButtonState();
 
     // --- Google Auth: блокировка без согласия только для регистрации ---
     const googleAuthLinkLogin = document.getElementById('google-auth-link-login');
@@ -646,69 +840,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
 
-    function renderPromptTemplates() {
-      const list = document.getElementById('prompt-templates-list');
-      if (!list) return;
-      list.innerHTML = '';
-      PROMPT_TEMPLATES.forEach((tpl, idx) => {
-        const card = document.createElement('div');
-        card.className = 'bg-purple-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-xl p-4 shadow flex flex-col gap-2';
-        card.innerHTML = `<div class="font-semibold text-purple-700 dark:text-purple-200 mb-2">${tpl.title}</div>
-          <textarea readonly class="w-full bg-transparent text-gray-700 dark:text-gray-200 text-sm resize-none outline-none" rows="3">${tpl.text}</textarea>
-          <div class="flex gap-2 mt-2">
-            <button class="copy-template-btn px-3 py-1 rounded-lg bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-all" data-idx="${idx}">Копировать</button>
-            <button class="insert-template-btn px-3 py-1 rounded-lg bg-pink-600 text-white text-xs font-semibold hover:bg-pink-700 transition-all" data-idx="${idx}">Вставить в чат</button>
-          </div>`;
-        list.appendChild(card);
-      });
-      // Навешиваем обработчики
-      list.querySelectorAll('.copy-template-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const idx = btn.getAttribute('data-idx');
-          navigator.clipboard.writeText(PROMPT_TEMPLATES[idx].text);
-          btn.textContent = 'Скопировано!';
-          setTimeout(() => { btn.textContent = 'Копировать'; }, 1500);
-        });
-      });
-      list.querySelectorAll('.insert-template-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const idx = btn.getAttribute('data-idx');
-          const promptInput = document.getElementById('prompt-input');
-          if (promptInput) {
-            promptInput.value = PROMPT_TEMPLATES[idx].text;
-            promptInput.focus();
-            // Автоматически закрыть модалку
-            document.getElementById('prompt-templates-modal').classList.add('hidden');
-          }
-        });
-      });
-    }
-
-    document.getElementById('prompt-templates-btn')?.addEventListener('click', () => {
-      document.getElementById('prompt-templates-modal').classList.remove('hidden');
-      renderPromptTemplates();
-    });
-    document.getElementById('prompt-templates-close')?.addEventListener('click', () => {
-      document.getElementById('prompt-templates-modal').classList.add('hidden');
-    });
-
-    // --- Helper buttons visibility logic ---
-    function updateHelperButtonsVisibility() {
-      const promptInput = document.getElementById('prompt-input');
-      const helperButtons = document.getElementById('prompt-helper-buttons');
-      const inlineHelper = document.getElementById('inline-helper-buttons');
-      if (!promptInput || !helperButtons || !inlineHelper) return;
-      if (promptInput.value.trim() === '') {
-        helperButtons.style.display = 'flex';
-        inlineHelper.style.display = 'none';
-      } else {
-        helperButtons.style.display = 'none';
-        inlineHelper.style.display = 'flex';
-      }
-    }
-    document.getElementById('prompt-input')?.addEventListener('input', updateHelperButtonsVisibility);
-    document.addEventListener('DOMContentLoaded', updateHelperButtonsVisibility);
-
     // --- FAQ/modal open/close logic ---
     function openFAQModal() {
       document.getElementById('faq-modal').classList.remove('hidden');
@@ -718,26 +849,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     function openTemplatesModal() {
       document.getElementById('prompt-templates-modal').classList.remove('hidden');
-      renderPromptTemplates();
+      // renderPromptTemplates() будет вызвана в templates.js
     }
     function closeTemplatesModal() {
       document.getElementById('prompt-templates-modal').classList.add('hidden');
     }
-    // Кнопки в initial-view
-    const showFaqBtn = document.getElementById('show-faq-btn');
-    const showTemplatesBtn = document.getElementById('show-templates-btn');
-    showFaqBtn?.addEventListener('click', openFAQModal);
-    showTemplatesBtn?.addEventListener('click', openTemplatesModal);
-    // Кнопки в inline-helper-buttons
-    const inlineFaqBtn = document.getElementById('inline-faq-btn');
-    const inlineTemplatesBtn = document.getElementById('inline-templates-btn');
-    inlineFaqBtn?.addEventListener('click', openFAQModal);
-    inlineTemplatesBtn?.addEventListener('click', openTemplatesModal);
-    // Закрытие по крестику
-    const faqCloseBtn = document.getElementById('faq-close');
-    faqCloseBtn?.addEventListener('click', closeFAQModal);
+
+    // Обработчики для кнопок закрытия модальных окон
+    document.getElementById('faq-close')?.addEventListener('click', closeFAQModal);
     document.getElementById('prompt-templates-close')?.addEventListener('click', closeTemplatesModal);
-    // Автоматическое закрытие по клику вне модального окна
+
+    // --- Обработчики для кнопок с data-action ---
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+        
+        const action = target.getAttribute('data-action');
+        if (action === 'show-faq') {
+            openFAQModal();
+        } else if (action === 'show-templates') {
+            openTemplatesModal();
+        }
+    });
+
+    // Закрытие модальных окон по клику вне их области
     window.addEventListener('mousedown', (e) => {
       const faqModal = document.getElementById('faq-modal');
       if (faqModal && !faqModal.classList.contains('hidden')) {
@@ -751,21 +886,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    document.getElementById('fixed-faq-btn')?.addEventListener('click', () => {
-        document.getElementById('faq-modal').classList.remove('hidden');
-    });
-    document.getElementById('fixed-templates-btn')?.addEventListener('click', () => {
-        document.getElementById('prompt-templates-modal').classList.remove('hidden');
-        renderPromptTemplates();
-    });
-
-    // --- Навешиваем обработчики на FAQ/Шаблоны в prompt-helper-buttons ---
-    const promptFaqBtn = document.querySelector('#prompt-helper-buttons #show-faq-btn');
-    const promptTemplatesBtn = document.querySelector('#prompt-helper-buttons #show-templates-btn');
-    if (promptFaqBtn) {
-        promptFaqBtn.addEventListener('click', openFAQModal);
-    }
-    if (promptTemplatesBtn) {
-        promptTemplatesBtn.addEventListener('click', openTemplatesModal);
-    }
+    // Финальная инициализация состояния кнопки
+    updateGenerateButtonState();
 });
