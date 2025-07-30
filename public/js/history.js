@@ -39,8 +39,21 @@ async function fetchAndRenderHistory() {
             // --- Название чата (теперь только с сервера) ---
             let chatTitle = chatItems[0].chat_title;
             if (!chatTitle) {
-                const firstDate = chatItems[0].created_at ? new Date(chatItems[0].created_at).toLocaleDateString('ru-RU') : '';
-                chatTitle = `Чат от ${firstDate}`;
+                // Если название не задано, генерируем на основе первого промпта
+                const firstPrompt = chatItems[0].prompt || '';
+                if (firstPrompt.trim().length > 0) {
+                    // Очищаем промпт от лишних символов
+                    let title = firstPrompt.trim().replace(/\s+/g, ' ');
+                    // Ограничиваем длину
+                    if (title.length > 50) {
+                        title = title.substring(0, 47) + '...';
+                    }
+                    chatTitle = title;
+                } else {
+                    // Если промпт пустой, используем дату
+                    const firstDate = chatItems[0].created_at ? new Date(chatItems[0].created_at).toLocaleDateString('ru-RU') : '';
+                    chatTitle = `Чат от ${firstDate}`;
+                }
             }
             const titleDiv = document.createElement('div');
             titleDiv.className = 'font-bold text-purple-700 dark:text-purple-300 mb-2 text-sm inline-block';

@@ -5,6 +5,29 @@ require('dotenv').config({ path: path.join(__dirname, '.env') }); // Load .env f
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Security Headers Middleware
+app.use((req, res, next) => {
+    // Content Security Policy - разрешаем CDN ресурсы
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:8080 https://api.openai.com https://generativelanguage.googleapis.com https://api.deepseek.com; frame-ancestors 'none';");
+    
+    // X-Frame-Options - защита от clickjacking
+    res.setHeader('X-Frame-Options', 'DENY');
+    
+    // X-Content-Type-Options - предотвращение MIME sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // X-XSS-Protection - дополнительная защита от XSS
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    
+    // Referrer Policy - контроль передачи referrer
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Permissions Policy - контроль доступа к API браузера
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    
+    next();
+});
+
 // Setup EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));

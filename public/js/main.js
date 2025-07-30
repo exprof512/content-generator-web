@@ -667,6 +667,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         spinner.style.display = 'inline-block';
     }
+    
+    // Генерация названия чата на основе промпта (как в ChatGPT)
+    function generateChatTitle(prompt) {
+        // Очищаем промпт от лишних символов
+        let title = prompt.trim();
+        
+        // Убираем лишние пробелы и переносы строк
+        title = title.replace(/\s+/g, ' ');
+        
+        // Ограничиваем длину (как в ChatGPT - примерно 50 символов)
+        if (title.length > 50) {
+            title = title.substring(0, 47) + '...';
+        }
+        
+        // Если промпт пустой или слишком короткий, используем дефолтное название
+        if (title.length < 3) {
+            const now = new Date();
+            title = `Чат от ${now.toLocaleDateString('ru-RU')}`;
+        }
+        
+        return title;
+    }
+    
     function hideMiniSpinner() {
         const spinner = document.getElementById('mini-spinner');
         if (spinner) spinner.style.display = 'none';
@@ -741,6 +764,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const submodel = selectedModel;
         const chat_id = window.currentChatId;
         
+        // Генерируем название чата на основе первого промпта (как в ChatGPT)
+        let chat_title = null;
+        if (!chat_id || chat_id === 'default') {
+            // Это новый чат - создаем название на основе промпта
+            chat_title = generateChatTitle(prompt);
+        }
+        
         // Проверяем доступность выбранной модели
         const currentOptions = MODEL_OPTIONS[model] || [];
         const selectedOption = currentOptions.find(opt => opt.value === submodel);
@@ -769,7 +799,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         let result;
         try {
-            result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id }, { signal: currentAbortController.signal });
+            result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id, chat_title }, { signal: currentAbortController.signal });
             replaceLoaderWithAIResponse(result.content);
             fetchAndRenderHistory();
             showToast('Генерация завершена!', 'success');

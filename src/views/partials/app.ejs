@@ -15,7 +15,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         <!-- История чатов -->
-        <div class="flex-1 overflow-y-auto p-2 space-y-2" id="history-list">
+        <div class="flex-1 overflow-y-auto p-2 space-y-2 max-h-[calc(100vh-120px)]" id="history-list">
             <!-- История чатов будет подгружаться сюда -->
         </div>
     </aside>
@@ -206,7 +206,7 @@
 
             <!-- Prompt Input Area -->
             <div id="prompt-wrapper" class="w-full p-4 md:p-6 fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 z-30 border-t border-gray-200 dark:border-gray-700 shadow-lg animate__animated animate__fadeIn">
-                <div class="max-w-4xl mx-auto mt-auto">
+                <div class="max-w-6xl mx-auto mt-auto">
                     <div class="relative p-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 shadow-lg focus-within:ring-2 focus-within:ring-purple-500 flex flex-col md:flex-row items-end gap-2">
                         <textarea
                             id="prompt-input"
