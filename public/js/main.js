@@ -248,6 +248,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         userTemplates = userTemplates.filter(t => t.id !== id);
         saveUserTemplates();
         showToast('Шаблон удален!', 'success');
+        // Обновляем список шаблонов сразу
+        updateUserTemplatesList();
     }
 
     function showUserTemplatesModal() {
@@ -278,6 +280,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
 
         document.body.appendChild(modal);
+
+        // Закрытие по клику вне модалки
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
     }
 
     function showAddTemplateForm() {
@@ -307,6 +316,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.body.appendChild(modal);
 
+        // Закрытие по клику вне модалки
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
         const form = modal.querySelector('#add-template-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -315,13 +331,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             addUserTemplate(name, content);
             modal.remove();
+            
+            // Обновляем список шаблонов сразу
+            updateUserTemplatesList();
         });
+    }
+
+    function updateUserTemplatesList() {
+        const templatesList = document.getElementById('user-templates-list');
+        if (templatesList) {
+            templatesList.innerHTML = userTemplates.map(template => `
+                <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">${template.name}</h3>
+                        <button onclick="deleteUserTemplate(${template.id})" class="text-red-500 hover:text-red-700">Удалить</button>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">${template.content.substring(0, 100)}${template.content.length > 100 ? '...' : ''}</p>
+                    <button onclick="useUserTemplate('${template.content.replace(/'/g, "\\'")}')" class="text-purple-600 hover:text-purple-700 text-sm">Использовать</button>
+                </div>
+            `).join('');
+        }
     }
 
     function useUserTemplate(content) {
         if (promptInput) {
             promptInput.value = content;
             promptInput.focus();
+            // Исправляем баг с кнопкой генерации
+            if (typeof updateGenerateButtonState === 'function') {
+                updateGenerateButtonState();
+            }
             showToast('Шаблон применен!', 'success');
         }
     }
@@ -374,6 +413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.deleteUserTemplate = deleteUserTemplate;
     window.useUserTemplate = useUserTemplate;
     window.showAddTemplateForm = showAddTemplateForm;
+    window.updateUserTemplatesList = updateUserTemplatesList;
 
     async function fetchAvailableModels() {
         try {
@@ -433,6 +473,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { value: 'deepseek-coder', label: 'DeepSeek Coder', available: false }
         ],
         dalle: [
+            { value: 'gpt-image-1', label: 'GPT Image 1', available: true },
             { value: 'dall-e-2', label: 'DALL-E 2', available: true },
             { value: 'dall-e-3', label: 'DALL-E 3', available: false }
         ]

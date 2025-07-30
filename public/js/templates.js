@@ -173,7 +173,10 @@ function renderPromptTemplates() {
       if (promptInput) {
         promptInput.value = PROMPT_TEMPLATES[idx].text;
         promptInput.focus();
-        if (typeof updateGenerateButtonState === 'function') updateGenerateButtonState();
+        // Исправляем баг с кнопкой генерации
+        if (typeof updateGenerateButtonState === 'function') {
+          updateGenerateButtonState();
+        }
         document.getElementById('prompt-templates-modal').classList.add('hidden');
         // Show toast notification
         if (typeof showToast === 'function') {
