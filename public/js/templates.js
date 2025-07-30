@@ -144,7 +144,7 @@ function renderPromptTemplates() {
   list.innerHTML = '';
   PROMPT_TEMPLATES.forEach((tpl, idx) => {
     const card = document.createElement('div');
-    card.className = 'bg-purple-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-xl p-4 shadow flex flex-col gap-2';
+    card.className = 'template-item bg-purple-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-xl p-4 shadow flex flex-col gap-2';
     card.innerHTML = `<div class="font-semibold text-purple-700 dark:text-purple-200 mb-2">${tpl.title}</div>
       <textarea readonly class="w-full bg-transparent text-gray-700 dark:text-gray-200 text-sm resize-none outline-none" rows="3">${tpl.text}</textarea>
       <div class="flex gap-2 mt-2">
@@ -160,6 +160,10 @@ function renderPromptTemplates() {
       navigator.clipboard.writeText(PROMPT_TEMPLATES[idx].text);
       btn.textContent = 'Скопировано!';
       setTimeout(() => { btn.textContent = 'Копировать'; }, 1500);
+      // Show toast notification
+      if (typeof showToast === 'function') {
+        showToast('Шаблон скопирован в буфер обмена!', 'success');
+      }
     });
   });
   list.querySelectorAll('.insert-template-btn').forEach(btn => {
@@ -171,6 +175,10 @@ function renderPromptTemplates() {
         promptInput.focus();
         if (typeof updateGenerateButtonState === 'function') updateGenerateButtonState();
         document.getElementById('prompt-templates-modal').classList.add('hidden');
+        // Show toast notification
+        if (typeof showToast === 'function') {
+          showToast('Шаблон вставлен в поле ввода!', 'success');
+        }
       }
     });
   });

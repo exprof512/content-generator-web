@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modelDropdownLabel = document.getElementById('model-dropdown-label');
     const modelDropdownList = document.getElementById('model-dropdown-list');
 
+    // --- Mobile History Elements ---
+    const historyToggleButton = document.getElementById('history-toggle-button');
+    const historyPanel = document.getElementById('history-panel');
+    const historyOverlay = document.getElementById('history-overlay');
+    const historyCloseButton = document.getElementById('history-close-button');
+
     let selectedAgent = 'chatgpt';
     let selectedModel = 'gpt-4o-mini';
 
@@ -23,6 +29,351 @@ document.addEventListener('DOMContentLoaded', async () => {
     let isAdmin = false;
     let imageGenCount = 0;
     let textGenCount = 0;
+
+    // --- Mobile History Toggle ---
+    if (historyToggleButton) {
+        historyToggleButton.addEventListener('click', () => {
+            if (historyPanel) {
+                historyPanel.classList.remove('-translate-x-full');
+                historyPanel.classList.add('translate-x-0');
+            }
+            if (historyOverlay) {
+                historyOverlay.classList.remove('hidden');
+            }
+        });
+    }
+
+    if (historyCloseButton) {
+        historyCloseButton.addEventListener('click', () => {
+            if (historyPanel) {
+                historyPanel.classList.remove('translate-x-0');
+                historyPanel.classList.add('-translate-x-full');
+            }
+            if (historyOverlay) {
+                historyOverlay.classList.add('hidden');
+            }
+        });
+    }
+
+    if (historyOverlay) {
+        historyOverlay.addEventListener('click', () => {
+            if (historyPanel) {
+                historyPanel.classList.remove('translate-x-0');
+                historyPanel.classList.add('-translate-x-full');
+            }
+            historyOverlay.classList.add('hidden');
+        });
+    }
+
+    // --- Enhanced Toast System ---
+    function showToast(message, type = 'info', duration = 4000) {
+        // Remove existing toasts
+        const existingToasts = document.querySelectorAll('.toast-notification');
+        existingToasts.forEach(toast => toast.remove());
+
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+        
+        let bgColor, textColor, icon;
+        switch (type) {
+            case 'success':
+                bgColor = 'bg-green-500';
+                textColor = 'text-white';
+                icon = '✓';
+                break;
+            case 'error':
+                bgColor = 'bg-red-500';
+                textColor = 'text-white';
+                icon = '✗';
+                break;
+            case 'warning':
+                bgColor = 'bg-yellow-500';
+                textColor = 'text-white';
+                icon = '⚠';
+                break;
+            default:
+                bgColor = 'bg-blue-500';
+                textColor = 'text-white';
+                icon = 'ℹ';
+        }
+
+        toast.className += ` ${bgColor} ${textColor}`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-2">
+                <span class="text-lg">${icon}</span>
+                <span class="flex-1">${message}</span>
+                <button class="text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+        
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+
+        // Auto remove
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    // --- Password Change Enhancement ---
+    function showPasswordChangeModal() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 bg-black/60 flex items-center justify-center';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8 mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Смена пароля</h2>
+                    <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" onclick="this.closest('.fixed').remove()">×</button>
+                </div>
+                <form id="password-change-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Текущий пароль</label>
+                            <input type="password" id="current-password" required class="w-full mt-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Новый пароль</label>
+                            <input type="password" id="new-password" required minlength="8" class="w-full mt-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Подтвердите новый пароль</label>
+                            <input type="password" id="confirm-password" required class="w-full mt-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                    </div>
+                    <div class="min-h-[1.25rem] mt-2">
+                        <p id="password-change-error" class="text-red-500 text-sm text-center"></p>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Отмена</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">Изменить пароль</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Handle form submission
+        const form = modal.querySelector('#password-change-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = modal.querySelector('#password-change-error');
+            const currentPassword = modal.querySelector('#current-password').value;
+            const newPassword = modal.querySelector('#new-password').value;
+            const confirmPassword = modal.querySelector('#confirm-password').value;
+
+            errorEl.textContent = '';
+
+            if (newPassword !== confirmPassword) {
+                errorEl.textContent = 'Пароли не совпадают';
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                errorEl.textContent = 'Пароль должен содержать минимум 8 символов';
+                return;
+            }
+
+            try {
+                const response = await apiCall('/api/change-password', 'POST', {
+                    current_password: currentPassword,
+                    new_password: newPassword
+                });
+
+                showToast('Пароль успешно изменен!', 'success');
+                modal.remove();
+            } catch (error) {
+                errorEl.textContent = error.message || 'Ошибка при смене пароля';
+            }
+        });
+    }
+
+    // --- Search Functionality ---
+    function addSearchToModal(modalId, searchPlaceholder, itemsSelector) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // Проверяем, не добавлен ли уже поиск
+        if (modal.querySelector(`#${modalId}-search`)) return;
+
+        const content = modal.querySelector('.space-y-4, .grid');
+        if (!content) return;
+
+        const searchInput = document.createElement('div');
+        searchInput.className = 'mb-4';
+        searchInput.innerHTML = `
+            <input type="text" placeholder="${searchPlaceholder}" 
+                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500"
+                   id="${modalId}-search">
+        `;
+
+        content.insertBefore(searchInput, content.firstChild);
+
+        const searchField = searchInput.querySelector('input');
+        
+        searchField.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            // Ищем элементы после того, как они будут добавлены
+            setTimeout(() => {
+                const items = modal.querySelectorAll(itemsSelector);
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const title = item.querySelector('.font-semibold')?.textContent.toLowerCase() || '';
+                    const shouldShow = text.includes(query) || title.includes(query);
+                    item.style.display = shouldShow ? '' : 'none';
+                });
+            }, 100);
+        });
+    }
+
+    // --- User Templates System ---
+    let userTemplates = JSON.parse(localStorage.getItem('userTemplates') || '[]');
+
+    function saveUserTemplates() {
+        localStorage.setItem('userTemplates', JSON.stringify(userTemplates));
+    }
+
+    function addUserTemplate(name, content) {
+        userTemplates.push({ id: Date.now(), name, content });
+        saveUserTemplates();
+        showToast('Шаблон добавлен!', 'success');
+    }
+
+    function deleteUserTemplate(id) {
+        userTemplates = userTemplates.filter(t => t.id !== id);
+        saveUserTemplates();
+        showToast('Шаблон удален!', 'success');
+    }
+
+    function showUserTemplatesModal() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 bg-black/60 flex items-center justify-center';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl p-8 mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Мои шаблоны</h2>
+                    <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" onclick="this.closest('.fixed').remove()">×</button>
+                </div>
+                <div class="mb-4">
+                    <button onclick="showAddTemplateForm()" class="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">Добавить шаблон</button>
+                </div>
+                <div id="user-templates-list" class="space-y-4">
+                    ${userTemplates.map(template => `
+                        <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-gray-900 dark:text-white">${template.name}</h3>
+                                <button onclick="deleteUserTemplate(${template.id})" class="text-red-500 hover:text-red-700">Удалить</button>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">${template.content.substring(0, 100)}${template.content.length > 100 ? '...' : ''}</p>
+                            <button onclick="useUserTemplate('${template.content.replace(/'/g, "\\'")}')" class="text-purple-600 hover:text-purple-700 text-sm">Использовать</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+    }
+
+    function showAddTemplateForm() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 bg-black/60 flex items-center justify-center';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8 mx-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Добавить шаблон</h3>
+                <form id="add-template-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Название</label>
+                            <input type="text" id="template-name" required class="w-full mt-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Содержание</label>
+                            <textarea id="template-content" required rows="4" class="w-full mt-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500"></textarea>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Отмена</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const form = modal.querySelector('#add-template-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = modal.querySelector('#template-name').value;
+            const content = modal.querySelector('#template-content').value;
+            
+            addUserTemplate(name, content);
+            modal.remove();
+        });
+    }
+
+    function useUserTemplate(content) {
+        if (promptInput) {
+            promptInput.value = content;
+            promptInput.focus();
+            showToast('Шаблон применен!', 'success');
+        }
+    }
+
+    // --- History Search ---
+    function addHistorySearch() {
+        const historyList = document.getElementById('history-list');
+        if (!historyList) return;
+
+        // Проверяем, не добавлен ли уже поиск
+        if (historyList.querySelector('#history-search')) return;
+
+        const searchContainer = document.createElement('div');
+        searchContainer.className = 'p-2 border-b border-gray-200 dark:border-gray-700';
+        searchContainer.innerHTML = `
+            <input type="text" placeholder="Поиск в истории..." 
+                   class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-purple-500 focus:border-purple-500"
+                   id="history-search">
+        `;
+
+        historyList.insertBefore(searchContainer, historyList.firstChild);
+
+        const searchInput = searchContainer.querySelector('input');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            // Ищем все возможные элементы истории
+            const historyItems = historyList.querySelectorAll('.history-item, .chat-item, [data-chat-title], button, .flex, .p-2, .rounded-lg');
+            
+            historyItems.forEach(item => {
+                // Пропускаем сам поиск и контейнеры
+                if (item.id === 'history-search' || item.classList.contains('p-2')) return;
+                
+                const text = item.textContent.toLowerCase();
+                const title = item.getAttribute('data-chat-title') || '';
+                const shouldShow = text.includes(query) || title.toLowerCase().includes(query);
+                
+                // Показываем/скрываем элемент
+                if (shouldShow) {
+                    item.style.display = '';
+                    item.style.visibility = 'visible';
+                } else {
+                    item.style.display = 'none';
+                    item.style.visibility = 'hidden';
+                }
+            });
+        });
+    }
+
+    // --- Global Functions for Templates ---
+    window.deleteUserTemplate = deleteUserTemplate;
+    window.useUserTemplate = useUserTemplate;
+    window.showAddTemplateForm = showAddTemplateForm;
 
     async function fetchAvailableModels() {
         try {
@@ -615,13 +966,55 @@ document.addEventListener('DOMContentLoaded', async () => {
                     profileButton.textContent = user.name ? user.name.charAt(0).toUpperCase() : 'П';
                 }
             }
+            
             // dropdown
             if (!accountDropdown) {
                 accountDropdown = document.createElement('div');
                 accountDropdown.id = 'account-dropdown';
-                accountDropdown.className = 'hidden absolute top-14 right-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-1 animate__animated animate__fadeIn animate__faster';
+                
+                // Создаем dropdown с правильными стилями
+                accountDropdown.className = 'hidden absolute bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 rounded-xl p-1 animate__animated animate__fadeIn animate__faster z-50';
+                
+                // Десктоп: справа сверху, фиксированная ширина
+                accountDropdown.style.cssText = `
+                    position: absolute;
+                    top: 3.5rem;
+                    right: 0;
+                    width: 400px;
+                    max-width: 90vw;
+                    background: white;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 0.75rem;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                    z-index: 50;
+                    overflow-y: auto;
+                    max-height: 80vh;
+                `;
+                
+                // Мобильная версия: снизу
+                if (window.innerWidth < 768) {
+                    accountDropdown.style.cssText = `
+                        position: fixed;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        width: 100%;
+                        max-width: 100%;
+                        background: white;
+                        border-top: 1px solid #e5e7eb;
+                        border-radius: 1rem 1rem 0 0;
+                        box-shadow: 0 -25px 50px -12px rgba(0, 0, 0, 0.25);
+                        z-index: 50;
+                        overflow-y: auto;
+                        max-height: 80vh;
+                    `;
+                }
+                
                 profileButton.parentNode.appendChild(accountDropdown);
             }
+            
+            // Обновляем позицию dropdown
+            updateDropdownPosition();
             
             // Подготавливаем данные для счетчиков
             let generationsText = '';
@@ -690,11 +1083,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                 <div class="p-1">
+                    <button id="change-password-btn" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                        </svg>
+                        Сменить пароль
+                    </button>
+                    <button id="user-templates-btn" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        Мои шаблоны
+                    </button>
                     <a href="/privacy" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Privacy Policy</a>
                     <a href="/terms" target="_blank" class="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Terms of Use</a>
                     <button id="logout-button" class="block w-full text-left mt-1 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Выйти</button>
                 </div>
             `;
+
+            // Add event listeners for new buttons
+            document.getElementById('change-password-btn')?.addEventListener('click', () => {
+                showPasswordChangeModal();
+                accountDropdown.classList.add('hidden');
+            });
+
+            document.getElementById('user-templates-btn')?.addEventListener('click', () => {
+                showUserTemplatesModal();
+                accountDropdown.classList.add('hidden');
+            });
+
         } catch (e) {
             // fallback: просто буква
             if (profileButton) profileButton.textContent = 'П';
@@ -710,6 +1127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 accountDropdown.classList.toggle('hidden');
                 if (!accountDropdown.classList.contains('hidden')) {
                     if (faqModal) faqModal.classList.add('hidden');
+                    // Обновляем позицию при показе
+                    updateDropdownPosition();
                 }
             }
         });
@@ -848,8 +1267,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('faq-modal').classList.add('hidden');
     }
     function openTemplatesModal() {
-      document.getElementById('prompt-templates-modal').classList.remove('hidden');
-      // renderPromptTemplates() будет вызвана в templates.js
+        document.getElementById('prompt-templates-modal').classList.remove('hidden');
+        // renderPromptTemplates() будет вызвана в templates.js
+        // Добавляем поиск после рендеринга шаблонов
+        setTimeout(() => {
+            addSearchToModal('prompt-templates-modal', 'Поиск шаблонов...', '.template-item');
+        }, 200);
     }
     function closeTemplatesModal() {
       document.getElementById('prompt-templates-modal').classList.add('hidden');
@@ -885,6 +1308,76 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (inner && !inner.contains(e.target)) closeTemplatesModal();
       }
     });
+
+    // --- Initialize History Search ---
+    addHistorySearch();
+
+    // --- Enhanced Mobile Menu ---
+    // Add swipe to close for mobile history panel
+    let startX = null;
+    if (historyPanel) {
+        historyPanel.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        historyPanel.addEventListener('touchend', function(e) {
+            if (startX !== null) {
+                const endX = e.changedTouches[0].clientX;
+                if (startX - endX > 60) {
+                    historyCloseButton?.click();
+                }
+            }
+            startX = null;
+        });
+    }
+
+    // --- Global Functions for External Access ---
+    window.showPasswordChangeModal = showPasswordChangeModal;
+    window.showUserTemplatesModal = showUserTemplatesModal;
+    window.showToast = showToast;
+    window.addHistorySearch = addHistorySearch;
+
+    // --- Responsive Dropdown ---
+    function updateDropdownPosition() {
+        if (accountDropdown) {
+            if (window.innerWidth < 768) {
+                // Мобильная версия: снизу
+                accountDropdown.style.cssText = `
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    width: 100%;
+                    max-width: 100%;
+                    background: white;
+                    border-top: 1px solid #e5e7eb;
+                    border-radius: 1rem 1rem 0 0;
+                    box-shadow: 0 -25px 50px -12px rgba(0, 0, 0, 0.25);
+                    z-index: 50;
+                    overflow-y: auto;
+                    max-height: 80vh;
+                `;
+            } else {
+                // Десктоп: справа сверху
+                accountDropdown.style.cssText = `
+                    position: absolute;
+                    top: 3.5rem;
+                    right: 0;
+                    width: 400px;
+                    max-width: 90vw;
+                    background: white;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 0.75rem;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                    z-index: 50;
+                    overflow-y: auto;
+                    max-height: 80vh;
+                `;
+            }
+        }
+    }
+
+    // Слушаем изменение размера окна
+    window.addEventListener('resize', updateDropdownPosition);
 
     // Финальная инициализация состояния кнопки
     updateGenerateButtonState();
