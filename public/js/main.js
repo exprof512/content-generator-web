@@ -698,7 +698,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let promptHelpersVisible = false;
     function showPromptHelpers() {
         if (!promptHelpersVisible) {
-            document.getElementById('prompt-helper-buttons').style.display = 'flex';
+            document.getElementById('helper-buttons').style.display = 'flex';
             promptHelpersVisible = true;
         }
     }
@@ -712,97 +712,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleGeneration() {
         const prompt = promptInput.value.trim();
         if (!prompt) return;
-        
-        // Блокируем кнопку и input во время генерации
+
+        // --- UI updates and request preparation ---
         generateButton.disabled = true;
         promptInput.disabled = true;
-        
-        // Показываем спиннер в кнопке (как в ChatGPT)
         generateButton.innerHTML = '<svg class="animate-spin inline w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="hidden md:inline">Генерация...</span>';
-        
         promptInput.value = '';
         promptInput.style.height = 'auto';
         updateGenerateButtonState();
-        
-        // 1. Добавить вопрос пользователя в чат
+
         addMessageToChat(prompt, 'user');
-        // 2. Добавить спиннер для ответа ИИ
         showLoaderAfterUserMessage();
-        showPromptHelpers(); // показываем FAQ/Шаблоны после первого промта
-        
-        let subscription;
+        showPromptHelpers();
+
+        currentAbortController = new AbortController();
+
         try {
-            subscription = await checkSubscription();
-        } catch (e) {
-            replaceLoaderWithAIResponse('Ошибка проверки подписки: ' + (e.message || 'Нет соединения с сервером'));
-            promptInput.disabled = false;
-            generateButton.disabled = false;
-            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
-            updateGenerateButtonState();
-            return;
-        }
-        
-        if (subscription.warning) {
-            addMessageToChat(subscription.warning, 'ai-warning');
-            showWarningBanner(subscription.warning);
-            if (subscription.warning.includes('скоро закончится')) {
-                showProModal();
+            // --- Subscription and model availability check ---
+            const subscription = await checkSubscription();
+            if (subscription.warning) {
+                addMessageToChat(subscription.warning, 'ai-warning');
+                showWarningBanner(subscription.warning);
+                if (subscription.warning.includes('скоро закончится')) {
+                    showProModal();
+                }
             }
-        }
-        
-        if (!subscription.can_generate) {
-            replaceLoaderWithAIResponse('Генерация недоступна. Пожалуйста, оплатите подписку.');
-            promptInput.disabled = false;
+
+            if (!subscription.can_generate) {
+                replaceLoaderWithAIResponse('Генерация недоступна. Пожалуйста, оплатите подписку.');
+                showProModal();
+                return;
+            }
+
+            const model = selectedAgent;
+            const submodel = selectedModel;
+            const chat_id = window.currentChatId;
+            let chat_title = (!chat_id || chat_id === 'default') ? generateChatTitle(prompt) : null;
+
+            const currentOptions = MODEL_OPTIONS[model] || [];
+            const selectedOption = currentOptions.find(opt => opt.value === submodel);
+
+            if (selectedOption && !selectedOption.available) {
+                replaceLoaderWithAIResponse('Эта модель недоступна для вашего тарифа. Перейдите на PRO для доступа ко всем моделям.');
+                showProModal();
+                return;
+            }
+
+            // --- Stop button logic ---
+            generateButton.innerHTML = '<span class="hidden md:inline">Стоп</span> <svg class="inline w-6 h-6 ml-1 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6L18 18M6 18L18 6"/></svg>';
             generateButton.disabled = false;
-            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
-            updateGenerateButtonState();
-            showProModal();
-            return;
-        }
-        
-        const model = selectedAgent;
-        const submodel = selectedModel;
-        const chat_id = window.currentChatId;
-        
-        // Генерируем название чата на основе первого промпта (как в ChatGPT)
-        let chat_title = null;
-        if (!chat_id || chat_id === 'default') {
-            // Это новый чат - создаем название на основе промпта
-            chat_title = generateChatTitle(prompt);
-        }
-        
-        // Проверяем доступность выбранной модели
-        const currentOptions = MODEL_OPTIONS[model] || [];
-        const selectedOption = currentOptions.find(opt => opt.value === submodel);
-        if (selectedOption && !selectedOption.available) {
-            replaceLoaderWithAIResponse('Эта модель недоступна для вашего тарифа. Перейдите на PRO для доступа ко всем моделям.');
-            promptInput.disabled = false;
-            generateButton.disabled = false;
-            generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
-            updateGenerateButtonState();
-            showProModal();
-            return;
-        }
-        
-        // --- STOP BUTTON LOGIC ---
-        if (!currentAbortController) {
-            currentAbortController = new AbortController();
-        }
-        
-        // Меняем кнопку на "Стоп" с иконкой X
-        generateButton.innerHTML = '<span class="hidden md:inline">Стоп</span> <svg class="inline w-6 h-6 ml-1 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6L18 18M6 18L18 6"/></svg>';
-        generateButton.disabled = false;
-        generateButton.onclick = () => {
-            if (currentAbortController) currentAbortController.abort();
-            generateButton.disabled = true;
-        };
-        
-        let result;
-        try {
-            result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id, chat_title }, { signal: currentAbortController.signal });
+            generateButton.onclick = () => {
+                if (currentAbortController) currentAbortController.abort();
+            };
+
+            // --- API call ---
+            const result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id, chat_title }, { signal: currentAbortController.signal });
             replaceLoaderWithAIResponse(result.content);
             fetchAndRenderHistory();
             showToast('Генерация завершена!', 'success');
+
         } catch (error) {
             if (error.name === 'AbortError') {
                 replaceLoaderWithAIResponse('Генерация отменена.');
@@ -810,51 +778,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 replaceLoaderWithAIResponse('Ошибка: ' + (error.message || 'Нет соединения с сервером'));
             }
         } finally {
-            // Восстанавливаем кнопку и input
+            // --- Restore UI and state ---
             promptInput.disabled = false;
             generateButton.disabled = false;
             generateButton.innerHTML = '<span class="hidden md:inline">Генерировать</span> <svg class="inline w-6 h-6 ml-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>';
             generateButton.onclick = handleGeneration;
             currentAbortController = null;
             updateGenerateButtonState();
-            
-            // Обновляем информацию о подписке после генерации
-            try {
-                const updatedSubscription = await checkSubscription();
-                
-                // Обновляем счетчик в UI
-                const generationsCounter = document.getElementById('account-generations');
-                const textCounter = document.getElementById('account-generations-text');
-                const imageCounter = document.getElementById('account-generations-image');
-                if (generationsCounter) {
-                    if (updatedSubscription.tariff === 'free') {
-                        // Для FREE показываем дневной лимит (осталось/лимит)
-                        const textLimit = updatedSubscription.limits?.text_gen_limit || 0;
-                        const imageLimit = updatedSubscription.limits?.image_gen_limit || 0;
-                        const textUsed = updatedSubscription.text_gen_count || 0;
-                        const imageUsed = updatedSubscription.image_gen_count || 0;
-                        const textLeft = Math.max(0, textLimit - textUsed);
-                        const imageLeft = Math.max(0, imageLimit - imageUsed);
-                        const totalLeft = textLeft + imageLeft;
-                        const totalLimit = textLimit + imageLimit;
-                        generationsCounter.textContent = `${totalLeft}/${totalLimit}`;
-                        if (textCounter) textCounter.textContent = `Текст: ${textLeft}/${textLimit}`;
-                        if (imageCounter) imageCounter.textContent = `Картинки: ${imageLeft}/${imageLimit}`;
-                    } else if (updatedSubscription.tariff === 'max') {
-                        // Для MAX показываем "Безлимитно"
-                        generationsCounter.textContent = 'Безлимитно';
-                        if (textCounter) textCounter.textContent = '';
-                        if (imageCounter) imageCounter.textContent = '';
-                    } else {
-                        // Для PRO показываем оставшиеся генерации
-                        generationsCounter.textContent = updatedSubscription.generations_left || 0;
-                        if (textCounter) textCounter.textContent = '';
-                        if (imageCounter) imageCounter.textContent = '';
-                    }
-                }
-            } catch (e) {
-                console.log('Failed to update subscription info:', e);
-            }
+            updateSubscriptionInfo();
         }
     }
 
@@ -1452,4 +1383,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Финальная инициализация состояния кнопки
     updateGenerateButtonState();
+
+    // function scrollChatToBottom() {
+    //     const chatMessages = document.getElementById('chat-messages');
+    //     if (chatMessages) {
+    //         chatMessages.scrollTop = chatMessages.scrollHeight;
+    //     }
+    // }
+
+    // // После рендера сообщений чата вызывать scrollChatToBottom
+    // // Найти функцию, где рендерятся сообщения, и добавить scrollChatToBottom() в конце
+    // // Например, после addMessageToChat или после загрузки истории чата
+    // // window.scrollChatToBottom = scrollChatToBottom;
 });

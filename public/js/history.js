@@ -23,11 +23,11 @@ async function fetchAndRenderHistory() {
             chats[chatId].push(item);
         });
 
-        // Сортировка по времени последнего сообщения в чате (новые сверху)
+        // Сортировка по времени последнего сообщения в чате (новые СНИЗУ)
         const sortedChatIds = Object.keys(chats).sort((a, b) => {
             const aLast = chats[a][chats[a].length - 1].created_at;
             const bLast = chats[b][chats[b].length - 1].created_at;
-            return bLast.localeCompare(aLast);
+            return aLast.localeCompare(bLast); // меняем порядок
         });
 
         sortedChatIds.forEach(chatId => {
@@ -91,6 +91,13 @@ async function fetchAndRenderHistory() {
 
             historyList.appendChild(chatBlock);
         });
+
+        // Автоскролл к последнему чату
+        setTimeout(() => {
+            if (historyList.scrollHeight > historyList.clientHeight) {
+                historyList.scrollTop = historyList.scrollHeight;
+            }
+        }, 100);
     } catch (error) {
         console.error('Failed to fetch history:', error);
     }
