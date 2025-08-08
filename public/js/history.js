@@ -11,96 +11,165 @@ async function fetchAndRenderHistory() {
         const history = await apiCall('/api/history');
         historyList.innerHTML = '';
         if (history.length === 0) {
-            historyList.innerHTML = `<p class="p-4 text-sm text-gray-500">История чатов пуста.</p>`;
+            historyList.innerHTML = `<p class="p-4 text-sm text-gray-500 dark:text-gray-400">История чатов пуста.</p>`;
             return;
         }
 
-        // Группируем по chat_id
+        // Группируем чаты по chat_id
         const chats = {};
         history.forEach(item => {
             const chatId = item.chat_id || 'default';
-            if (!chats[chatId]) chats[chatId] = [];
-            chats[chatId].push(item);
-        });
-
-        // Сортировка по времени последнего сообщения в чате (новые СНИЗУ)
-        const sortedChatIds = Object.keys(chats).sort((a, b) => {
-            const aLast = chats[a][chats[a].length - 1].created_at;
-            const bLast = chats[b][chats[b].length - 1].created_at;
-            return aLast.localeCompare(bLast); // меняем порядок
-        });
-
-        sortedChatIds.forEach(chatId => {
-            const chatItems = chats[chatId];
-            // Блок чата
-            const chatBlock = document.createElement('div');
-            chatBlock.className = 'mb-4 p-3 rounded-xl bg-white dark:bg-gray-800 shadow border border-purple-100 dark:border-gray-700 cursor-pointer hover:border-purple-400 transition-all';
-
-            // --- Название чата (теперь только с сервера) ---
-            let chatTitle = chatItems[0].chat_title;
-            if (!chatTitle) {
-                // Если название не задано, генерируем на основе первого промпта
-                const firstPrompt = chatItems[0].prompt || '';
-                if (firstPrompt.trim().length > 0) {
-                    // Очищаем промпт от лишних символов
-                    let title = firstPrompt.trim().replace(/\s+/g, ' ');
-                    // Ограничиваем длину
-                    if (title.length > 50) {
-                        title = title.substring(0, 47) + '...';
-                    }
-                    chatTitle = title;
-                } else {
-                    // Если промпт пустой, используем дату
-                    const firstDate = chatItems[0].created_at ? new Date(chatItems[0].created_at).toLocaleDateString('ru-RU') : '';
-                    chatTitle = `Чат от ${firstDate}`;
-                }
+            if (!chats[chatId]) {
+                chats[chatId] = {
+                    items: [],
+                    latest_timestamp: new Date(0),
+                    title: 'Новый чат'
+                };
             }
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'font-bold text-purple-700 dark:text-purple-300 mb-2 text-sm inline-block';
-            titleDiv.textContent = chatTitle;
-            chatBlock.appendChild(titleDiv);
-
-            // --- Кнопка переименовать ---
-            const renameBtn = document.createElement('button');
-            renameBtn.className = 'rename-chat-btn p-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors ml-2';
-            renameBtn.title = 'Переименовать чат';
-            renameBtn.innerHTML = `<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-2.828 0L9 13zm-6 6h12"/></svg>`;
-            renameBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showRenameChatModal(chatId, titleDiv);
-            });
-            chatBlock.appendChild(renameBtn);
-
-            // --- Кнопка удалить чат ---
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-history-btn p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition-colors ml-2 float-right';
-            deleteBtn.title = 'Удалить чат';
-            deleteBtn.innerHTML = `<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                handleDeleteChat(chatId, chatBlock);
-            });
-            chatBlock.appendChild(deleteBtn);
-
-            // Клик по чату — показать все сообщения этого чата
-            chatBlock.addEventListener('click', () => {
-                loadChatMessages(chatItems);
-                window.currentChatId = chatId;
-                sessionStorage.setItem('currentChatId', chatId);
-            });
-
-            historyList.appendChild(chatBlock);
+            chats[chatId].items.push(item);
+            const current_timestamp = new Date(item.created_at);
+            if (current_timestamp > chats[chatId].latest_timestamp) {
+                chats[chatId].latest_timestamp = current_timestamp;
+                chats[chatId].title = item.chat_title || (item.prompt ? item.prompt.substring(0, 40) + '...' : 'Без названия');
+            }
         });
 
-        // Автоскролл к последнему чату
-        setTimeout(() => {
-            if (historyList.scrollHeight > historyList.clientHeight) {
-                historyList.scrollTop = historyList.scrollHeight;
+        // Группируем по датам
+        const groupedByDate = {
+            today: [],
+            yesterday: [],
+            last7days: [],
+            last30days: [],
+            older: []
+        };
+
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const last7days = new Date(today);
+        last7days.setDate(last7days.getDate() - 7);
+        const last30days = new Date(today);
+        last30days.setDate(last30days.getDate() - 30);
+
+        for (const chatId in chats) {
+            const chat = chats[chatId];
+            const chatDate = new Date(chat.latest_timestamp);
+
+            if (chatDate >= today) {
+                groupedByDate.today.push({ id: chatId, ...chat });
+            } else if (chatDate >= yesterday) {
+                groupedByDate.yesterday.push({ id: chatId, ...chat });
+            } else if (chatDate >= last7days) {
+                groupedByDate.last7days.push({ id: chatId, ...chat });
+            } else if (chatDate >= last30days) {
+                groupedByDate.last30days.push({ id: chatId, ...chat });
+            } else {
+                groupedByDate.older.push({ id: chatId, ...chat });
             }
-        }, 100);
+        }
+
+        // Функция для рендера группы
+        const renderGroup = (title, group) => {
+            if (group.length === 0) return;
+
+            const groupContainer = document.createElement('div');
+            groupContainer.className = 'mb-4';
+            
+            const groupTitle = document.createElement('h3');
+            groupTitle.className = 'px-3 pt-3 pb-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider';
+            groupTitle.textContent = title;
+            groupContainer.appendChild(groupTitle);
+
+            const list = document.createElement('div');
+            list.className = 'space-y-1';
+            group.sort((a, b) => b.latest_timestamp - a.latest_timestamp); // Сортировка внутри группы
+
+            group.forEach(chat => {
+                const chatElement = document.createElement('div');
+                chatElement.className = 'history-item group flex items-center justify-between w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-purple-100 dark:hover:bg-gray-700 cursor-pointer transition-colors';
+                chatElement.dataset.chatId = chat.id;
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'truncate flex-1';
+                titleSpan.textContent = chat.title;
+
+                const menuButton = document.createElement('button');
+                menuButton.className = 'opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-opacity';
+                menuButton.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01"></path></svg>';
+                
+                chatElement.appendChild(titleSpan);
+                chatElement.appendChild(menuButton);
+                list.appendChild(chatElement);
+
+                // Обработчик клика по чату
+                chatElement.addEventListener('click', (e) => {
+                    if (e.target === menuButton || menuButton.contains(e.target)) return;
+                    loadChatMessages(chat.items);
+                    window.currentChatId = chat.id;
+                    sessionStorage.setItem('currentChatId', chat.id);
+                });
+
+                // Обработчик для меню
+                menuButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showHistoryItemMenu(e.currentTarget, chat.id, chat.title, chatElement);
+                });
+            });
+
+            groupContainer.appendChild(list);
+            historyList.appendChild(groupContainer);
+        };
+
+        renderGroup('Сегодня', groupedByDate.today);
+        renderGroup('Вчера', groupedByDate.yesterday);
+        renderGroup('Предыдущие 7 дней', groupedByDate.last7days);
+        renderGroup('Предыдущие 30 дней', groupedByDate.last30days);
+        renderGroup('Ранее', groupedByDate.older);
+
     } catch (error) {
         console.error('Failed to fetch history:', error);
+        historyList.innerHTML = `<p class="p-4 text-sm text-red-500">Ошибка загрузки истории.</p>`;
     }
+}
+
+function showHistoryItemMenu(button, chatId, currentTitle, element) {
+    // Удаляем существующие меню
+    document.querySelectorAll('.history-item-menu').forEach(menu => menu.remove());
+
+    const menu = document.createElement('div');
+    menu.className = 'history-item-menu absolute z-30 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1';
+    
+    const rect = button.getBoundingClientRect();
+    menu.style.top = `${rect.top}px`;
+    menu.style.left = `${rect.left - menu.offsetWidth}px`;
+
+    menu.innerHTML = `
+        <button class="rename-btn block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Переименовать</button>
+        <button class="delete-btn block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">Удалить</button>
+    `;
+
+    document.body.appendChild(menu);
+
+    menu.querySelector('.rename-btn').addEventListener('click', () => {
+        showRenameChatModal(chatId, element.querySelector('span'));
+        menu.remove();
+    });
+
+    menu.querySelector('.delete-btn').addEventListener('click', () => {
+        handleDeleteChat(chatId, element);
+        menu.remove();
+    });
+
+    // Закрытие меню по клику вне его
+    setTimeout(() => {
+        document.addEventListener('click', function onClickOutside(e) {
+            if (!menu.contains(e.target)) {
+                menu.remove();
+                document.removeEventListener('click', onClickOutside);
+            }
+        });
+    }, 0);
 }
 
 // Кастомное модальное окно для подтверждения удаления чата
@@ -135,7 +204,6 @@ async function handleDeleteChat(chatId, element) {
 function loadChatMessages(chatItems) {
     const chatMessages = document.getElementById('chat-messages');
     chatMessages.innerHTML = '';
-    activateChatLayout();
     chatItems.forEach(item => {
         addMessageToChat(item.prompt, 'user', item.id);
         addMessageToChat(item.response, 'ai', item.id);
@@ -145,7 +213,6 @@ function loadChatMessages(chatItems) {
 // При создании нового чата — генерируем новый chat_id
 document.getElementById('new-chat-button')?.addEventListener('click', () => {
     currentChatId = generateChatId();
-    resetChatLayout();
 });
 
 // --- Модалка для переименования чата ---

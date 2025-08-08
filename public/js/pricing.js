@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('back-to-generator-btn')?.addEventListener('click', () => {
-        window.location.href = '/generator';
+        window.location.href = '/';
     });
 
     // Hook for auth modal to re-render this block after successful login

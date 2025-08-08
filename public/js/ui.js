@@ -50,31 +50,7 @@ marked.setOptions({
     breaks: true,
 });
 
-function activateChatLayout() {
-    if (isChatActive) return;
-    isChatActive = true;
-    const initialView = document.getElementById('initial-view');
-    const chatMessages = document.getElementById('chat-messages');
-    const chatContainer = document.getElementById('chat-container');
 
-    initialView.classList.add('hidden');
-    chatMessages.classList.remove('hidden');
-    chatContainer.classList.remove('justify-center');
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    chatMessages.parentNode.scrollTop = chatMessages.parentNode.scrollHeight;
-}
-
-function resetChatLayout() {
-    isChatActive = false;
-    const initialView = document.getElementById('initial-view');
-    const chatMessages = document.getElementById('chat-messages');
-    const chatContainer = document.getElementById('chat-container');
-
-    chatMessages.innerHTML = '';
-    chatMessages.classList.add('hidden');
-    initialView.classList.remove('hidden');
-    chatContainer.classList.add('justify-center');
-}
 
 function clearAppState() {
     const historyList = document.getElementById('history-list');
@@ -97,92 +73,57 @@ function clearAppState() {
 }
 
 function addMessageToChat(content, type, historyId = null, isLoader = false) {
-    activateChatLayout();
     const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+
     const messageWrapper = document.createElement('div');
-    messageWrapper.className = 'flex w-full gap-4 mb-4';
+    messageWrapper.className = 'flex items-start gap-4 py-4 border-b border-gray-200 dark:border-gray-700';
+
+    
+
+    const messageContent = document.createElement('div');
+    messageContent.className = 'flex-1';
+
     if (type === 'user') {
-        messageWrapper.classList.add('justify-end');
-    } else {
         messageWrapper.classList.add('justify-start');
-    }
-    const messageElement = document.createElement('div');
-    const isUser = type === 'user';
-    const isError = type === 'ai-error';
-
-    messageElement.className = `chat-message group animate__animated animate__fadeInUp ${isUser ? 'user' : 'ai'} ${isUser ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-2xl shadow-lg px-5 py-4 max-w-xl lg:max-w-3xl`;
-    messageElement.style.border = isUser ? '2px solid #a78bfa' : '2px solid #e5e7eb';
-    messageElement.style.marginBottom = '12px';
-
-    if (isUser) {
-        messageElement.innerHTML = `
-            <div class="message-content">${content}</div>
-            <div class="message-actions mt-2 flex gap-2">
-                <button class="message-action-btn copy-btn" title="Копировать">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                </button>
-                <button class="message-action-btn edit-btn" title="Редактировать">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
-                </button>
-            </div>
-        `;
-        messageElement.querySelector('.copy-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            navigator.clipboard.writeText(content);
-        });
-        messageElement.querySelector('.edit-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('prompt-input').value = content;
-            document.getElementById('prompt-input').focus();
-            messageElement.remove();
-        });
-        messageWrapper.appendChild(messageElement);
-    } else if (isLoader) {
-        // Спиннер для ответа ИИ
-        messageElement.innerHTML = `<div class="flex items-center gap-2"><span class="loader inline-block w-6 h-6 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></span><span class="text-gray-500">Генерируется ответ...</span></div>`;
-        messageWrapper.appendChild(messageElement);
+        messageContent.className = 'prose dark:prose-invert max-w-none';
+        messageContent.textContent = content;
     } else {
-        const aiBubble = document.createElement('div');
-        aiBubble.className = `prose dark:prose-invert max-w-3xl w-full bg-gray-50 dark:bg-gray-900 border border-purple-100 dark:border-gray-700 px-6 py-5 rounded-2xl shadow-lg ${isError ? 'border-red-500' : ''}`;
-        // Если это картинка DALL-E, используем прокси-эндпоинт
-        let isImage = false;
-        if (historyId && typeof content === 'string' && content.startsWith('https://')) {
-            isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(content.split('?')[0]);
-        }
-        if (isImage && !isError) {
-            aiBubble.innerHTML = `<img src="/api/image/${historyId}" alt="Generated image" class="rounded-lg max-w-sm"/>`;
+        messageWrapper.classList.add('justify-end');
+        messageContent.className = 'prose dark:prose-invert max-w-none';
+
+        if (isLoader) {
+            messageContent.innerHTML = '<div class="flex items-center gap-2"><span class="loader inline-block w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span><span class="text-gray-500 dark:text-gray-400">AI думает...</span></div>';
         } else {
-            aiBubble.innerHTML = marked.parse(content);
+            // Обработка Markdown для ответа AI
+            messageContent.innerHTML = marked.parse(content);
+            // Стилизация блоков кода
+            messageContent.querySelectorAll('pre').forEach(preElement => {
+                preElement.classList.add('bg-gray-800', 'dark:bg-black', 'text-white', 'rounded-lg', 'p-4', 'overflow-x-auto', 'my-4', 'shadow-inner');
+                const code = preElement.querySelector('code');
+                const lang = code.className.replace('language-', '');
+                
+                const header = document.createElement('div');
+                header.className = 'flex justify-between items-center bg-gray-700 dark:bg-gray-900 text-gray-300 px-4 py-2 rounded-t-lg text-sm';
+                header.innerHTML = `<span>${lang || 'code'}</span><button class="copy-code-btn text-xs hover:text-white">Копировать</button>`;
+                
+                preElement.parentNode.insertBefore(header, preElement);
+
+                header.querySelector('.copy-code-btn').addEventListener('click', (e) => {
+                    navigator.clipboard.writeText(code.innerText);
+                    e.target.textContent = 'Скопировано!';
+                    setTimeout(() => { e.target.textContent = 'Копировать'; }, 2000);
+                });
+            });
         }
-        // Стилизация code/pre
-        aiBubble.querySelectorAll('pre').forEach(preElement => {
-            preElement.classList.add('bg-gray-900', 'text-white', 'rounded-xl', 'p-4', 'overflow-x-auto', 'my-4', 'shadow-inner');
-            preElement.style.fontSize = '1rem';
-            preElement.style.lineHeight = '1.6';
-            preElement.style.border = '1px solid #a78bfa';
-            const wrapper = document.createElement('div');
-            wrapper.className = 'code-block-wrapper group flex items-center gap-2';
-            const copyButton = document.createElement('button');
-            copyButton.textContent = 'Copy';
-            copyButton.className = 'copy-code-btn px-3 py-1 rounded-lg bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-all ml-2';
-            copyButton.onclick = () => {
-                navigator.clipboard.writeText(preElement.querySelector('code').innerText);
-                copyButton.textContent = 'Copied!';
-                setTimeout(() => { copyButton.textContent = 'Copy'; }, 2000);
-            };
-            preElement.parentNode.insertBefore(wrapper, preElement);
-            wrapper.appendChild(preElement);
-            wrapper.appendChild(copyButton);
-        });
-        messageElement.appendChild(aiBubble);
-        messageWrapper.appendChild(messageElement);
     }
+
+    
+    messageWrapper.appendChild(messageContent);
     chatMessages.appendChild(messageWrapper);
-    chatMessages.classList.remove('hidden');
-    // --- Новый UX: не скроллить вниз, а делать scrollIntoView для вопроса пользователя ---
-    if (type === 'user' || isLoader) {
-        messageWrapper.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
+
+    // Прокрутка вниз
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function showLoaderAfterUserMessage() {
@@ -192,24 +133,10 @@ function showLoaderAfterUserMessage() {
 
 function replaceLoaderWithAIResponse(aiContent, historyId = null) {
     const chatMessages = document.getElementById('chat-messages');
-    // Найти последний спиннер
-    const loaders = chatMessages.querySelectorAll('.chat-message.ai');
-    const lastLoader = loaders[loaders.length - 1];
-    if (lastLoader) {
-        // Заменить на ответ ИИ
-        const newWrapper = document.createElement('div');
-        newWrapper.className = 'flex w-full gap-4 mb-4 justify-start';
-        const messageElement = document.createElement('div');
-        messageElement.className = 'chat-message group animate__animated animate__fadeInUp ai bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl shadow-lg px-5 py-4 max-w-xl lg:max-w-3xl';
-        messageElement.style.border = '2px solid #e5e7eb';
-        messageElement.style.marginBottom = '12px';
-        const aiBubble = document.createElement('div');
-        aiBubble.className = 'prose dark:prose-invert max-w-3xl w-full bg-gray-50 dark:bg-gray-900 border border-purple-100 dark:border-gray-700 px-6 py-5 rounded-2xl shadow-lg';
-        aiBubble.innerHTML = marked.parse(aiContent);
-        messageElement.appendChild(aiBubble);
-        newWrapper.appendChild(messageElement);
-        chatMessages.replaceChild(newWrapper, lastLoader.parentNode);
-        // Не скроллим вниз
+    const lastMessage = chatMessages.lastElementChild;
+    if (lastMessage) {
+        lastMessage.remove();
+        addMessageToChat(aiContent, 'ai', historyId);
     }
 }
 

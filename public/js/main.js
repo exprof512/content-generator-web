@@ -723,7 +723,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         addMessageToChat(prompt, 'user');
         showLoaderAfterUserMessage();
-        showPromptHelpers();
+        
 
         currentAbortController = new AbortController();
 
@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             generateButton.onclick = handleGeneration;
             currentAbortController = null;
             updateGenerateButtonState();
-            updateSubscriptionInfo();
+            renderUserProfile();
         }
     }
 
@@ -854,10 +854,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newChatButton = document.getElementById('new-chat-button');
     if (newChatButton) {
         newChatButton.addEventListener('click', () => {
+            if (newChatButton) {
+        newChatButton.addEventListener('click', () => {
             window.currentChatId = generateChatId();
             sessionStorage.setItem('currentChatId', window.currentChatId);
-            resetChatLayout();
-            hidePromptHelpers(); // скрываем FAQ/Шаблоны при новом чате
+            const chatMessages = document.getElementById('chat-messages');
+            if(chatMessages) chatMessages.innerHTML = '';
+        });
+    }
+            
         });
     }
 
@@ -984,8 +989,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     right: 0;
                     width: 400px;
                     max-width: 90vw;
-                    background: white;
-                    border: 1px solid #e5e7eb;
+                    /* border: 1px solid #e5e7eb; */
                     border-radius: 0.75rem;
                     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
                     z-index: 50;
@@ -1002,8 +1006,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         right: 0;
                         width: 100%;
                         max-width: 100%;
-                        background: white;
-                        border-top: 1px solid #e5e7eb;
+                        /* border-top: 1px solid #e5e7eb; */
                         border-radius: 1rem 1rem 0 0;
                         box-shadow: 0 -25px 50px -12px rgba(0, 0, 0, 0.25);
                         z-index: 50;
@@ -1350,8 +1353,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     right: 0;
                     width: 100%;
                     max-width: 100%;
-                    background: white;
-                    border-top: 1px solid #e5e7eb;
+                    /* background: white; */
+                    /* border-top: 1px solid #e5e7eb; */
                     border-radius: 1rem 1rem 0 0;
                     box-shadow: 0 -25px 50px -12px rgba(0, 0, 0, 0.25);
                     z-index: 50;
@@ -1366,8 +1369,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     right: 0;
                     width: 400px;
                     max-width: 90vw;
-                    background: white;
-                    border: 1px solid #e5e7eb;
+                    /* background: white; */
+                    /* border: 1px solid #e5e7eb; */
                     border-radius: 0.75rem;
                     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
                     z-index: 50;
