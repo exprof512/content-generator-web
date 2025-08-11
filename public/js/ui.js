@@ -77,52 +77,40 @@ function addMessageToChat(content, type, historyId = null, isLoader = false) {
     if (!chatMessages) return;
 
     const messageWrapper = document.createElement('div');
-    messageWrapper.className = 'flex items-start gap-4 py-4 border-b border-gray-200 dark:border-gray-700';
+    messageWrapper.className = `chat-message ${type}`;
 
-    
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = type === 'user' ? 'U' : 'AI';
 
-    const messageContent = document.createElement('div');
-    messageContent.className = 'flex-1';
+    const bubble = document.createElement('div');
+    bubble.className = `message-bubble ${type}-bubble`;
 
-    if (type === 'user') {
-        messageWrapper.classList.add('justify-start');
-        messageContent.className = 'prose dark:prose-invert max-w-none';
-        messageContent.textContent = content;
+    if (isLoader) {
+        bubble.innerHTML = '<div class="loader"></div>';
     } else {
-        messageWrapper.classList.add('justify-end');
-        messageContent.className = 'prose dark:prose-invert max-w-none';
-
-        if (isLoader) {
-            messageContent.innerHTML = '<div class="flex items-center gap-2"><span class="loader inline-block w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span><span class="text-gray-500 dark:text-gray-400">AI думает...</span></div>';
-        } else {
-            // Обработка Markdown для ответа AI
-            messageContent.innerHTML = marked.parse(content);
-            // Стилизация блоков кода
-            messageContent.querySelectorAll('pre').forEach(preElement => {
-                preElement.classList.add('bg-gray-800', 'dark:bg-black', 'text-white', 'rounded-lg', 'p-4', 'overflow-x-auto', 'my-4', 'shadow-inner');
-                const code = preElement.querySelector('code');
-                const lang = code.className.replace('language-', '');
-                
-                const header = document.createElement('div');
-                header.className = 'flex justify-between items-center bg-gray-700 dark:bg-gray-900 text-gray-300 px-4 py-2 rounded-t-lg text-sm';
-                header.innerHTML = `<span>${lang || 'code'}</span><button class="copy-code-btn text-xs hover:text-white">Копировать</button>`;
-                
-                preElement.parentNode.insertBefore(header, preElement);
-
-                header.querySelector('.copy-code-btn').addEventListener('click', (e) => {
-                    navigator.clipboard.writeText(code.innerText);
-                    e.target.textContent = 'Скопировано!';
-                    setTimeout(() => { e.target.textContent = 'Копировать'; }, 2000);
-                });
-            });
-        }
+        bubble.innerHTML = marked.parse(content);
+        bubble.querySelectorAll('pre code').forEach((block) => {
+            const preElement = block.parentElement;
+            preElement.classList.add('code-block-wrapper');
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-code-btn';
+            copyButton.textContent = 'Copy';
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(block.textContent);
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy';
+                }, 2000);
+            };
+            preElement.appendChild(copyButton);
+        });
     }
 
-    
-    messageWrapper.appendChild(messageContent);
+    messageWrapper.appendChild(avatar);
+    messageWrapper.appendChild(bubble);
     chatMessages.appendChild(messageWrapper);
 
-    // Прокрутка вниз
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 

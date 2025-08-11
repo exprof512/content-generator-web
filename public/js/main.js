@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <button onclick="deleteUserTemplate(${template.id})" class="text-red-500 hover:text-red-700">Удалить</button>
                             </div>
                             <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">${template.content.substring(0, 100)}${template.content.length > 100 ? '...' : ''}</p>
-                            <button onclick="useUserTemplate('${template.content.replace(/'/g, "\\'")}')" class="text-purple-600 hover:text-purple-700 text-sm">Использовать</button>
+                            <button onclick="useUserTemplate('${template.content.replace(/'/g, "\'")}')" class="text-purple-600 hover:text-purple-700 text-sm">Использовать</button>
                         </div>
                     `).join('')}
                 </div>
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <button onclick="deleteUserTemplate(${template.id})" class="text-red-500 hover:text-red-700">Удалить</button>
                     </div>
                     <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">${template.content.substring(0, 100)}${template.content.length > 100 ? '...' : ''}</p>
-                    <button onclick="useUserTemplate('${template.content.replace(/'/g, "\\'")}')" class="text-purple-600 hover:text-purple-700 text-sm">Использовать</button>
+                    <button onclick="useUserTemplate('${template.content.replace(/'/g, "\'")}')" class="text-purple-600 hover:text-purple-700 text-sm">Использовать</button>
                 </div>
             `).join('');
         }
@@ -1253,7 +1253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 e.preventDefault();
                 googleAcceptRegister.focus();
                 googleAcceptRegister.classList.add('ring', 'ring-red-400');
-                setTimeout(() => googleAcceptRegister.classList.remove('ring', 'ring-red-400'), 1200);
+                setTimeout(() => googleAcceptRegister.classList.remove('ring', 'ring-400'), 1200);
                 return;
             }
             e.preventDefault();

@@ -140,23 +140,25 @@ function showHistoryItemMenu(button, chatId, currentTitle, element) {
     const menu = document.createElement('div');
     menu.className = 'history-item-menu absolute z-30 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1';
     
-    const rect = button.getBoundingClientRect();
-    menu.style.top = `${rect.top}px`;
-    menu.style.left = `${rect.left - menu.offsetWidth}px`;
+    // Позиционирование относительно кнопки
+    menu.style.top = `${button.offsetTop + button.offsetHeight}px`;
+    menu.style.right = `0px`;
 
     menu.innerHTML = `
         <button class="rename-btn block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Переименовать</button>
         <button class="delete-btn block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">Удалить</button>
     `;
 
-    document.body.appendChild(menu);
+    element.appendChild(menu);
 
-    menu.querySelector('.rename-btn').addEventListener('click', () => {
+    menu.querySelector('.rename-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
         showRenameChatModal(chatId, element.querySelector('span'));
         menu.remove();
     });
 
-    menu.querySelector('.delete-btn').addEventListener('click', () => {
+    menu.querySelector('.delete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
         handleDeleteChat(chatId, element);
         menu.remove();
     });
@@ -168,7 +170,7 @@ function showHistoryItemMenu(button, chatId, currentTitle, element) {
                 menu.remove();
                 document.removeEventListener('click', onClickOutside);
             }
-        });
+        }, { once: true });
     }, 0);
 }
 
