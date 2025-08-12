@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const historyCloseButton = document.getElementById('history-close-button');
 
     let selectedAgent = 'chatgpt';
-    let selectedModel = 'gpt-4o-mini';
+    let selectedModel = 'gpt-5-mini';
 
     // --- Модели для каждого ИИ ---
     let MODEL_OPTIONS = {};
@@ -431,16 +431,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 MODEL_OPTIONS[agent] = (allModels[agent] || []).map(model => {
                     // Человеко-читабельные лейблы
                     let label = model;
-                    if (model === 'gpt-4o-mini') label = 'GPT-4o-mini';
-                    if (model === 'gpt-4') label = 'GPT-4';
-                    if (model === 'gpt-4.1') label = 'GPT-4.1';
+                    if (model === 'gpt-5-nano') label = 'GPT-5-nano';
+                    if (model === 'gpt-5-mini') label = 'GPT-5-mini';
+                    if (model === 'gpt-5') label = 'GPT-5';
                     if (model === 'gemini-2.0-flash') label = 'Gemini 2.0 Flash';
                     if (model === 'gemini-2.5-flash') label = 'Gemini 2.5 Flash';
                     if (model === 'gemini-2.5-pro') label = 'Gemini 2.5 Pro';
                     if (model === 'deepseek-chat') label = 'DeepSeek Chat';
                     if (model === 'deepseek-reasoner') label = 'DeepSeek Reasoner';
                     if (model === 'deepseek-coder') label = 'DeepSeek Coder';
-                    if (model === 'gpt-image-1') label = 'GPT Image 1';
                     if (model === 'dall-e-2') label = 'DALL-E 2';
                     if (model === 'dall-e-3') label = 'DALL-E 3';
                     
@@ -458,14 +457,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             // fallback: дефолтные модели
             MODEL_OPTIONS = {
         chatgpt: [
-            { value: 'gpt-4o-mini', label: 'GPT-4o-mini', available: true },
-            { value: 'gpt-4', label: 'GPT-4', available: false },
-            { value: 'gpt-4.1', label: 'GPT-4.1', available: false }
+            { value: 'gpt-5-nano', label: 'GPT-5-nano', available: true },
+            { value: 'gpt-5-mini', label: 'GPT-5-mini', available: false },
+            { value: 'gpt-5', label: 'GPT-5', available: false }
         ],
         gemini: [
-                    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash', available: true },
-                    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', available: false },
-                    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', available: false }
+            { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash', available: true },
+            { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', available: false },
+            { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', available: false }
         ],
         deepseek: [
             { value: 'deepseek-chat', label: 'DeepSeek Chat', available: false },
@@ -473,7 +472,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             { value: 'deepseek-coder', label: 'DeepSeek Coder', available: false }
         ],
         dalle: [
-            { value: 'gpt-image-1', label: 'GPT Image 1', available: true },
             { value: 'dall-e-2', label: 'DALL-E 2', available: true },
             { value: 'dall-e-3', label: 'DALL-E 3', available: false }
         ]

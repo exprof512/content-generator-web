@@ -79,10 +79,6 @@ function addMessageToChat(content, type, historyId = null, isLoader = false) {
     const messageWrapper = document.createElement('div');
     messageWrapper.className = `chat-message ${type}`;
 
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.innerHTML = type === 'user' ? 'U' : 'AI';
-
     const bubble = document.createElement('div');
     bubble.className = `message-bubble ${type}-bubble`;
 
@@ -107,7 +103,6 @@ function addMessageToChat(content, type, historyId = null, isLoader = false) {
         });
     }
 
-    messageWrapper.appendChild(avatar);
     messageWrapper.appendChild(bubble);
     chatMessages.appendChild(messageWrapper);
 

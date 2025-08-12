@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>window.API_BASE_URL = "<%= API_BASE_URL %>";</script>
+    <script>window.CLOUDPAYMENTS_PUBLIC_ID = "<%= CLOUDPAYMENTS_PUBLIC_ID %>";</script>
+    <script src="https://widget.cloudpayments.ru/bundles/cloudpayments"></script>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300 min-h-screen flex flex-col">
     <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
@@ -42,8 +44,7 @@
                     <li>Доступ ко всем моделям</li>
                     <li>Приоритетная поддержка</li>
                 </ul>
-                <button data-tariff="pro" data-system="yookassa" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2 pay-btn">Оформить PRO</button>
-                <button data-tariff="pro" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-gray-400 text-gray-500 dark:text-gray-400 font-semibold cursor-not-allowed pay-btn" disabled>В разработке</button>
+                <button data-tariff="pro" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all mb-2 pay-btn">Оформить PRO</button>
             </div>
             <!-- MAX -->
             <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-6 sm:p-8 flex flex-col items-center border-2 border-indigo-300 dark:border-indigo-700">
@@ -54,12 +55,11 @@
                     <li>Доступ ко всем моделям</li>
                     <li>VIP-поддержка</li>
                 </ul>
-                <button data-tariff="max" data-system="yookassa" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2 pay-btn">Оформить MAX</button>
-                <button data-tariff="max" data-system="telegram" class="w-full py-2 px-6 rounded-xl border border-gray-400 text-gray-500 dark:text-gray-400 font-semibold cursor-not-allowed pay-btn" disabled>В разработке</button>
+                <button data-tariff="max" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all mb-2 pay-btn">Оформить MAX</button>
             </div>
         </div>
         <div class="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
-            Оплата через ЮKassa (карты РФ, СБП). Telegram в разработке.<br>
+            Оплата через CloudPayments (карты РФ, СБП).
             По вопросам пишите: <a href="mailto:support@starpromt.ru" class="underline text-purple-600">support@starpromt.ru</a>
         </div>
     </div>
