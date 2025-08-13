@@ -132,3 +132,32 @@ async function checkSubscription() {
 
 window.apiCall = apiCall;
 window.publicApiCall = publicApiCall;
+
+async function fetchImage(imageUrl) {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+        await window.logout();
+        throw new Error('Not authenticated');
+    }
+
+    const options = {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    };
+
+    const response = await fetch(imageUrl, options);
+
+    if (response.status === 401) {
+        // Handle token refresh or logout
+        await window.logout();
+        if (typeof showSessionExpiredModal === 'function') showSessionExpiredModal();
+        throw new Error('Session expired');
+    }
+
+    if (!response.ok) {
+        throw new Error('Image request failed');
+    }
+
+    return response.blob();
+}

@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (model === 'gpt-5-nano') label = 'GPT-5-nano';
                     if (model === 'gpt-5-mini') label = 'GPT-5-mini';
                     if (model === 'gpt-5') label = 'GPT-5';
-                    if (model === 'gemini-2.0-flash') label = 'Gemini 2.0 Flash';
+                    if (model === 'gemini-2.5-flash-lite') label = 'Gemini 2.5 Flash Lite';
                     if (model === 'gemini-2.5-flash') label = 'Gemini 2.5 Flash';
                     if (model === 'gemini-2.5-pro') label = 'Gemini 2.5 Pro';
                     if (model === 'deepseek-chat') label = 'DeepSeek Chat';
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { value: 'gpt-5', label: 'GPT-5', available: false }
         ],
         gemini: [
-            { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash', available: true },
+            { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', available: true },
             { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', available: false },
             { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', available: false }
         ],
@@ -765,7 +765,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // --- API call ---
             const result = await apiCall('/api/generate', 'POST', { model, submodel, prompt, chat_id, chat_title }, { signal: currentAbortController.signal });
-            replaceLoaderWithAIResponse(result.content);
+            replaceLoaderWithAIResponse(result.content, result.historyId);
             fetchAndRenderHistory();
             showToast('Генерация завершена!', 'success');
 

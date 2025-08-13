@@ -72,7 +72,7 @@ function clearAppState() {
     resetChatLayout();
 }
 
-function addMessageToChat(content, type, historyId = null, isLoader = false) {
+async function addMessageToChat(content, type, historyId = null, isLoader = false) {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;
 
@@ -86,7 +86,15 @@ function addMessageToChat(content, type, historyId = null, isLoader = false) {
         bubble.innerHTML = '<div class="loader"></div>';
     } else {
         if (content.startsWith('https://') && (content.includes('.png') || content.includes('.jpg') || content.includes('.jpeg'))) {
-            bubble.innerHTML = `<img src="/api/images/${historyId}" class="w-full h-auto rounded-lg">`;
+            const imageUrl = `${window.API_BASE_URL}/api/images/${historyId}`;
+            try {
+                const imageBlob = await fetchImage(imageUrl);
+                const objectURL = URL.createObjectURL(imageBlob);
+                bubble.innerHTML = `<img src="${objectURL}" class="w-full h-auto rounded-lg">`;
+            } catch (error) {
+                console.error('Failed to load image:', error);
+                bubble.innerHTML = 'Failed to load image.';
+            }
         } else {
             bubble.innerHTML = marked.parse(content);
             bubble.querySelectorAll('pre code').forEach((block) => {
