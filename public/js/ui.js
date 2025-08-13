@@ -85,22 +85,26 @@ function addMessageToChat(content, type, historyId = null, isLoader = false) {
     if (isLoader) {
         bubble.innerHTML = '<div class="loader"></div>';
     } else {
-        bubble.innerHTML = marked.parse(content);
-        bubble.querySelectorAll('pre code').forEach((block) => {
-            const preElement = block.parentElement;
-            preElement.classList.add('code-block-wrapper');
-            const copyButton = document.createElement('button');
-            copyButton.className = 'copy-code-btn';
-            copyButton.textContent = 'Copy';
-            copyButton.onclick = () => {
-                navigator.clipboard.writeText(block.textContent);
-                copyButton.textContent = 'Copied!';
-                setTimeout(() => {
-                    copyButton.textContent = 'Copy';
-                }, 2000);
-            };
-            preElement.appendChild(copyButton);
-        });
+        if (content.startsWith('https://') && (content.includes('.png') || content.includes('.jpg') || content.includes('.jpeg'))) {
+            bubble.innerHTML = `<img src="/api/images/${historyId}" class="w-full h-auto rounded-lg">`;
+        } else {
+            bubble.innerHTML = marked.parse(content);
+            bubble.querySelectorAll('pre code').forEach((block) => {
+                const preElement = block.parentElement;
+                preElement.classList.add('code-block-wrapper');
+                const copyButton = document.createElement('button');
+                copyButton.className = 'copy-code-btn';
+                copyButton.textContent = 'Copy';
+                copyButton.onclick = () => {
+                    navigator.clipboard.writeText(block.textContent);
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyButton.textContent = 'Copy';
+                    }, 2000);
+                };
+                preElement.appendChild(copyButton);
+            });
+        }
     }
 
     messageWrapper.appendChild(bubble);
@@ -110,7 +114,6 @@ function addMessageToChat(content, type, historyId = null, isLoader = false) {
 }
 
 function showLoaderAfterUserMessage() {
-    // Добавляет спиннер сразу после последнего сообщения пользователя
     addMessageToChat('', 'ai', null, true);
 }
 
@@ -139,78 +142,6 @@ function removeLoader() {
     if (loaderElement) loaderElement.remove();
 }
 
-const LANGS = {
-    RU: {
-        login: 'Войти',
-        'about-title': 'О платформе',
-        'about-desc': 'ContentGen Hub — это ваш универсальный AI-хаб: тексты, изображения, код, аналитика. Всё в одном окне, с удобным интерфейсом и прозрачными тарифами.',
-        'about-1-title': 'Все топовые AI-модели',
-        'about-1-desc': 'ChatGPT, Gemini, DALL-E, DeepSeek и другие — в одном аккаунте.',
-        'about-2-title': 'Простота и скорость',
-        'about-2-desc': 'Минималистичный интерфейс, быстрый отклик, ничего лишнего.',
-        'about-3-title': 'Выгодно и честно',
-        'about-3-desc': 'Прозрачные тарифы, бесплатный старт, поддержка 24/7.'
-    },
-    EN: {
-        login: 'Sign In',
-        'about-title': 'About the Platform',
-        'about-desc': 'ContentGen Hub is your universal AI hub: text, images, code, analytics. All in one window, with a simple interface and transparent pricing.',
-        'about-1-title': 'All Top AI Models',
-        'about-1-desc': 'ChatGPT, Gemini, DALL-E, DeepSeek and more — in one account.',
-        'about-2-title': 'Simplicity & Speed',
-        'about-2-desc': 'Minimalist interface, instant response, nothing extra.',
-        'about-3-title': 'Fair & Profitable',
-        'about-3-desc': 'Transparent pricing, free start, 24/7 support.'
-    }
-};
-
-function getInitialLang() {
-    const savedLang = (localStorage.getItem('lang') || 'RU').toUpperCase();
-    // Убедимся, что сохраненный язык валиден, иначе вернем 'RU'
-    return LANGS[savedLang] ? savedLang : 'RU';
-}
-let currentLang = getInitialLang();
-
-function switchLang(lang) {
-    if (lang) {
-        currentLang = lang;
-    } else {
-        currentLang = currentLang === 'RU' ? 'EN' : 'RU';
-    }
-    localStorage.setItem('lang', currentLang);
-    const langLabel = document.getElementById('lang-label');
-    if (langLabel) langLabel.textContent = currentLang;
-    document.querySelectorAll('[data-lang]').forEach(el => {
-        const key = el.getAttribute('data-lang');
-        if (LANGS[currentLang][key]) el.textContent = LANGS[currentLang][key];
-    });
-    // Кнопки RU/EN в аккаунте
-    const ruBtn = document.getElementById('lang-ru-btn');
-    const enBtn = document.getElementById('lang-en-btn');
-    if (ruBtn && enBtn) {
-        if (currentLang === 'RU') {
-            ruBtn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
-            enBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
-        } else {
-            enBtn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
-            ruBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'font-bold');
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const langLabel = document.getElementById('lang-label');
-    if (langLabel) langLabel.textContent = currentLang;
-    const langSwitch = document.getElementById('lang-switch');
-    if (langSwitch) langSwitch.addEventListener('click', () => switchLang());
-    // Кнопки RU/EN в аккаунте
-    const ruBtn = document.getElementById('lang-ru-btn');
-    const enBtn = document.getElementById('lang-en-btn');
-    if (ruBtn) ruBtn.addEventListener('click', () => switchLang('RU'));
-    if (enBtn) enBtn.addEventListener('click', () => switchLang('EN'));
-    switchLang(currentLang);
-});
-
 function updateGenerateButtonState() {
     const promptInput = document.getElementById('prompt-input');
     const generateButton = document.getElementById('generate-button');
@@ -218,12 +149,3 @@ function updateGenerateButtonState() {
         generateButton.disabled = promptInput.value.trim() === '';
     }
 }
-
-// Переключатель языка
-// const langSwitcher = document.getElementById('lang-switcher');
-// if (langSwitcher) {
-//     langSwitcher.addEventListener('click', () => {
-//         const nextLang = i18n.currentLang === 'ru' ? 'en' : 'ru';
-//         i18n.setLanguage(nextLang);
-//     });
-// }
