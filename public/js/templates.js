@@ -145,7 +145,19 @@ function renderPromptTemplates() {
   PROMPT_TEMPLATES.forEach((tpl, idx) => {
     const card = document.createElement('div');
     card.className = 'template-item bg-purple-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-xl p-4 shadow flex flex-col gap-2';
+    let description = '';
+    if (tpl.title.includes('SEO')) description = 'SEO-описание: оптимизируйте для поисковых систем, добавьте ключевые слова.';
+    if (tpl.title.includes('Пост')) description = 'Пост для соцсетей: используйте engaging-стиль, добавьте CTA.';
+    if (tpl.title.includes('Изображение')) description = 'Генерация изображения: укажите стиль, детали, цветовую палитру.';
+    if (tpl.title.includes('Письмо')) description = 'Письмо: персонализируйте обращение, укажите цель.';
+    if (tpl.title.includes('Сценарий')) description = 'Сценарий: структурируйте, добавьте визуальные элементы.';
+    if (tpl.title.includes('Вакансия')) description = 'Вакансия: опишите обязанности, требования, условия.';
+    if (tpl.title.includes('Roadmap')) description = 'Roadmap: опишите этапы, сроки, приоритеты.';
+    if (tpl.title.includes('User Story')) description = 'User Story: роль, цель, ожидаемый результат.';
+    if (tpl.title.includes('Тест-кейсы')) description = 'Тест-кейсы: шаги, входные данные, ожидаемый результат.';
+    if (tpl.title.includes('Бизнес-план')) description = 'Бизнес-план: стратегия, цели, ресурсы.';
     card.innerHTML = `<div class="font-semibold text-purple-700 dark:text-purple-200 mb-2">${tpl.title}</div>
+      ${description ? `<div class='text-xs text-gray-500 dark:text-gray-400 mb-1'>${description}</div>` : ''}
       <textarea readonly class="w-full bg-transparent text-gray-700 dark:text-gray-200 text-sm resize-none outline-none" rows="3">${tpl.text}</textarea>
       <div class="flex gap-2 mt-2">
         <button class="copy-template-btn px-3 py-1 rounded-lg bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-all" data-idx="${idx}">Копировать</button>

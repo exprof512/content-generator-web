@@ -431,9 +431,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 MODEL_OPTIONS[agent] = (allModels[agent] || []).map(model => {
                     // Человеко-читабельные лейблы
                     let label = model;
-                    if (model === 'gpt-5-nano') label = 'GPT-5-nano';
-                    if (model === 'gpt-5-mini') label = 'GPT-5-mini';
                     if (model === 'gpt-5') label = 'GPT-5';
+                    if (model === 'gpt-5-mini') label = 'GPT-5-mini';
+                    if (model === 'gpt-5-nano') label = 'GPT-5-nano';
                     if (model === 'gemini-2.5-flash-lite') label = 'Gemini 2.5 Flash Lite';
                     if (model === 'gemini-2.5-flash') label = 'Gemini 2.5 Flash';
                     if (model === 'gemini-2.5-pro') label = 'Gemini 2.5 Pro';
@@ -457,9 +457,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // fallback: дефолтные модели
             MODEL_OPTIONS = {
         chatgpt: [
-            { value: 'gpt-5-nano', label: 'GPT-5-nano', available: true },
+            { value: 'gpt-5', label: 'GPT-5', available: true },
             { value: 'gpt-5-mini', label: 'GPT-5-mini', available: false },
-            { value: 'gpt-5', label: 'GPT-5', available: false }
+            { value: 'gpt-5-nano', label: 'GPT-5-nano', available: false }
         ],
         gemini: [
             { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', available: true },
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', available: false }
         ],
         deepseek: [
-            { value: 'deepseek-chat', label: 'DeepSeek Chat', available: false },
+            { value: 'deepseek-chat', label: 'DeepSeek Chat', available: true },
             { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner', available: false },
             { value: 'deepseek-coder', label: 'DeepSeek Coder', available: false }
         ],
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             } else {
                 // Заблокированная модель
-                li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm text-gray-400 cursor-not-allowed opacity-60" data-value="${opt.value}" disabled><span>${opt.label}</span><span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">PRO</span></button>`;
+                li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm text-gray-400 cursor-not-allowed opacity-60" data-value="${opt.value}"><span>${opt.label}</span><span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">PRO</span></button>`;
                 const button = li.querySelector('button');
                 button.addEventListener('click', () => {
                     showProModal();
@@ -852,15 +852,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newChatButton = document.getElementById('new-chat-button');
     if (newChatButton) {
         newChatButton.addEventListener('click', () => {
-            if (newChatButton) {
-        newChatButton.addEventListener('click', () => {
             window.currentChatId = generateChatId();
             sessionStorage.setItem('currentChatId', window.currentChatId);
             const chatMessages = document.getElementById('chat-messages');
-            if(chatMessages) chatMessages.innerHTML = '';
-        });
-    }
-            
+            if (chatMessages) {
+                chatMessages.innerHTML = '';
+            }
+            // При создании нового чата, также обновляем историю, чтобы убрать выделение
+            fetchAndRenderHistory();
         });
     }
 

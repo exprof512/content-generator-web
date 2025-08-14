@@ -79,7 +79,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/>
                                         </svg>
                                     </span>
-                                    <span id="model-dropdown-label">GPT-5-nano</span>
+                                    <span id="model-dropdown-label">GPT-5</span>
                                     <svg class="ml-auto w-3 h-3 text-pink-400 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
@@ -113,6 +113,15 @@
                 </button>
                 <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Шаблоны промптов</h2>
                 <div class="space-y-4 text-gray-700 dark:text-gray-200">
+                    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                        <b>Рекомендации:</b> Используйте шаблоны для ускорения работы с генерацией текстов, постов, писем, сценариев и изображений. Каждый шаблон можно вставить в чат одним кликом или скопировать для дальнейшего редактирования.
+                        <ul class="list-disc ml-6 mt-2">
+                            <li>Для соцсетей — используйте шаблоны с engaging-стилем и призывом к действию.</li>
+                            <li>Для SEO — шаблоны с ключевыми словами и описанием аудитории.</li>
+                            <li>Для изображений — указывайте стиль, детали и цветовую палитру.</li>
+                            <li>Для писем — персонализируйте обращение и цель письма.</li>
+                        </ul>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="prompt-templates-list">
                         <!-- Шаблоны будут подгружаться через JS -->
                     </div>
@@ -134,6 +143,57 @@
                     <div class="faq-item">
                         <b>Как пользоваться сервисом?</b>
                         <p>Выберите модель, введите запрос и нажмите "Генерировать". История чатов сохраняется автоматически.</p>
+                    </div>
+                    <div class="faq-item">
+                        <b>Модели и их возможности</b>
+                        <div class="relative">
+                            <button id="faq-models-toggle" class="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow focus:outline-none">Показать подробности</button>
+                            <div id="faq-models-menu" class="hidden absolute left-0 mt-2 w-full max-w-xl bg-white dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-xl shadow-xl z-50 p-6 animate__animated animate__fadeIn animate__faster">
+                                <div class="mb-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <img src="/img/chatgpt.svg" class="w-8 h-8" alt="ChatGPT">
+                                        <span class="font-bold text-purple-700 dark:text-purple-300">ChatGPT</span>
+                                    </div>
+                                    <ul class="list-disc ml-6 text-sm">
+                                        <li><b>GPT-5</b> — максимальная креативность и глубина, подходит для сложных задач и диалогов.</li>
+                                        <li><b>GPT-5-mini</b> — быстрые ответы, оптимально для коротких запросов.</li>
+                                        <li><b>GPT-5-nano</b> — экономичный режим, базовые генерации.</li>
+                                    </ul>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <img src="/img/gemini.svg" class="w-8 h-8" alt="Gemini">
+                                        <span class="font-bold text-pink-600 dark:text-pink-300">Gemini</span>
+                                    </div>
+                                    <ul class="list-disc ml-6 text-sm">
+                                        <li><b>Gemini 2.5 Flash Lite</b> — быстрые генерации, оптимально для чатов.</li>
+                                        <li><b>Gemini 2.5 Flash</b> — баланс скорости и качества, аналитика и идеи.</li>
+                                        <li><b>Gemini 2.5 Pro</b> — максимальная точность, сложные задачи, бизнес-аналитика.</li>
+                                    </ul>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <img src="/img/deepseek.svg" class="w-8 h-8" alt="DeepSeek">
+                                        <span class="font-bold text-gray-700 dark:text-gray-200">DeepSeek</span>
+                                    </div>
+                                    <ul class="list-disc ml-6 text-sm">
+                                        <li><b>DeepSeek Chat</b> — универсальный ассистент для диалогов.</li>
+                                        <li><b>DeepSeek Reasoner</b> — логика, рассуждения, решения задач.</li>
+                                        <li><b>DeepSeek Coder</b> — генерация и анализ кода.</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <img src="/img/dalle.svg" class="w-8 h-8" alt="DALL-E">
+                                        <span class="font-bold text-blue-700 dark:text-blue-300">DALL-E</span>
+                                    </div>
+                                    <ul class="list-disc ml-6 text-sm">
+                                        <li><b>DALL-E 2</b> — генерация изображений по описанию, базовые стили.</li>
+                                        <li><b>DALL-E 3</b> — продвинутые иллюстрации, детализация, художественные сцены.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="faq-item">
                         <b>Какие есть тарифы?</b>
