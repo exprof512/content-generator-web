@@ -4,7 +4,7 @@
         <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <a href="/" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">StarPromt AI</a>
             <nav class="hidden md:flex items-center gap-6 text-gray-600 dark:text-gray-300 font-medium">
-                <a href="#pricing" class="hover:text-purple-600 dark:hover:text-purple-400">Тарифы</a>
+                <a href="/pricing" class="hover:text-purple-600 dark:hover:text-purple-400">Тарифы</a>
             </nav>
             <div class="flex items-center gap-2">
                 <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
@@ -125,14 +125,19 @@
         <section id="tariffs" class="py-16 px-4 bg-gray-50 dark:bg-gray-900">
           <div class="max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">Тарифы</h2>
+            <div class="mb-8 text-center text-gray-700 dark:text-gray-300 text-base">
+                <b>Все тарифы дают доступ к топовым AI-моделям:</b> ChatGPT (GPT-5, mini, nano), Gemini (Flash, Pro), DeepSeek (Chat, Reasoner, Coder), DALL-E (2, 3).<br>
+                <span class="block mt-2">На бесплатном тарифе доступны базовые модели и лимит 10 текстовых и 3 изображений в день. PRO — 200 текстовых и 50 изображений в месяц, доступ ко всем моделям и приоритетная поддержка. MAX — безлимитные генерации, VIP-поддержка, все модели и функции платформы.</span>
+                <span class="block mt-2 text-sm text-purple-600 dark:text-purple-300">* Генерации — это любые запросы к AI: текст, изображение, код, аналитика.</span>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
               <!-- FREE -->
               <div class="rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8 flex flex-col items-center border-2 border-purple-200 dark:border-purple-700">
                 <h3 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">FREE</h3>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">0 ₽</div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
-                  <li>10 генераций в день</li>
-                  <li>Доступ ко всем моделям</li>
+                  <li>10 генераций в день (текст/изображение)</li>
+                  <li>Доступ к базовым моделям</li>
                   <li>Без привязки карты</li>
                 </ul>
                 <a href="/" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold shadow-lg hover:from-purple-700 hover:to-indigo-600 transition-all text-center">Начать бесплатно</a>
@@ -143,7 +148,7 @@
                 <h3 class="text-2xl font-bold mb-2 text-purple-700 dark:text-purple-300">PRO</h3>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">499 ₽<span class="text-base font-normal">/мес</span></div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
-                  <li>100 генераций в день</li>
+                  <li>200 текстовых + 50 изображений в месяц</li>
                   <li>Доступ ко всем моделям</li>
                   <li>Приоритетная поддержка</li>
                 </ul>
@@ -155,8 +160,8 @@
                 <h3 class="text-2xl font-bold mb-2 text-indigo-700 dark:text-indigo-300">MAX</h3>
                 <div class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">1999 ₽<span class="text-base font-normal">/мес</span></div>
                 <ul class="mb-6 text-gray-700 dark:text-gray-200 text-sm space-y-2">
-                  <li>Безлимитные генерации</li>
-                  <li>Доступ ко всем моделям</li>
+                  <li>Безлимитные генерации (текст/изображение/код)</li>
+                  <li>Доступ ко всем моделям и функциям платформы</li>
                   <li>VIP-поддержка</li>
                 </ul>
                 <a href="/pricing" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-all text-center mb-2">Оформить MAX</a>
