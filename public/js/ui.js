@@ -90,7 +90,23 @@ async function addMessageToChat(content, type, historyId = null, isLoader = fals
             try {
                 const imageBlob = await fetchImage(imageUrl);
                 const objectURL = URL.createObjectURL(imageBlob);
-                bubble.innerHTML = `<img src="${objectURL}" class="w-full h-auto rounded-lg">`;
+                
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'relative';
+
+                const image = document.createElement('img');
+                image.src = objectURL;
+                image.className = 'w-full h-auto rounded-lg';
+
+                const downloadButton = document.createElement('button');
+                downloadButton.className = 'absolute top-2 right-2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition';
+                downloadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>';
+                downloadButton.onclick = () => downloadImage(objectURL);
+                
+                imageContainer.appendChild(image);
+                imageContainer.appendChild(downloadButton);
+                bubble.appendChild(imageContainer);
+
             } catch (error) {
                 console.error('Failed to load image:', error);
                 bubble.innerHTML = 'Failed to load image.';
@@ -119,6 +135,15 @@ async function addMessageToChat(content, type, historyId = null, isLoader = fals
     chatMessages.appendChild(messageWrapper);
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function downloadImage(url) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'generated-image.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 function showLoaderAfterUserMessage() {
