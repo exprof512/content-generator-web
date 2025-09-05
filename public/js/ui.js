@@ -50,8 +50,6 @@ marked.setOptions({
     breaks: true,
 });
 
-
-
 function clearAppState() {
     const historyList = document.getElementById('history-list');
     if (historyList) {
@@ -79,58 +77,66 @@ async function addMessageToChat(content, type, historyId = null, isLoader = fals
     const messageWrapper = document.createElement('div');
     messageWrapper.className = `chat-message ${type}`;
 
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar-icon';
+
+    if (type === 'user') {
+        avatar.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-purple-200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-3.31 0-10 1.68-10 5v2h20v-2c0-3.32-6.69-5-10-5z"/></svg>`;
+    } else {
+        avatar.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8v4H4v8h4v4h8v-4h4V8h-4z"></path><path d="M8 12h8"></path><path d="M12 16v-4"></path></svg>`;
+    }
+
     const bubble = document.createElement('div');
     bubble.className = `message-bubble ${type}-bubble`;
 
     if (isLoader) {
         bubble.innerHTML = '<div class="loader"></div>';
-    } else {
-        if (content.startsWith('https://') && (content.includes('.png') || content.includes('.jpg') || content.includes('.jpeg'))) {
-            const imageUrl = `${window.API_BASE_URL}/api/images/${historyId}`;
-            try {
-                const imageBlob = await fetchImage(imageUrl);
-                const objectURL = URL.createObjectURL(imageBlob);
-                
-                const imageContainer = document.createElement('div');
-                imageContainer.className = 'relative';
+    } else if (type === 'ai' && content.startsWith('https://') && (content.includes('.png') || content.includes('.jpg') || content.includes('.jpeg'))) {
+        const imageUrl = `${window.API_BASE_URL}/api/images/${historyId}`;
+        try {
+            const imageBlob = await fetchImage(imageUrl);
+            const objectURL = URL.createObjectURL(imageBlob);
+            
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'relative';
 
-                const image = document.createElement('img');
-                image.src = objectURL;
-                image.className = 'w-full h-auto rounded-lg';
+            const image = document.createElement('img');
+            image.src = objectURL;
+            image.className = 'w-full h-auto rounded-lg';
 
-                const downloadButton = document.createElement('button');
-                downloadButton.className = 'absolute top-2 right-2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition';
-                downloadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>';
-                downloadButton.onclick = () => downloadImage(objectURL);
-                
-                imageContainer.appendChild(image);
-                imageContainer.appendChild(downloadButton);
-                bubble.appendChild(imageContainer);
+            const downloadButton = document.createElement('button');
+            downloadButton.className = 'absolute top-2 right-2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition';
+            downloadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>';
+            downloadButton.onclick = () => downloadImage(objectURL);
+            
+            imageContainer.appendChild(image);
+            imageContainer.appendChild(downloadButton);
+            bubble.appendChild(imageContainer);
 
-            } catch (error) {
-                console.error('Failed to load image:', error);
-                bubble.innerHTML = 'Failed to load image.';
-            }
-        } else {
-            bubble.innerHTML = marked.parse(content);
-            bubble.querySelectorAll('pre code').forEach((block) => {
-                const preElement = block.parentElement;
-                preElement.classList.add('code-block-wrapper');
-                const copyButton = document.createElement('button');
-                copyButton.className = 'copy-code-btn';
-                copyButton.textContent = 'Copy';
-                copyButton.onclick = () => {
-                    navigator.clipboard.writeText(block.textContent);
-                    copyButton.textContent = 'Copied!';
-                    setTimeout(() => {
-                        copyButton.textContent = 'Copy';
-                    }, 2000);
-                };
-                preElement.appendChild(copyButton);
-            });
+        } catch (error) {
+            console.error('Failed to load image:', error);
+            bubble.innerHTML = 'Failed to load image.';
         }
+    } else {
+        bubble.innerHTML = marked.parse(content);
+        bubble.querySelectorAll('pre code').forEach((block) => {
+            const preElement = block.parentElement;
+            preElement.classList.add('code-block-wrapper');
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-code-btn';
+            copyButton.textContent = 'Copy';
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(block.textContent);
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy';
+                }, 2000);
+            };
+            preElement.appendChild(copyButton);
+        });
     }
 
+    messageWrapper.appendChild(avatar);
     messageWrapper.appendChild(bubble);
     chatMessages.appendChild(messageWrapper);
 
@@ -153,10 +159,10 @@ function showLoaderAfterUserMessage() {
 function replaceLoaderWithAIResponse(aiContent, historyId = null) {
     const chatMessages = document.getElementById('chat-messages');
     const lastMessage = chatMessages.lastElementChild;
-    if (lastMessage) {
+    if (lastMessage && lastMessage.querySelector('.loader')) {
         lastMessage.remove();
-        addMessageToChat(aiContent, 'ai', historyId);
     }
+    addMessageToChat(aiContent, 'ai', historyId);
 }
 
 function showLoader() {

@@ -57,22 +57,33 @@ main#chat-container {
 }
 
 .chat-message {
-    @apply flex w-full my-2;
+    @apply flex w-full my-2 items-start gap-3;
 }
 
 .chat-message.user {
-    @apply justify-end;
+    @apply justify-end flex-row-reverse;
 }
 
 .chat-message.ai {
     @apply justify-start;
 }
 
+.avatar-icon {
+    @apply w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md;
+}
+
+.chat-message.user .avatar-icon {
+    @apply bg-purple-600;
+}
+
+.chat-message.ai .avatar-icon {
+    @apply bg-gray-200 dark:bg-gray-700;
+}
+
 .message-bubble {
-    @apply max-w-xl lg:max-w-2xl px-5 py-3 rounded-2xl relative shadow-lg text-base;
+    @apply max-w-full px-5 py-3 rounded-2xl relative shadow-lg text-base;
     overflow-wrap: break-word;
     word-break: break-word;
-    max-width: 100%;
     word-wrap: break-word;
 }
 
@@ -82,6 +93,39 @@ main#chat-container {
 
 .ai-bubble { 
     @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 leading-relaxed rounded-tl-none shadow-gray-200/50;
+}
+
+/* Formatting for AI responses */
+.message-bubble p {
+    @apply my-2;
+}
+
+.message-bubble ul, .message-bubble ol {
+    @apply my-2 pl-5;
+}
+
+.message-bubble li {
+    @apply my-1;
+}
+
+.message-bubble ul li {
+    list-style-type: disc;
+}
+
+.message-bubble ol li {
+    list-style-type: decimal;
+}
+
+.message-bubble a {
+    @apply text-purple-600 underline;
+}
+
+.message-bubble strong, .message-bubble b {
+    @apply font-bold;
+}
+
+.message-bubble em, .message-bubble i {
+    @apply italic;
 }
 
 /* Styling for code blocks inside AI bubbles */
@@ -116,7 +160,7 @@ main#chat-container {
 }
 
 .copy-code-btn {
-    @apply absolute top-2 right-2 p-1.5 text-xs bg-gray-600/50 text-white/70 rounded-md hover:bg-gray-500/70 transition-all opacity-0 group-hover:opacity-100;
+    @apply absolute top-2 right-2 p-2 text-xs bg-gray-600/50 text-white/70 rounded-md hover:bg-gray-500/70 transition-all opacity-0 group-hover:opacity-100;
 }
 
 select {
@@ -202,6 +246,7 @@ select option {
     overflow-y: auto;
     min-height: 0;
     scroll-behavior: smooth;
+    padding: 1rem;
 }
 
 #prompt-wrapper {
@@ -209,6 +254,7 @@ select option {
     bottom: 0;
     background: #fff;
     z-index: 10;
+    padding: 1rem;
 }
 
 .dark #prompt-wrapper {
@@ -219,4 +265,30 @@ body, html {
     height: 100%;
     min-height: 100%;
     overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    #chat-messages {
+        padding: 0.5rem;
+    }
+
+    #prompt-wrapper {
+        padding: 0.5rem;
+    }
+
+    .message-bubble {
+        max-width: 90%;
+    }
+
+    .avatar-icon {
+        @apply w-8 h-8;
+    }
+
+    .chat-message {
+        @apply gap-2;
+    }
+
+    .copy-code-btn {
+        @apply opacity-100;
+    }
 }
