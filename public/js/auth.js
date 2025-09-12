@@ -108,12 +108,41 @@ async function fetchUserData() {
 }
 
 function formatSubscriptionDate(expires, tariff) {
-    if (tariff === 'free' || !expires || new Date(expires) < new Date()) {
-        return { text: 'Нет активной подписки', isActive: false };
+    // Проверяем валидность даты
+    if (!expires || expires === '0001-01-01T00:00:00Z' || expires === '1970-01-01T00:00:00Z') {
+        if (tariff === 'free') {
+            return { text: 'Бесплатный период', isActive: false };
+        }
+        return { text: 'Без срока', isActive: false };
     }
+    
     const date = new Date(expires);
+    
+    // Проверяем, что дата валидна
+    if (isNaN(date.getTime()) || date.getFullYear() < 1900) {
+        if (tariff === 'free') {
+            return { text: 'Бесплатный период', isActive: false };
+        }
+        return { text: 'Без срока', isActive: false };
+    }
+    
+    const now = new Date();
+    const isActive = date > now;
+    
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return { text: 'до ' + date.toLocaleDateString('ru-RU', options), isActive: true };
+    const formattedDate = date.toLocaleDateString('ru-RU', options);
+    
+    if (tariff === 'free') {
+        return { 
+            text: isActive ? `до ${formattedDate}` : 'Период истек', 
+            isActive 
+        };
+    }
+    
+    return { 
+        text: isActive ? `до ${formattedDate}` : 'Подписка истекла', 
+        isActive 
+    };
 }
 
 async function handleEmailRegister(event) {

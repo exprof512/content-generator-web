@@ -81,10 +81,12 @@ main#chat-container {
 }
 
 .message-bubble {
-    @apply max-w-full px-5 py-3 rounded-2xl relative shadow-lg text-base;
+    @apply max-w-4xl px-5 py-3 rounded-2xl relative shadow-lg text-base;
     overflow-wrap: break-word;
     word-break: break-word;
     word-wrap: break-word;
+    min-width: 0;
+    flex-shrink: 1;
 }
 
 .user-bubble { 
@@ -131,15 +133,42 @@ main#chat-container {
 /* Styling for code blocks inside AI bubbles */
 .ai-bubble pre {
     @apply bg-gray-800 dark:bg-black/60 p-4 rounded-lg my-3 overflow-x-auto shadow-inner;
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 .ai-bubble code {
     font-family: 'Fira Code', 'Courier New', Courier, monospace;
     @apply text-sm text-green-300;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 .ai-bubble pre code {
     @apply text-white;
+}
+
+/* Улучшения для длинного текста */
+.message-bubble {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.message-bubble p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+}
+
+.message-bubble ul, .message-bubble ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.message-bubble li {
+    margin: 0.25rem 0;
+    line-height: 1.5;
 }
 
 /* History item actions */
@@ -236,17 +265,19 @@ select option {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
     min-height: 0;
-    overflow: auto;
+    overflow: hidden;
 }
 
 #chat-messages {
     flex: 1 1 auto;
     overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0;
     scroll-behavior: smooth;
     padding: 1rem;
+    -webkit-overflow-scrolling: touch;
 }
 
 #prompt-wrapper {
@@ -263,32 +294,93 @@ select option {
 
 body, html {
     height: 100%;
-    min-height: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#app-page {
+    height: 100vh;
+    min-height: 100vh;
     overflow: hidden;
 }
 
 @media (max-width: 768px) {
     #chat-messages {
         padding: 0.5rem;
+        height: calc(100vh - 140px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     #prompt-wrapper {
         padding: 0.5rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 20;
     }
 
     .message-bubble {
-        max-width: 90%;
+        max-width: 85%;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
 
     .avatar-icon {
-        @apply w-8 h-8;
+        @apply w-8 h-8 flex-shrink-0;
     }
 
     .chat-message {
         @apply gap-2;
+        align-items: flex-start;
     }
 
     .copy-code-btn {
         @apply opacity-100;
+    }
+
+    /* Улучшения для мобильного скролла */
+    #chat-container {
+        height: 100vh;
+        height: 100dvh; /* Для новых браузеров */
+        overflow: hidden;
+    }
+
+    /* Исправление для длинных кодовых блоков */
+    .ai-bubble pre {
+        overflow-x: auto;
+        max-width: 100%;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+    .ai-bubble code {
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+    /* Исправления для iOS Safari */
+    body {
+        -webkit-overflow-scrolling: touch;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+
+    #app-page {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+    }
+
+    /* Исправление для клавиатуры на мобильных */
+    @supports (-webkit-touch-callout: none) {
+        #chat-container {
+            height: -webkit-fill-available;
+        }
     }
 }

@@ -1,3 +1,18 @@
+// Инициализация темы до загрузки DOM для предотвращения мигания
+(function () {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Применяем тему немедленно
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+    } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', async () => {
     // --- DOM Elements ---
     const promptInput = document.getElementById('prompt-input');
@@ -73,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const toast = document.createElement('div');
         toast.className = `toast-notification fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
-        
+
         let bgColor, textColor, icon;
         switch (type) {
             case 'success':
@@ -107,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
 
         document.body.appendChild(toast);
-        
+
         // Animate in
         setTimeout(() => {
             toast.classList.remove('translate-x-full');
@@ -215,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         content.insertBefore(searchInput, content.firstChild);
 
         const searchField = searchInput.querySelector('input');
-        
+
         searchField.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
             // Ищем элементы после того, как они будут добавлены
@@ -328,10 +343,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const name = modal.querySelector('#template-name').value;
             const content = modal.querySelector('#template-content').value;
-            
+
             addUserTemplate(name, content);
             modal.remove();
-            
+
             // Обновляем список шаблонов сразу
             updateUserTemplatesList();
         });
@@ -388,15 +403,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const query = e.target.value.toLowerCase();
             // Ищем все возможные элементы истории
             const historyItems = historyList.querySelectorAll('.history-item, .chat-item, [data-chat-title], button, .flex, .p-2, .rounded-lg');
-            
+
             historyItems.forEach(item => {
                 // Пропускаем сам поиск и контейнеры
                 if (item.id === 'history-search' || item.classList.contains('p-2')) return;
-                
+
                 const text = item.textContent.toLowerCase();
                 const title = item.getAttribute('data-chat-title') || '';
                 const shouldShow = text.includes(query) || title.toLowerCase().includes(query);
-                
+
                 // Показываем/скрываем элемент
                 if (shouldShow) {
                     item.style.display = '';
@@ -420,11 +435,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await apiCall('/api/available-models', 'GET');
             userTariff = data.tariff || 'free';
             AVAILABLE_MODELS = data.available_models || {};
-            
+
             // Получаем полный список моделей и информацию о доступности
             const allModels = data.all_models || {};
             const modelsInfo = data.models_info || {};
-            
+
             // Преобразуем в формат для выпадающего списка
             MODEL_OPTIONS = {};
             Object.keys(allModels).forEach(agent => {
@@ -442,12 +457,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (model === 'deepseek-coder') label = 'DeepSeek Coder';
                     if (model === 'dall-e-2') label = 'DALL-E 2';
                     if (model === 'dall-e-3') label = 'DALL-E 3';
-                    
+
                     // Проверяем доступность модели
                     const isAvailable = modelsInfo[agent] && modelsInfo[agent][model];
-                    
-                    return { 
-                        value: model, 
+
+                    return {
+                        value: model,
                         label,
                         available: isAvailable
                     };
@@ -456,26 +471,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
             // fallback: дефолтные модели
             MODEL_OPTIONS = {
-        chatgpt: [
-            { value: 'gpt-5', label: 'GPT-5', available: true },
-            { value: 'gpt-5-mini', label: 'GPT-5-mini', available: false },
-            { value: 'gpt-5-nano', label: 'GPT-5-nano', available: false }
-        ],
-        gemini: [
-            { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', available: true },
-            { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', available: false },
-            { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', available: false }
-        ],
-        deepseek: [
-            { value: 'deepseek-chat', label: 'DeepSeek Chat', available: true },
-            { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner', available: false },
-            { value: 'deepseek-coder', label: 'DeepSeek Coder', available: false }
-        ],
-        dalle: [
-            { value: 'dall-e-2', label: 'DALL-E 2', available: true },
-            { value: 'dall-e-3', label: 'DALL-E 3', available: false }
-        ]
-    };
+                chatgpt: [
+                    { value: 'gpt-5', label: 'GPT-5', available: true },
+                    { value: 'gpt-5-mini', label: 'GPT-5-mini', available: false },
+                    { value: 'gpt-5-nano', label: 'GPT-5-nano', available: false }
+                ],
+                gemini: [
+                    { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', available: true },
+                    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', available: false },
+                    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', available: false }
+                ],
+                deepseek: [
+                    { value: 'deepseek-chat', label: 'DeepSeek Chat', available: true },
+                    { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner', available: false },
+                    { value: 'deepseek-coder', label: 'DeepSeek Coder', available: false }
+                ],
+                dalle: [
+                    { value: 'dall-e-2', label: 'DALL-E 2', available: true },
+                    { value: 'dall-e-3', label: 'DALL-E 3', available: false }
+                ]
+            };
         }
     }
 
@@ -526,7 +541,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- Обновление тарифа пользователя после оплаты ---
-    window.updateUserTariff = async function() {
+    window.updateUserTariff = async function () {
         await fetchUserTariff();
         await fetchAvailableModels();
         renderModelDropdown(selectedAgent);
@@ -539,21 +554,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!modelDropdownList || !modelDropdownLabel) return;
         modelDropdownList.innerHTML = '';
         const options = MODEL_OPTIONS[agentKey] || [];
-        
+
         if (!options.length) {
             selectedModel = null;
             if (modelDropdownLabel) modelDropdownLabel.textContent = 'Нет доступных моделей';
             if (generateButton) generateButton.disabled = true;
             return;
         }
-        
+
         // Находим первую доступную модель для выбора по умолчанию
         let firstAvailableModel = null;
         let firstModel = null;
-        
+
         options.forEach(opt => {
             const li = document.createElement('div');
-            
+
             if (opt.available) {
                 // Доступная модель
                 li.innerHTML = `<button type="button" class="dropdown-item flex items-center justify-between w-full px-4 py-2 text-sm hover:bg-pink-50 dark:hover:bg-gray-700" data-value="${opt.value}"><span>${opt.label}</span></button>`;
@@ -563,7 +578,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (modelDropdownLabel) modelDropdownLabel.textContent = opt.label;
                     if (modelDropdownMenu) modelDropdownMenu.style.display = 'none';
                 });
-                
+
                 // Запоминаем первую доступную модель
                 if (firstAvailableModel === null) {
                     firstAvailableModel = opt.value;
@@ -577,15 +592,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (modelDropdownMenu) modelDropdownMenu.style.display = 'none';
                 });
             }
-            
+
             // Запоминаем первую модель (любую) для fallback
             if (firstModel === null) {
                 firstModel = opt.value;
             }
-            
+
             modelDropdownList.appendChild(li);
         });
-        
+
         // Выбираем первую доступную модель по умолчанию, или первую модель если нет доступных
         if (firstAvailableModel) {
             selectedModel = firstAvailableModel;
@@ -600,7 +615,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectedModel = null;
             if (modelDropdownLabel) modelDropdownLabel.textContent = 'Нет доступных моделей';
         }
-        
+
         if (generateButton) generateButton.disabled = !selectedModel;
     }
 
@@ -665,29 +680,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         spinner.style.display = 'inline-block';
     }
-    
+
     // Генерация названия чата на основе промпта (как в ChatGPT)
     function generateChatTitle(prompt) {
         // Очищаем промпт от лишних символов
         let title = prompt.trim();
-        
+
         // Убираем лишние пробелы и переносы строк
         title = title.replace(/\s+/g, ' ');
-        
+
         // Ограничиваем длину (как в ChatGPT - примерно 50 символов)
         if (title.length > 50) {
             title = title.substring(0, 47) + '...';
         }
-        
+
         // Если промпт пустой или слишком короткий, используем дефолтное название
         if (title.length < 3) {
             const now = new Date();
             title = `Чат от ${now.toLocaleDateString('ru-RU')}`;
         }
-        
+
         return title;
     }
-    
+
     function hideMiniSpinner() {
         const spinner = document.getElementById('mini-spinner');
         if (spinner) spinner.style.display = 'none';
@@ -721,7 +736,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         addMessageToChat(prompt, 'user');
         showLoaderAfterUserMessage();
-        
+
 
         currentAbortController = new AbortController();
 
@@ -791,7 +806,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (promptInput && generateButton) {
             const hasText = promptInput.value.trim() !== '';
             generateButton.disabled = !hasText;
-            
+
             // Визуальная обратная связь
             if (hasText) {
                 generateButton.classList.remove('opacity-50');
@@ -962,7 +977,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const user = await apiCall('/api/me');
             const subscription = await apiCall('/api/subscription/check');
-            
+
             if (profileButton) {
                 if (user.avatar_url) {
                     profileButton.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" class="w-full h-full object-cover rounded-full">`;
@@ -970,15 +985,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     profileButton.textContent = user.name ? user.name.charAt(0).toUpperCase() : 'П';
                 }
             }
-            
+
             // dropdown
             if (!accountDropdown) {
                 accountDropdown = document.createElement('div');
                 accountDropdown.id = 'account-dropdown';
-                
+
                 // Создаем dropdown с правильными стилями
                 accountDropdown.className = 'hidden absolute bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 rounded-xl p-1 animate__animated animate__fadeIn animate__faster z-50';
-                
+
                 // Десктоп: справа сверху, фиксированная ширина
                 accountDropdown.style.cssText = `
                     position: absolute;
@@ -993,7 +1008,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     overflow-y: auto;
                     max-height: 80vh;
                 `;
-                
+
                 // Мобильная версия: снизу
                 if (window.innerWidth < 768) {
                     accountDropdown.style.cssText = `
@@ -1011,19 +1026,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                         max-height: 80vh;
                     `;
                 }
-                
+
                 profileButton.parentNode.appendChild(accountDropdown);
             }
-            
+
             // Обновляем позицию dropdown
             updateDropdownPosition();
-            
+
             // Подготавливаем данные для счетчиков
             let generationsText = '';
             let generationsImage = '';
             let generationsDisplay = '';
             let expiresDisplay = '';
-            
+
             if (user.tariff === 'free') {
                 const textLimit = subscription.limits?.text_gen_limit || 0;
                 const imageLimit = subscription.limits?.image_gen_limit || 0;
@@ -1048,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 generationsImage = '';
                 expiresDisplay = user.subscription_expires ? new Date(user.subscription_expires).toLocaleDateString('ru-RU') : '';
             }
-            
+
             accountDropdown.innerHTML = `
                 <div class="p-3">
                     <div class="flex items-center gap-4 mb-3">
@@ -1199,8 +1214,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     document.getElementById('hero-cta-btn-2')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('show-auth-modal-btn')?.click();
+        e.preventDefault();
+        document.getElementById('show-auth-modal-btn')?.click();
     });
 
     // --- Initial Setup ---
@@ -1211,23 +1226,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateSendButton();
 
     // --- Dark Mode ---
-    window.toggleDarkMode = function() {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Обновляем переключатель если он уже существует
+        const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
             themeToggle.checked = document.documentElement.classList.contains('dark');
         }
     }
-    if (localStorage.getItem('theme') === 'dark') {
-        document.documentElement.classList.add('dark');
+
+    window.toggleDarkMode = function () {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+        // Обновляем переключатель
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.checked = isDark;
+        }
+
+        // Принудительно обновляем стили
+        document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 300);
     }
+
+    // Инициализация темы должна происходить раньше
+    initializeTheme();
 
     // После авторизации и показа app-page — инициализируем меню моделей
     await fetchAvailableModels();
     await fetchUserTariff();
     renderModelDropdown(selectedAgent);
     if (modelDropdownLabel) modelDropdownLabel.textContent = (MODEL_OPTIONS[selectedAgent]?.[0]?.label) || '';
-    
+
     // Обновляем состояние кнопки после загрузки моделей
     updateGenerateButtonState();
 
@@ -1237,7 +1279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const googleAcceptRegister = document.getElementById('google-accept-register');
     // --- Google Auth: абсолютные переходы на backend ---
     if (googleAuthLinkLogin) {
-        googleAuthLinkLogin.addEventListener('click', function(e) {
+        googleAuthLinkLogin.addEventListener('click', function (e) {
             e.preventDefault();
             let baseUrl = window.API_BASE_URL || '';
             if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
@@ -1245,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     if (googleAuthLinkRegister && googleAcceptRegister) {
-        googleAuthLinkRegister.addEventListener('click', function(e) {
+        googleAuthLinkRegister.addEventListener('click', function (e) {
             if (!googleAcceptRegister.checked) {
                 e.preventDefault();
                 googleAcceptRegister.focus();
@@ -1259,14 +1301,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = baseUrl + '/auth/google/login?register=1';
         });
     }
-    
+
 
     // --- FAQ/modal open/close logic ---
     function openFAQModal() {
-      document.getElementById('faq-modal').classList.remove('hidden');
+        document.getElementById('faq-modal').classList.remove('hidden');
     }
     function closeFAQModal() {
-      document.getElementById('faq-modal').classList.add('hidden');
+        document.getElementById('faq-modal').classList.add('hidden');
     }
     function openTemplatesModal() {
         document.getElementById('prompt-templates-modal').classList.remove('hidden');
@@ -1277,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 200);
     }
     function closeTemplatesModal() {
-      document.getElementById('prompt-templates-modal').classList.add('hidden');
+        document.getElementById('prompt-templates-modal').classList.add('hidden');
     }
 
     // Обработчики для кнопок закрытия модальных окон
@@ -1288,7 +1330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('click', (e) => {
         const target = e.target.closest('[data-action]');
         if (!target) return;
-        
+
         const action = target.getAttribute('data-action');
         if (action === 'show-faq') {
             openFAQModal();
@@ -1299,16 +1341,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Закрытие модальных окон по клику вне их области
     window.addEventListener('mousedown', (e) => {
-      const faqModal = document.getElementById('faq-modal');
-      if (faqModal && !faqModal.classList.contains('hidden')) {
-        const inner = faqModal.children[0];
-        if (inner && !inner.contains(e.target)) closeFAQModal();
-      }
-      const tplModal = document.getElementById('prompt-templates-modal');
-      if (tplModal && !tplModal.classList.contains('hidden')) {
-        const inner = tplModal.children[0];
-        if (inner && !inner.contains(e.target)) closeTemplatesModal();
-      }
+        const faqModal = document.getElementById('faq-modal');
+        if (faqModal && !faqModal.classList.contains('hidden')) {
+            const inner = faqModal.children[0];
+            if (inner && !inner.contains(e.target)) closeFAQModal();
+        }
+        const tplModal = document.getElementById('prompt-templates-modal');
+        if (tplModal && !tplModal.classList.contains('hidden')) {
+            const inner = tplModal.children[0];
+            if (inner && !inner.contains(e.target)) closeTemplatesModal();
+        }
     });
 
     // --- Initialize History Search ---
@@ -1318,10 +1360,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add swipe to close for mobile history panel
     let startX = null;
     if (historyPanel) {
-        historyPanel.addEventListener('touchstart', function(e) {
+        historyPanel.addEventListener('touchstart', function (e) {
             startX = e.touches[0].clientX;
         });
-        historyPanel.addEventListener('touchend', function(e) {
+        historyPanel.addEventListener('touchend', function (e) {
             if (startX !== null) {
                 const endX = e.changedTouches[0].clientX;
                 if (startX - endX > 60) {
@@ -1396,3 +1438,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     // // Например, после addMessageToChat или после загрузки истории чата
     // // window.scrollChatToBottom = scrollChatToBottom;
 });
+// ---Функция переключения темы-- -
+    function toggleDarkMode() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+
+        if (isDark) {
+            // Переключаем на светлую тему
+            html.classList.remove('dark');
+            html.style.colorScheme = 'light';
+            localStorage.setItem('theme', 'light');
+        } else {
+            // Переключаем на темную тему
+            html.classList.add('dark');
+            html.style.colorScheme = 'dark';
+            localStorage.setItem('theme', 'dark');
+        }
+
+        // Обновляем иконку темы
+        updateThemeIcon();
+    }
+
+// --- Обновление иконки темы ---
+function updateThemeIcon() {
+    const themeIconLanding = document.getElementById('theme-icon-landing');
+    const themeIconApp = document.getElementById('theme-icon-app');
+    const isDark = document.documentElement.classList.contains('dark');
+
+    const lightIcon = '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>';
+    const darkIcon = '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>';
+
+    if (themeIconLanding) {
+        themeIconLanding.innerHTML = isDark ? lightIcon : darkIcon;
+    }
+    if (themeIconApp) {
+        themeIconApp.innerHTML = isDark ? lightIcon : darkIcon;
+    }
+}
+
+// --- Инициализация темы при загрузке ---
+document.addEventListener('DOMContentLoaded', () => {
+    updateThemeIcon();
+});
+
+// --- Глобальная функция для использования в HTML ---
+window.toggleDarkMode = toggleDarkMode;

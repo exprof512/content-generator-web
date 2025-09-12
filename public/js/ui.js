@@ -140,7 +140,13 @@ async function addMessageToChat(content, type, historyId = null, isLoader = fals
     messageWrapper.appendChild(bubble);
     chatMessages.appendChild(messageWrapper);
 
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Улучшенный скролл с задержкой для рендеринга
+    setTimeout(() => {
+        chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: 'smooth'
+        });
+    }, 100);
 }
 
 function downloadImage(url) {

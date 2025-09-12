@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware to pass environment variables to all rendered templates
 app.use((req, res, next) => {
-    res.locals.API_BASE_URL = process.env.API_BASE_URL;
+    res.locals.API_BASE_URL = process.env.API_BASE_URL || process.env.API_URL || 'http://localhost:8080';
     res.locals.CLOUDPAYMENTS_PUBLIC_ID = process.env.CLOUDPAYMENTS_PUBLIC_ID;
     next();
 });
@@ -71,5 +71,7 @@ app.get('/auth/callback.html', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Frontend server is running on http://localhost:${port}`);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`Frontend server is running on http://localhost:${port}`);
+    }
 });
